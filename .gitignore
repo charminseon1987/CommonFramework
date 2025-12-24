@@ -18,3 +18,15 @@ mendixProject
 **/screenshot-results
 **/tests/testProject
 **/artifacts
+
+
+# Custom Widget 빌드 파일 제외
+**/node_modules/
+**/dist/
+**/package-lock.json
+**/typings/
+**/cypress/
+**/.mpk/
+
+# MPK 파일은 포함 (빌드된 위젯)
+!**/*.mpk
