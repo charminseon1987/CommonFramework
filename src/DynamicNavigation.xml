@@ -6,12 +6,263 @@
     <name>Dynamic Navigation</name>
     <description>SBTGlobal Dynamic Navigation Widget with Role-based Access Control</description>
     <icon/>
-    <properties>
-        <propertyGroup caption="General">
+     <properties>
+        <!-- <propertyGroup caption="General">
             <property key="sampleText" type="string" required="false">
                 <caption>Default value</caption>
                 <description>Sample text input</description>
             </property>
+        </propertyGroup> -->
+
+            <!-- 데이터 소스 -->
+        <propertyGroup caption="Data Source">
+            <property key="menuDataSource" type="datasource" isList="true" required="true">
+                <caption>Menu Data Source</caption>
+                <description>List of menu items from microflow</description>
+            </property>
+            
+            <property key="currentUser" type="object" isList="true" required="false">
+                <caption>Current User</caption>
+                <description>Current logged-in user object</description>
+                <properties />
+            </property>
+            
+            <!-- Menu Attributes -->
+            <property key="menuId" type="attribute" dataSource="menuDataSource" required="true">
+                <caption>Menu ID</caption>
+                <description>Menu identifier (MenuId)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="menuName" type="attribute" dataSource="menuDataSource" required="true">
+                <caption>Menu Name</caption>
+                <description>Display name of menu (MenuName)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="menuDepth" type="attribute" dataSource="menuDataSource" required="true">
+                <caption>Menu Depth</caption>
+                <description>Hierarchy depth (Depth)</description>
+                <attributeTypes>
+                    <attributeType name="Integer"/>
+                    <attributeType name="Long"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="parentMenuId" type="attribute" dataSource="menuDataSource" required="true">
+                <caption>Parent Menu ID</caption>
+                <description>Parent menu identifier (ParentId)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="sortNo" type="attribute" dataSource="menuDataSource" required="true">
+                <caption>Sort Order</caption>
+                <description>Menu sort order (SortNo)</description>
+                <attributeTypes>
+                    <attributeType name="Integer"/>
+                    <attributeType name="Long"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="leftNo" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Left Number</caption>
+                <description>Nested set left value (LeftNo)</description>
+                <attributeTypes>
+                    <attributeType name="Integer"/>
+                    <attributeType name="Long"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="rightNo" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Right Number</caption>
+                <description>Nested set right value (RightNo)</description>
+                <attributeTypes>
+                    <attributeType name="Integer"/>
+                    <attributeType name="Long"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="displayYn" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Display Flag</caption>
+                <description>Menu visibility flag (DisplayYn)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="enabledTF" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Enabled</caption>
+                <description>Menu enabled status (EnabledTF)</description>
+                <attributeTypes>
+                    <attributeType name="Boolean"/>
+                </attributeTypes>
+            </property>
+            
+            <!-- Resource Attributes (from Association) -->
+            <property key="resourceName" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Resource Name</caption>
+                <description>Resource name from resource (SyMenu_SyResource/ResourceName)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="resourceType" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Resource Type</caption>
+                <description>Resource type from resource (SyMenu_SyResource/ResourceType)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="pageURL" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Page URL</caption>
+                <description>Page URL for navigation (SyMenu_SyResource/PageURL)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="iconClass" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Icon Class</caption>
+                <description>Icon class from resource (SyMenu_SyResource/IconClass)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            
+            <property key="resourceEnabledTF" type="attribute" dataSource="menuDataSource" required="false">
+                <caption>Resource Enabled</caption>
+                <description>Resource enabled status from resource (SyMenu_SyResource/EnabledTF)</description>
+                <attributeTypes>
+                    <attributeType name="Boolean"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+
+         <!-- Layout Configuration -->
+        <propertyGroup caption="Layout">
+            <property key="layout" type="enumeration" defaultValue="vertical">
+                <caption>Navigation Layout</caption>
+                <description>Choose navigation layout style</description>
+                <enumerationValues>
+                    <enumerationValue key="vertical">Vertical (Sidebar)</enumerationValue>
+                    <enumerationValue key="horizontal">Horizontal (Topbar)</enumerationValue>
+                    <enumerationValue key="topbar_fullwidth">Horizontal (Topbar Fullwidth)</enumerationValue>
+                </enumerationValues>
+            </property>
+        
+            
+            <property key="sidebarWidth" type="string" defaultValue="260px">
+                <caption>Sidebar Width</caption>
+                <description>Width of sidebar (e.g., 260px, 20%)</description>
+            </property>
+            
+            <property key="topbarHeight" type="string" defaultValue="60px">
+                <caption>Topbar Height</caption>
+                <description>Height of topbar (e.g., 60px)</description>
+            </property>
+            
+            <property key="collapsible" type="boolean" defaultValue="true">
+                <caption>Collapsible</caption>
+                <description>Allow sidebar to collapse</description>
+            </property>
+        </propertyGroup>
+        
+        <!-- Behavior -->
+        <propertyGroup caption="Behavior">
+            <property key="onMenuClick" type="action" required="true">
+                <caption>On Menu Click</caption>
+                <description>Action when menu item is clicked</description>
+            </property>
+            
+            <property key="onAuthFailed" type="action" required="false">
+                <caption>On Authorization Failed</caption>
+                <description>Action when user lacks permission</description>
+            </property>
+            
+            <property key="expandedByDefault" type="boolean" defaultValue="false">
+                <caption>Expanded by Default</caption>
+                <description>Expand all menus on load</description>
+            </property>
+            
+            <property key="autoExpandActivePath" type="boolean" defaultValue="true">
+                <caption>Auto Expand Active Path</caption>
+                <description>Automatically expand path to active menu</description>
+            </property>
+            
+            <property key="maxDepth" type="integer" defaultValue="2">
+                <caption>Max Depth</caption>
+                <description>Maximum menu depth (0-2 for 3 levels)</description>
+            </property>
+            
+            <property key="enableDynamicAuth" type="boolean" defaultValue="false">
+                <caption>Enable Dynamic Authorization</caption>
+                <description>Check permissions dynamically</description>
+            </property>
+        </propertyGroup>
+        
+        <!-- Appearance -->
+        <propertyGroup caption="Appearance">
+            <property key="themeColor" type="string" defaultValue="#1890ff">
+                <caption>Theme Color</caption>
+                <description>Primary color for active states</description>
+            </property>
+            
+            <property key="showDepthIndicator" type="boolean" defaultValue="false">
+                <caption>Show Depth Indicator</caption>
+                <description>Display depth level (for debugging)</description>
+            </property>
+            
+            <property key="animationDuration" type="integer" defaultValue="300">
+                <caption>Animation Duration</caption>
+                <description>Duration of animations in milliseconds</description>
+            </property>
+            
+            <property key="customClass" type="string" required="false">
+                <caption>Custom CSS Class</caption>
+                <description>Additional CSS class for styling</description>
+            </property>
+        </propertyGroup>
+        
+        <!-- Advanced -->
+        <propertyGroup caption="Advanced">
+            <property key="enableKeyboardNav" type="boolean" defaultValue="true">
+                <caption>Enable Keyboard Navigation</caption>
+                <description>Support keyboard shortcuts</description>
+            </property>
+            
+            <property key="cacheDuration" type="integer" defaultValue="300000">
+                <caption>Cache Duration (ms)</caption>
+                <description>Menu cache duration (default: 5 minutes)</description>
+            </property>
+            
+            <property key="debugMode" type="boolean" defaultValue="false">
+                <caption>Debug Mode</caption>
+                <description>Enable debug logging</description>
+            </property>
         </propertyGroup>
     </properties>
 </widget>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
