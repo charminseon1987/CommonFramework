@@ -2,7 +2,7 @@
 
 import { ReactElement, createElement } from "react";
 import classNames from "classnames";
-import { MenuTreeNode } from "../types/menu.types";
+import { MenuTreeNode } from "../../types/menu.types";
 
 
 interface HorizontalMenuItemProps {

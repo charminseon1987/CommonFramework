@@ -2,7 +2,7 @@
 
 import { ReactElement, createElement } from 'react';
 import { MenuItem } from './MenuItem';
-import { MenuTreeNode } from './types/menu.types';
+import { MenuTreeNode } from '../types/menu.types';
 
 interface NavigationMenuProps {
   menuItems: MenuTreeNode[];

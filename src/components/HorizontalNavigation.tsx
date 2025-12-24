@@ -2,7 +2,7 @@
 
 import { ReactElement, createElement, useState, useCallback } from "react";
 import classNames from "classnames";
-import { MenuTreeNode } from "./types/menu.types";
+import { MenuTreeNode } from "../types/menu.types";
 import { HorizontalMenuItem } from "./Horizontal/HorizontalMenuItem";
 import "../ui/HorizontalNavigation.scss";
 
