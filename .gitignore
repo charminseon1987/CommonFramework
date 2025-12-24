@@ -21,6 +21,7 @@ mendixProject
 
 
 # Custom Widget 빌드 파일 제외
+
 **/node_modules/
 **/dist/
 **/package-lock.json
@@ -30,3 +31,24 @@ mendixProject
 
 # MPK 파일은 포함 (빌드된 위젯)
 !**/*.mpk
+
+
+
+# Mendix 프로젝트 파일
+deployment/
+*.lock
+*.bak
+
+# CustomWidget 빌드 파일만 제외 (소스는 포함)
+CustomWidget/**/node_modules/
+CustomWidget/**/dist/
+CustomWidget/**/package-lock.json
+CustomWidget/**/typings/
+CustomWidget/**/cypress/
+
+# 빌드된 MPK는 포함
+!CustomWidget/**/*.mpk
+
+# Mendix 프로젝트의 widgets 폴더에 있는 MPK는 포함
+!**/widgets/*.mpk
+
