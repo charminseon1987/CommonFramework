@@ -7,9 +7,9 @@ import { DynamicNavigationContainerProps } from "./components/types/widget.types
 import { NavigationMenu } from "./components/NavigationMenu";
 import { HorizontalNavigationMenu } from "./components/Horizontal/HorizontalNavigationMenu";
 import { MenuItemData, NavigationState } from "./components/types/menu.types";
-import { buildMenuTree, toggleMenuExpand, 
-    expandAllMenus, getExpandedMenuIds, 
-    saveExpandedMenuIds, restoreMenuExpansion, 
+import { buildMenuTree, toggleMenuExpand, toggleDepth0MenuExpand,
+    expandAllMenus, getExpandedMenuIds,
+    saveExpandedMenuIds, restoreMenuExpansion,
     loadExpandedMenuIds, saveActiveMenuId, loadActiveMenuId } from "./components/utils/menuHelpers";
 
 
@@ -225,29 +225,38 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const handleHorizontalMenuClick = useCallback((
         menuId: string,
         pageURL: string | undefined,
-        hasChildren: boolean,
+        _hasChildren: boolean,
         depth: number
     ) => {
-        // 마지막 depth에서 페이지 이동 시 모든 메뉴 접기
-        // depth는 0부터 시작하므로, depth === maxDepth - 1이거나 자식이 없는 경우가 마지막 depth
-        const isLastDepth = depth >= props.maxDepth - 1 || !hasChildren;
-        
+        console.log('=== handleHorizontalMenuClick ===');
+        console.log('menuId:', menuId);
+        console.log('pageURL:', pageURL);
+        console.log('hasChildren:', _hasChildren);
+        console.log('depth:', depth);
+
+        // depth 1(두 번째 레벨)에서는 절대 메뉴를 닫지 않음
+        // depth 2 이상에서만 메뉴 접기
+        const shouldCloseMenu = depth >= 2;
+        console.log('shouldCloseMenu:', shouldCloseMenu);
+
         // 페이지 이동 전에 현재 확장 상태와 활성 메뉴를 localStorage에 저장
         setState(prev => {
-            // 현재 확장 상태 저장
-            const expandedIds = getExpandedMenuIds(prev.menuTree);
-            saveExpandedMenuIds(expandedIds);
-            
             // 활성 메뉴 ID 저장
             saveActiveMenuId(menuId);
-            
-            // 마지막 depth에서 페이지 이동 시 모든 메뉴 접기
+
+            // depth 2 이상에서 페이지 이동 시에만 모든 메뉴 접기
             let newTree = prev.menuTree;
-            if (isLastDepth && pageURL) {
+            if (shouldCloseMenu && pageURL) {
+                console.log('🔴 메뉴 닫기 실행 (depth >= 2 && pageURL 있음)');
                 newTree = expandAllMenus(prev.menuTree, false);
                 saveExpandedMenuIds([]);
+            } else {
+                console.log('🟢 메뉴 상태 유지 (depth < 2 또는 pageURL 없음)');
+                // depth 1 이하에서는 현재 확장 상태 유지
+                const expandedIds = getExpandedMenuIds(prev.menuTree);
+                saveExpandedMenuIds(expandedIds);
             }
-            
+
             return {
                 ...prev,
                 activeMenuId: menuId,
@@ -317,7 +326,26 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             // 확장 상태를 localStorage에 저장
             const expandedIds = getExpandedMenuIds(newTree);
             saveExpandedMenuIds(expandedIds);
-            
+
+            return {
+                ...prev,
+                menuTree: newTree
+            };
+        });
+    }, [props.debugMode]);
+
+    // Horizontal 레이아웃 전용: Depth 0 메뉴 토글 (다른 depth 0 메뉴 자동으로 닫기)
+    const handleToggleExpandHorizontal = useCallback((menuId: string) => {
+        console.log('=== handleToggleExpandHorizontal ===');
+        console.log('토글할 menuId:', menuId);
+
+        setState(prev => {
+            const newTree = toggleDepth0MenuExpand(prev.menuTree, menuId);
+            // 확장 상태를 localStorage에 저장
+            const expandedIds = getExpandedMenuIds(newTree);
+            console.log('확장된 메뉴 IDs:', expandedIds);
+            saveExpandedMenuIds(expandedIds);
+
             return {
                 ...prev,
                 menuTree: newTree
@@ -604,7 +632,8 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                                 menuItems={state.menuTree}
                                 activeMenuId={state.activeMenuId}
                                 onHorizontalMenuClick={handleHorizontalMenuClick}
-                                onToggleExpand={handleToggleExpand}
+                                onToggleExpand={handleToggleExpandHorizontal}
+                                onToggleExpandNormal={handleToggleExpand}
                                 depth={0}
                                 maxDepth={props.maxDepth}
                                 showDepthIndicator={props.showDepthIndicator}
@@ -660,7 +689,8 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                                 menuItems={state.menuTree}
                                 activeMenuId={state.activeMenuId}
                                 onHorizontalMenuClick={handleHorizontalMenuClick}
-                                onToggleExpand={handleToggleExpand}
+                                onToggleExpand={handleToggleExpandHorizontal}
+                                onToggleExpandNormal={handleToggleExpand}
                                 depth={0}
                                 maxDepth={props.maxDepth}
                                 showDepthIndicator={props.showDepthIndicator}

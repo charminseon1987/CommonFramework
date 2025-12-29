@@ -99,6 +99,31 @@ export const toggleMenuExpand = (
 };
 
 /**
+ * Depth 0 메뉴의 확장 상태 토글 (다른 depth 0 메뉴는 자동으로 닫기)
+ * Horizontal 레이아웃에서 사용
+ */
+export const toggleDepth0MenuExpand = (
+  tree: MenuTreeNode[],
+  menuId: string
+): MenuTreeNode[] => {
+  return tree.map(item => {
+    if (item.menuId === menuId) {
+      // 클릭한 메뉴는 토글
+      return { ...item, isExpanded: !item.isExpanded };
+    } else {
+      // 다른 depth 0 메뉴는 닫기
+      return {
+        ...item,
+        isExpanded: false,
+        children: item.children.length > 0
+          ? expandAllMenus(item.children, false) // 하위 메뉴도 모두 닫기
+          : []
+      };
+    }
+  });
+};
+
+/**
  * 모든 메뉴 확장/축소
  */
 export const expandAllMenus = (

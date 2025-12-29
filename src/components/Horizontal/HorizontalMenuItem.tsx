@@ -11,6 +11,7 @@ interface HorizontalMenuItemProps {
   activeMenuId: string | null;
   onHorizontalMenuClick: (menuId: string, pageURL: string | undefined, hasChildren: boolean, depth: number) => void;
   onToggleExpand: (menuId: string) => void;
+  onToggleExpandNormal?: (menuId: string) => void;
   depth: number;
   maxDepth: number;
   showDepthIndicator: boolean;
@@ -23,6 +24,7 @@ export function HorizontalMenuItem({
   activeMenuId,
   onHorizontalMenuClick,
   onToggleExpand,
+  onToggleExpandNormal,
   depth,
   maxDepth,
   showDepthIndicator,
@@ -43,7 +45,13 @@ export function HorizontalMenuItem({
     e.preventDefault();
     e.stopPropagation();
     if (canExpand) {
-      onToggleExpand(item.menuId);
+      // depth 0일 때는 Horizontal 전용 토글 (다른 depth 0 메뉴 닫기)
+      // depth 1 이상일 때는 일반 토글 (해당 메뉴만 토글)
+      if (depth === 0) {
+        onToggleExpand(item.menuId);
+      } else if (onToggleExpandNormal) {
+        onToggleExpandNormal(item.menuId);
+      }
     }
   };
 
@@ -126,16 +134,17 @@ export function HorizontalMenuItem({
           <ul className={`horizontal-menu-item-submenu depth-${depth + 1}`} role="menu">
             {depth === 0 &&  <a>{item.menuName}</a>}
             {item.children.map(child => (
-              <HorizontalMenuItem 
-              key={child.menuId} 
-              item={child} 
-              isActive={activeMenuId === child.menuId} 
-                activeMenuId={activeMenuId} 
-                onHorizontalMenuClick={onHorizontalMenuClick} 
-                onToggleExpand={onToggleExpand} 
-                depth={depth + 1} 
-                maxDepth={maxDepth} 
-                showDepthIndicator={showDepthIndicator} 
+              <HorizontalMenuItem
+              key={child.menuId}
+              item={child}
+              isActive={activeMenuId === child.menuId}
+                activeMenuId={activeMenuId}
+                onHorizontalMenuClick={onHorizontalMenuClick}
+                onToggleExpand={onToggleExpand}
+                onToggleExpandNormal={onToggleExpandNormal}
+                depth={depth + 1}
+                maxDepth={maxDepth}
+                showDepthIndicator={showDepthIndicator}
                 layout={layout} />
             ))}
           </ul>
