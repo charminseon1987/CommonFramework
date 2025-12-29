@@ -670,7 +670,7 @@
 
 
     // top bar 스타일 
-  &.layout-horizontal { 
+  &.layout-horizontal {
     .nav-topbar {
       display: flex;
       align-items: center;
@@ -683,6 +683,8 @@
       min-height: var(--topbar-height); // 👈 최소 높이도 고정
       max-height: var(--topbar-height); // 👈 최대 높이도 고정
       overflow: visible; // 👈 드롭다운이 잘리지 않도록
+      position: relative; // 👈 position 추가 (z-index가 작동하도록)
+      z-index: 1000; // 👈 z-index 낮춤 (메인 페이지를 가리지 않도록)
       
 
       .nav-topbar-inner {
@@ -760,7 +762,7 @@
         flex:1;
         overflow: visible; // 👈 드롭다운이 잘리지 않도록
         position: relative; // 👈 드롭다운 위치 기준점
-        z-index: 10000; // 👈 드롭다운이 다른 요소 위에 표시되도록
+        z-index: auto; // 👈 부모 z-index 상속
         // 가로 메뉴 스타일 추가
         .horizontal-menu-depth-0 {
           position: relative;
@@ -873,7 +875,7 @@
             box-shadow: var(--shadow-lg);
             margin-top: 8px; // 👈 상단 여백 추가
             margin-bottom: 0;
-            z-index: 10001 !important; // 👈 다른 요소 위에 표시 (더 높은 z-index)
+            z-index: 1001 !important; // 👈 topbar보다 1 높게
             list-style: none;
             padding: 8px 0;
             margin-left: 0;
@@ -950,7 +952,7 @@
                 margin-left: 0; // 👈 좌측 마진 제거
                 margin-top: 4px; // 👈 상단 마진 추가
                 margin-bottom: 0; // 👈 하단 마진 제거
-                z-index: 10002 !important; // 👈 더 높은 z-index (depth-1보다 높게) 
+                z-index: 1002 !important; // 👈 depth-1보다 1 높게
                 padding-left: 24px; // 👈 들여쓰기 추가하여 트리 구조처럼 보이도록
                 flex-shrink: 0; // 👈 축소되지 않도록
                 // depth-2 서브메뉴는 border와 shadow 제거
@@ -964,7 +966,7 @@
                 // depth-2의 서브메뉴 아이템들 (adminpage, masterpage 등)
                 .horizontal-menu-item {
                   position: relative; // 👈 추가
-                  z-index: 10003 !important; // 👈 더 높은 z-index
+                  z-index: auto; // 👈 부모 z-index 상속
 
                   .horizontal-menu-item-content {
                     padding-left: 32px; // 👈 더 깊은 들여쓰기
@@ -975,7 +977,7 @@
                     cursor: pointer; // 👈 추가 (클릭 가능하다는 시각적 피드백) hs
                     pointer-events: auto; // 👈 추가 (명시적으로 클릭 이벤트 활성화) hs
                     position: relative; // 👈 추가
-                    z-index: 10004 !important; // 👈 더 높은 z-index
+                    z-index: auto; // 👈 부모 z-index 상속
 
 
                     &:hover {

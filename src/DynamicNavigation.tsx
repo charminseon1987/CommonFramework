@@ -239,30 +239,14 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         const shouldCloseMenu = depth >= 2;
         console.log('shouldCloseMenu:', shouldCloseMenu);
 
-        // 페이지 이동 전에 현재 확장 상태와 활성 메뉴를 localStorage에 저장
-        setState(prev => {
-            // 활성 메뉴 ID 저장
-            saveActiveMenuId(menuId);
+        // 활성 메뉴 ID를 먼저 localStorage에 저장
+        saveActiveMenuId(menuId);
 
-            // depth 2 이상에서 페이지 이동 시에만 모든 메뉴 접기
-            let newTree = prev.menuTree;
-            if (shouldCloseMenu && pageURL) {
-                console.log('🔴 메뉴 닫기 실행 (depth >= 2 && pageURL 있음)');
-                newTree = expandAllMenus(prev.menuTree, false);
-                saveExpandedMenuIds([]);
-            } else {
-                console.log('🟢 메뉴 상태 유지 (depth < 2 또는 pageURL 없음)');
-                // depth 1 이하에서는 현재 확장 상태 유지
-                const expandedIds = getExpandedMenuIds(prev.menuTree);
-                saveExpandedMenuIds(expandedIds);
-            }
-
-            return {
-                ...prev,
-                activeMenuId: menuId,
-                menuTree: newTree
-            };
-        });
+        // depth 2 이상에서 페이지 이동 시에는 메뉴를 닫고, 그렇지 않으면 유지
+        if (shouldCloseMenu && pageURL) {
+            console.log('🔴 메뉴 닫기 실행 (depth >= 2 && pageURL 있음)');
+            saveExpandedMenuIds([]);
+        }
 
         // 페이지 URL이 있으면 해당 페이지로 이동
         if (pageURL) {
