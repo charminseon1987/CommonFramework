@@ -20,132 +20,18 @@
                 <caption>Menu Data Source</caption>
                 <description>List of menu items from microflow</description>
             </property>
-            
+
             <property key="currentUser" type="object" isList="true" required="false">
                 <caption>Current User</caption>
                 <description>Current logged-in user object</description>
                 <properties />
             </property>
-            
-            <!-- Menu Attributes -->
-            <property key="menuId" type="attribute" dataSource="menuDataSource" required="true">
-                <caption>Menu ID</caption>
-                <description>Menu identifier (MenuId)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="menuName" type="attribute" dataSource="menuDataSource" required="true">
-                <caption>Menu Name</caption>
-                <description>Display name of menu (MenuName)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="menuDepth" type="attribute" dataSource="menuDataSource" required="true">
-                <caption>Menu Depth</caption>
-                <description>Hierarchy depth (Depth)</description>
-                <attributeTypes>
-                    <attributeType name="Integer"/>
-                    <attributeType name="Long"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="parentMenuId" type="attribute" dataSource="menuDataSource" required="true">
-                <caption>Parent Menu ID</caption>
-                <description>Parent menu identifier (ParentId)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="sortNo" type="attribute" dataSource="menuDataSource" required="true">
-                <caption>Sort Order</caption>
-                <description>Menu sort order (SortNo)</description>
-                <attributeTypes>
-                    <attributeType name="Integer"/>
-                    <attributeType name="Long"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="leftNo" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Left Number</caption>
-                <description>Nested set left value (LeftNo)</description>
-                <attributeTypes>
-                    <attributeType name="Integer"/>
-                    <attributeType name="Long"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="rightNo" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Right Number</caption>
-                <description>Nested set right value (RightNo)</description>
-                <attributeTypes>
-                    <attributeType name="Integer"/>
-                    <attributeType name="Long"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="displayYn" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Display Flag</caption>
-                <description>Menu visibility flag (DisplayYn)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="enabledTF" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Enabled</caption>
-                <description>Menu enabled status (EnabledTF)</description>
-                <attributeTypes>
-                    <attributeType name="Boolean"/>
-                </attributeTypes>
-            </property>
-            
-            <!-- Resource Attributes (from Association) -->
-            <property key="resourceName" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Resource Name</caption>
-                <description>Resource name from resource (SyMenu_SyResource/ResourceName)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="resourceType" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Resource Type</caption>
-                <description>Resource type from resource (SyMenu_SyResource/ResourceType)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="pageURL" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Page URL</caption>
-                <description>Page URL for navigation (SyMenu_SyResource/PageURL)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="iconClass" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Icon Class</caption>
-                <description>Icon class from resource (SyMenu_SyResource/IconClass)</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            
-            <property key="resourceEnabledTF" type="attribute" dataSource="menuDataSource" required="false">
-                <caption>Resource Enabled</caption>
-                <description>Resource enabled status from resource (SyMenu_SyResource/EnabledTF)</description>
-                <attributeTypes>
-                    <attributeType name="Boolean"/>
-                </attributeTypes>
+            <property key="Resource" type="datasource" isList="true" required="true">
+                <caption>Resource Data Source</caption>
+                <description>List of Resource items from microflow</description>
             </property>
         </propertyGroup>
-
+        
          <!-- Layout Configuration -->
         <propertyGroup caption="Layout">
             <property key="layout" type="enumeration" defaultValue="vertical">

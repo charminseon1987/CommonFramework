@@ -1,6 +1,6 @@
 // src/utils/cacheManager.ts
 
-import { MenuTreeNode, MenuCache } from '../types/menu.types';
+import { MenuTreeNode, MenuCache } from '../../types/menu.types';
 
 /**
  * 메뉴 캐시 관리자 (Singleton)
