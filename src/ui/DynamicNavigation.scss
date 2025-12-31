@@ -468,27 +468,32 @@
     }
 
     // top bar 스타일
-    &:is(.layout-horizontal, .layout-topbar_fullwidth) {
+    &.layout-horizontal {
         .nav-topbar {
             width: 100vw;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column; // 👈 column으로 변경 (inner는 여전히 가로)
+            align-items: stretch;
+            padding: 0;
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
-            height: var(--topbar-height); // 👈 고정 높이 설정
+            // height: var(--topbar-height); // 👈 고정 높이 설정
             min-height: var(--topbar-height); // 👈 최소 높이도 고정
-            max-height: var(--topbar-height); // 👈 최대 높이도 고정
+            // max-height: var(--topbar-height); // 👈 최대 높이도 고정
             overflow: visible; // 👈 드롭다운이 잘리지 않도록
+            position: relative;
 
             .nav-topbar-inner {
                 display: flex;
+                flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
-                height: 100%;
+                height: var(--topbar-height);
+                flex-shrink: 0;
                 width: 100%;
+                padding: 20px;
                 // max-width: 1400px;
             }
 
@@ -798,41 +803,44 @@
                 flex-shrink: 0;
                 position: relative;
 
-                .nav-controls {
-                    position: relative;
-                }
-            }
+                // 햄버거 버튼 (기존 nav-control-btn 스타일 확장)
+                .hamburger-btn {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
 
-            // 햄버거 버튼 (기존 nav-control-btn 스타일 확장)
-            .nav-control-btn.hamburger-btn {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-around;
-                align-items: center;
-                padding: 8px;
+                    width: 44px;
+                    height: 44px;
+                    padding: 12px;
+                    gap: 5px;
 
-                .hamburger-line {
-                    width: 18px;
-                    height: 2.5px;
-                    background-color: currentColor;
-                    border-radius: 2px;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    transform-origin: center;
-                }
+                    border: none;
+                    background: transparent;
+                    cursor: pointer;
+                    overflow: visible;
 
-                &.is-open {
                     .hamburger-line {
-                        &:nth-child(1) {
-                            transform: translateY(6px) rotate(45deg);
-                        }
+                        width: 20px;
+                        height: 2.5px;
+                        background-color: currentColor;
+                        border-radius: 2px;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        transform-origin: center;
+                    }
 
-                        &:nth-child(2) {
-                            opacity: 0;
-                            transform: scaleX(0);
-                        }
+                    &.is-open {
+                        .hamburger-line {
+                            &:nth-child(1) {
+                                transform: translateY(7px) rotate(45deg);
+                            }
 
-                        &:nth-child(3) {
-                            transform: translateY(-6px) rotate(-45deg);
+                            &:nth-child(2) {
+                                opacity: 0;
+                            }
+
+                            &:nth-child(3) {
+                                transform: translateY(-7px) rotate(-45deg);
+                            }
                         }
                     }
                 }
@@ -945,47 +953,40 @@
             }
         }
     }
-    &.layout-topbar_fullwidth {
+    &.layout-horizontal {
         .mega-menu {
+            width: 100%;
+            position: relative;
             background: #fff;
             border-top: 1px solid #eee;
-            font-size: 14px;
-            
-        }
+            font-weight: 500;
 
-        .mega-menu-depth-0 {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .mega-submenu .depth-2{
-          font-weight: 500;
-        }
-        .mega-submenu-area {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            width: 90%;
-            margin: 0 auto;
-        }
+            .mega-submenu-area {
+                position: relative;
+                display: block;
+                width: 100%;
+                min-height: 100px;
+                padding: 16px 0;
+            }
 
-        .mega-submenu {
-            list-style: none;
-            margin: 0;
-            padding-left: 8px;
-        }
+            .mega-submenu-column {
+                .mega-submenu {
+                    list-style: none;
+                    margin: 0;
+                    padding: 0 16px;
 
-        .mega-submenu-item {
-            background: none;
-            border: none;
-            padding: 8px;
+                    .mega-submenu-item {
+                        background: none;
+                        border: none;
+                        padding: 8px;
+                        cursor: pointer;
+                        color: var(--text-secondary);
 
-            cursor: pointer;
-            color: var(--text-secondary);
-
-            &:hover {
-                color: var(--theme-color);
+                        &:hover {
+                            color: var(--theme-color);
+                        }
+                    }
+                }
             }
         }
     }

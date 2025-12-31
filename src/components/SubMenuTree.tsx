@@ -39,7 +39,7 @@ export default function SubMenuTree({ nodes, activeMenuId, depth, onMenuClick }:
                         </div>
 
                         {/* recursive */}
-                        {hasChildren && node.isExpanded && (
+                        {hasChildren && (
                             <SubMenuTree
                                 nodes={node.children!}
                                 activeMenuId={activeMenuId}
