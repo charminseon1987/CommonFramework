@@ -54,13 +54,13 @@ todos:
 
 1. **`.nav-sidebar` 스타일 추가** (`src/ui/DynamicNavigation.scss`):
    ```scss
-         .nav-sidebar {
-             width: var(--sidebar-width);
-             max-width: var(--sidebar-width);
-             min-width: var(--sidebar-width);
-             height: 100vh;
-             // 기타 필요한 스타일
-         }
+            .nav-sidebar {
+                width: var(--sidebar-width);
+                max-width: var(--sidebar-width);
+                min-width: var(--sidebar-width);
+                height: 100vh;
+                // 기타 필요한 스타일
+            }
    ```
 
 
@@ -68,15 +68,16 @@ todos:
 
 2. **`.layout-vertical` 컨테이너 스타일**:
    ```scss
-         &.layout-vertical {
-             width: var(--sidebar-width);
-             max-width: var(--sidebar-width);
-             
-             &.collapsed {
-                 width: 60px; // 또는 적절한 값
-                 .nav-sidebar {
-                     width: 60px;
-                 }
-             }
-         }
+            &.layout-vertical {
+                width: var(--sidebar-width);
+                max-width: var(--sidebar-width);
+                
+                &.collapsed {
+                    width: 60px; // 또는 적절한 값
+                    .nav-sidebar {
+                        width: 60px;
+                    }
+                }
+            }
+   
    ```
