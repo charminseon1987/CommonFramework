@@ -1080,4 +1080,528 @@
             }
         }
     }
+
+    
+  // Horizontal (Topbar Fullwidth) 스타일 추가
+  &.layout-topbar_fullwidth {
+    .nav-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      height: var(--topbar-height); // 👈 고정 높이 설정
+      min-height: var(--topbar-height); // 👈 최소 높이도 고정
+      max-height: var(--topbar-height); // 👈 최대 높이도 고정
+      overflow: visible; // 👈 드롭다운이 잘리지 않도록
+      position: fixed; // 👈 fixed로 변경하여 페이지 상단에 고정
+      top: 0; // 👈 상단에 고정
+      left: 0; // 👈 왼쪽에 고정
+      right: 0; // 👈 오른쪽에 고정
+      width: 100%; // 👈 전체 너비
+      z-index: 1000; // 👈 다른 요소 위에 표시
+      
+
+      .nav-topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        width: 100%;
+        max-width: 1400px;
+      }
+
+      .nav-topbar-left {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 16px;
+        flex-shrink: 0;
+
+        .nav-title{
+          margin: 0;
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text-primary);
+          letter-spacing: -0.02em;
+          background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+
+
+          .nav-title-button{
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            // nav-title의 투명 텍스트 효과 완전히 오버라이드
+            -webkit-text-fill-color: #1890ff !important;
+            color: #1890ff !important;
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            background-clip: initial !important;
+            
+            &:hover {
+              color: #096dd9 !important;
+              -webkit-text-fill-color: #096dd9 !important;
+              transform: translateX(2px);
+            }
+            
+            &:active {
+              transform: translateX(1px);
+            }
+            
+            &:focus {
+              outline: 2px solid var(--theme-color);
+              outline-offset: 4px;
+              border-radius: 4px;
+            }
+            
+          }
+        }
+      }
+      
+
+      .nav-topbar-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        flex:1;
+        overflow: visible; // 👈 드롭다운이 잘리지 않도록
+        position: static; // 👈 static으로 변경하여 nav-topbar 기준으로 위치
+        z-index: 10000; // 👈 드롭다운이 다른 요소 위에 표시되도록
+        // 가로 메뉴 스타일 추가
+        .horizontal-menu-depth-0 {
+          position: relative;
+          display: flex; // 👈 가로 정렬
+          flex-direction: row; // 👈 가로 방향
+          align-items: center; // 👈 중앙 정렬로 변경하여 높이 고정 유지
+          gap: 8px; // 메뉴 간 간격
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          justify-content: center;
+          padding: 8px 30px;
+          height: 100%; // 👈 부모 높이에 맞춤
+          overflow: visible; // 👈 드롭다운이 잘리지 않도록
+          
+          // 메뉴 아이템 (HOME1, HOME2 등)
+          .horizontal-menu-item {
+            position: relative; // 👈 서브메뉴의 기준점
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: auto; // 👈 자동 너비
+            min-width: fit-content; // 👈 내용에 맞는 최소 너비
+            height: 100%; // 👈 부모 높이에 맞춤 (홈 버튼과 같은 높이 유지)
+            align-self: stretch; // 👈 부모의 높이를 따라감
+          }
+          
+          .horizontal-menu-item-content{
+            padding: 8px 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            border-radius: 8px;
+            transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            height: 100%; // 👈 부모 높이에 맞춤
+            box-sizing: border-box; // 👈 패딩 포함 높이 계산
+            
+            &:hover {
+              background-color: var(--hover-bg);
+            }
+            
+            .horizontal-menu-item-label{
+              margin: 0;
+              font-size: 18px;
+              font-weight: 700;
+              color: var(--text-primary);
+              letter-spacing: -0.02em;
+              background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+            }
+            .horizontal-menu-item-arrow{
+              border: none;
+              background: none;
+              padding: 0;
+              cursor: pointer;
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+              text-align: left;
+              margin: 0;
+              font-size: 18px;
+              font-weight: 700;
+              letter-spacing: -0.02em;
+              // nav-title의 투명 텍스트 효과 완전히 오버라이드
+              -webkit-text-fill-color: #1890ff !important;
+              color: #1890ff !important;
+              background: none !important;
+              -webkit-background-clip: initial !important;
+              background-clip: initial !important;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              
+              svg {
+                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+              }
+              
+              &.expanded svg {
+                transform: rotate(180deg);
+              }
+              
+              &:hover {
+                color: #096dd9 !important;
+                -webkit-text-fill-color: #096dd9 !important;
+                transform: translateX(2px);
+              }
+              
+              &:active {
+                transform: translateX(1px);
+              }
+              
+              &:focus {
+                outline: 2px solid var(--theme-color);
+                outline-offset: 4px;
+                border-radius: 4px;
+              }
+            }
+          }
+          a {
+            font-size: 18px;
+            font-weight: 700;
+            // color: var(--text-primary);
+            letter-spacing: -0.02em;
+         
+            color: black;
+            background-color: #d4e6f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 8px 30px;
+          }
+          
+          // 서브메뉴 (header1, header2 등) - 전체 너비를 차지하는 박스로 표시
+          .horizontal-menu-item-submenu {
+            position: fixed; // 👈 fixed로 변경하여 전체 화면 기준으로 위치
+            top: var(--topbar-height); // 👈 nav-topbar 높이만큼 아래에 위치
+            left: 0; // 👈 왼쪽 끝부터
+            right: 0; // 👈 오른쪽 끝까지
+            width: 100vw; // 👈 전체 뷰포트 너비 사용
+            min-height: 200px; // 👈 최소 높이 설정
+            background: white;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            z-index: 999; // 👈 다른 요소 위에 표시 (topbar보다 낮게)
+            list-style: none;
+            padding: 24px 40px; // 👈 패딩 추가
+            animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; // 👈 flex 추가
+            flex-direction: row; // 👈 가로 방향으로 변경하여 HEADER1, HEADER2가 가로로 배치되도록
+            align-items: flex-start; // 👈 상단 정렬
+            gap: 40px; // 👈 아이템 간 간격 추가
+            justify-content: flex-start; // 👈 왼쪽 정렬
+            box-sizing: border-box; // 👈 패딩 포함 크기 계산
+            
+            .horizontal-menu-item {
+              position: relative;
+              width: auto; // 👈 자동 너비
+              min-width: 200px; // 👈 최소 너비 설정
+              flex: 0 0 auto; // 👈 flex-shrink와 flex-grow 비활성화
+              border-bottom: none; // 👈 구분선 제거
+              display: flex; // 👈 flex 추가
+              flex-direction: column; // 👈 세로 방향으로 하위 메뉴가 펼쳐지도록
+              align-items: flex-start; // 👈 왼쪽 정렬
+              
+              .horizontal-menu-item-content {
+                padding: 12px 16px;
+                width: 100%; // 👈 전체 너비 사용
+                min-width: 100%; // 👈 최소 너비도 전체 너비
+                border-radius: 8px;
+                margin: 0;
+                white-space: nowrap; // 👈 텍스트 줄바꿈 방지
+                
+                &:hover {
+                  background-color: var(--hover-bg);
+                  transform: none; // 👈 호버 시 이동하지 않음
+                }
+                
+                .horizontal-menu-item-label {
+                  font-size: 16px;
+                  font-weight: 600;
+                  background: none;
+                  -webkit-background-clip: initial;
+                  -webkit-text-fill-color: initial;
+                  background-clip: initial;
+                  color: var(--text-primary);
+                }
+              }
+              
+              &.active .horizontal-menu-item-content {
+                background-color: var(--hover-bg);
+                
+                .horizontal-menu-item-label {
+                  color: var(--theme-color);
+                  font-weight: 700;
+                }
+              }
+              
+              // HEADER1의 하위 메뉴가 펼쳐질 때 HEADER2가 아래로 밀리도록
+              &.expanded {
+                width: auto; // 👈 하위 메뉴가 펼쳐질 때 자동 너비
+                min-width: 200px; // 👈 최소 너비 유지
+              }
+              
+              // depth-1의 서브메뉴는 세로로 트리 구조처럼 펼쳐짐 (HEADER1의 하위 메뉴)
+              .horizontal-menu-item-submenu {
+                position: relative; // 👈 상대 위치로 변경하여 세로로 펼쳐지도록
+                top: 0; // 👈 top 제거
+                left: 0; // 👈 왼쪽 정렬
+                width: 100%; // 👈 전체 너비 사용
+                margin-left: 0; // 👈 좌측 마진 제거
+                margin-top: 8px; // 👈 상단 마진 추가
+                margin-bottom: 0; // 👈 하단 마진 제거
+                z-index: 1002; // 👈 더 높은 z-index
+                padding-left: 0; // 👈 들여쓰기 제거
+                flex-shrink: 0; // 👈 축소되지 않도록
+                // depth-2 서브메뉴는 border와 shadow 제거
+                border: none; // 👈 border 제거
+                border-radius: 0; // 👈 border-radius 제거
+                box-shadow: none; // 👈 shadow 제거
+                background: transparent; // 👈 배경 투명
+                padding: 0; // 👈 padding 제거
+                
+                // depth-2의 서브메뉴 아이템들 (adminpage, masterpage 등)
+                .horizontal-menu-item {
+                  .horizontal-menu-item-content {
+                    padding-left: 24px; // 👈 bullet point를 위한 들여쓰기
+                    background: transparent; // 👈 배경 투명
+                    border: none; // 👈 border 제거
+                    border-radius: 0; // 👈 border-radius 제거
+                    box-shadow: none; // 👈 shadow 제거
+                    position: relative; // 👈 bullet point 위치 기준
+                    
+                    // bullet point 추가
+                    &::before {
+                      content: '•';
+                      position: absolute;
+                      left: 8px;
+                      color: var(--text-secondary);
+                      font-size: 16px;
+                      line-height: 1;
+                    }
+                    
+                    &:hover {
+                      background: transparent; // 👈 호버 시에도 배경 없음
+                      
+                      &::before {
+                        color: var(--theme-color);
+                      }
+                    }
+                    
+                    .horizontal-menu-item-label {
+                      font-size: 14px; // 👈 폰트 크기
+                      font-weight: 400;
+                      color: var(--text-secondary);
+                    }
+                  }
+                  
+                  &.active .horizontal-menu-item-content {
+                    background: transparent;
+                    
+                    &::before {
+                      color: var(--theme-color);
+                    }
+                    
+                    .horizontal-menu-item-label {
+                      color: var(--theme-color);
+                      font-weight: 600;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          .horizontal-menu-item-depth-indicator{
+            padding: 0 16px;
+          }
+        }
+
+      }
+
+      .nav-topbar-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 16px;
+        flex-shrink: 0;
+        position: absolute;
+        right: 20px;
+
+        .nav-controls {
+          position: relative;
+        }
+      }
+
+      // 햄버거 버튼 (기존 nav-control-btn 스타일 확장)
+      .nav-control-btn.hamburger-btn {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px;
+
+        .hamburger-line {
+          width: 18px;
+          height: 2.5px;
+          background-color: currentColor;
+          border-radius: 2px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-origin: center;
+        }
+
+        &.is-open {
+          .hamburger-line {
+            &:nth-child(1) {
+              transform: translateY(6px) rotate(45deg);
+            }
+
+            &:nth-child(2) {
+              opacity: 0;
+              transform: scaleX(0);
+            }
+
+            &:nth-child(3) {
+              transform: translateY(-6px) rotate(-45deg);
+            }
+          }
+        }
+      }
+
+      // 드롭다운 메뉴
+      .nav-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 160px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1.5px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        z-index: 1001;
+        overflow: hidden;
+        animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .nav-dropdown-item {
+          display: block;
+          width: 100%;
+          padding: 12px 16px;
+          border: none;
+          background: transparent;
+          text-align: left;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-primary);
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          border-bottom: 1px solid rgba(232, 232, 232, 0.5);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background-color: var(--hover-bg);
+            color: var(--theme-color);
+          }
+
+          &:active {
+            background-color: rgba(24, 144, 255, 0.15);
+          }
+
+          &:focus {
+            outline: 2px solid var(--theme-color);
+            outline-offset: -2px;
+          }
+        }
+      }
+
+      @keyframes dropdownFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .nav-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-title-button {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        // nav-title의 투명 텍스트 효과 완전히 오버라이드
+        -webkit-text-fill-color: #1890ff !important;
+        color: #1890ff !important;
+        background: none !important;
+        -webkit-background-clip: initial !important;
+        background-clip: initial !important;
+        
+        &:hover {
+          color: #096dd9 !important;
+          -webkit-text-fill-color: #096dd9 !important;
+          transform: translateX(2px);
+        }
+        
+        &:active {
+          transform: translateX(1px);
+        }
+        
+        &:focus {
+          outline: 2px solid var(--theme-color);
+          outline-offset: 4px;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
 }
+
