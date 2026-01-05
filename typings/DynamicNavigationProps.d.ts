@@ -6,15 +6,7 @@
 import { CSSProperties } from "react";
 import { ActionValue, ListValue } from "mendix";
 
-export interface CurrentUserType {
-
-}
-
 export type LayoutEnum = "vertical" | "horizontal" | "topbar_fullwidth";
-
-export interface CurrentUserPreviewType {
-
-}
 
 export interface DynamicNavigationContainerProps {
     name: string;
@@ -22,9 +14,10 @@ export interface DynamicNavigationContainerProps {
     style?: CSSProperties;
     tabIndex?: number;
     menuDataSource: ListValue;
-    currentUser: CurrentUserType[];
     Resource: ListValue;
+    currentUser?: ListValue;
     layout: LayoutEnum;
+    maxDepth: number;
     sidebarWidth: string;
     topbarHeight: string;
     collapsible: boolean;
@@ -32,7 +25,6 @@ export interface DynamicNavigationContainerProps {
     onAuthFailed?: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
-    maxDepth: number;
     enableDynamicAuth: boolean;
     themeColor: string;
     showDepthIndicator: boolean;
@@ -55,9 +47,10 @@ export interface DynamicNavigationPreviewProps {
     renderMode: "design" | "xray" | "structure";
     translate: (text: string) => string;
     menuDataSource: {} | { caption: string } | { type: string } | null;
-    currentUser: CurrentUserPreviewType[];
     Resource: {} | { caption: string } | { type: string } | null;
+    currentUser: {} | { caption: string } | { type: string } | null;
     layout: LayoutEnum;
+    maxDepth: number | null;
     sidebarWidth: string;
     topbarHeight: string;
     collapsible: boolean;
@@ -65,7 +58,6 @@ export interface DynamicNavigationPreviewProps {
     onAuthFailed: {} | null;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
-    maxDepth: number | null;
     enableDynamicAuth: boolean;
     themeColor: string;
     showDepthIndicator: boolean;

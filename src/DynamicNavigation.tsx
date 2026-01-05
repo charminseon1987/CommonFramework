@@ -13,6 +13,8 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
+import useUserData from "./hooks/useUserData";
+import { UserInformation } from "./components/UserInformation";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
@@ -20,7 +22,9 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
      * ------------------------------------------------------------------ */
     const menuData = useMenuData(props);
     const { state, setState } = useNavigationState(menuData);
-
+    // User domain
+    const userData = useUserData(props);
+    console.log("userData from home", userData);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -152,40 +156,47 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
      * VERTICAL (SIDEBAR)
      * ================================================================== */
     return (
-        <div className={containerClasses}>
-            <aside className="nav-sidebar" role="navigation">
-                {/* 헤더 */}
-                <div className="nav-header">
-                    <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                        홈
-                    </button>
+        <div>
+            <UserInformation user={userData?.[0]} />
+            <div className={containerClasses}>
+                <aside className="nav-sidebar" role="navigation">
+                    {/* 헤더 */}
+                    <div className="nav-header">
+                        <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
+                            홈
+                        </button>
 
-                    <div className="nav-controls">
-                        <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
-                        <button className="nav-control-btn collapse-all" onClick={handleCollapseAll} type="button" />
+                        <div className="nav-controls">
+                            <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
+                            <button
+                                className="nav-control-btn collapse-all"
+                                onClick={handleCollapseAll}
+                                type="button"
+                            />
+                        </div>
                     </div>
-                </div>
 
-                {/* 메뉴 */}
-                <nav className="nav-content">
-                    <NavigationMenu
-                        menuItems={state.menuTree}
-                        activeMenuId={state.activeMenuId}
-                        onMenuClick={handleMenuClickWrapper}
-                        onToggleExpand={toggleExpand}
-                        depth={0}
-                        maxDepth={props.maxDepth}
-                        showDepthIndicator={props.showDepthIndicator}
-                    />
-                </nav>
+                    {/* 메뉴 */}
+                    <nav className="nav-content">
+                        <NavigationMenu
+                            menuItems={state.menuTree}
+                            activeMenuId={state.activeMenuId}
+                            onMenuClick={handleMenuClickWrapper}
+                            onToggleExpand={toggleExpand}
+                            depth={0}
+                            maxDepth={props.maxDepth}
+                            showDepthIndicator={props.showDepthIndicator}
+                        />
+                    </nav>
 
-                {/* 접기 버튼 */}
-                {props.collapsible && (
-                    <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
-                        <span className="nav-toggle-icon" />
-                    </button>
-                )}
-            </aside>
+                    {/* 접기 버튼 */}
+                    {props.collapsible && (
+                        <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
+                            <span className="nav-toggle-icon" />
+                        </button>
+                    )}
+                </aside>
+            </div>
         </div>
     );
 }

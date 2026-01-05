@@ -20,18 +20,18 @@
                 <caption>Menu Data Source</caption>
                 <description>List of menu items from microflow</description>
             </property>
-
-            <property key="currentUser" type="object" isList="true" required="false">
-                <caption>Current User</caption>
-                <description>Current logged-in user object</description>
-                <properties />
-            </property>
             <property key="Resource" type="datasource" isList="true" required="true">
                 <caption>Resource Data Source</caption>
                 <description>List of Resource items from microflow</description>
             </property>
-        </propertyGroup>
+
+            <property key="currentUser" type="datasource" isList="true" required="false">
+                <caption>Current User</caption>
+                <description>Current logged-in user object</description>
+            </property>
         
+        </propertyGroup>
+
          <!-- Layout Configuration -->
         <propertyGroup caption="Layout">
             <property key="layout" type="enumeration" defaultValue="vertical">
@@ -43,7 +43,10 @@
                     <enumerationValue key="topbar_fullwidth">Horizontal (Topbar Fullwidth)</enumerationValue>
                 </enumerationValues>
             </property>
-        
+            <property key="maxDepth" type="integer" defaultValue="2">
+                <caption>Max Depth</caption>
+                <description>Maximum menu depth (0-2 for 3 levels)</description>
+            </property>
             
             <property key="sidebarWidth" type="string" defaultValue="260px">
                 <caption>Sidebar Width</caption>
@@ -81,11 +84,6 @@
             <property key="autoExpandActivePath" type="boolean" defaultValue="true">
                 <caption>Auto Expand Active Path</caption>
                 <description>Automatically expand path to active menu</description>
-            </property>
-            
-            <property key="maxDepth" type="integer" defaultValue="2">
-                <caption>Max Depth</caption>
-                <description>Maximum menu depth (0-2 for 3 levels)</description>
             </property>
             
             <property key="enableDynamicAuth" type="boolean" defaultValue="false">

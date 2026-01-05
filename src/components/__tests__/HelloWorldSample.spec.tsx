@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { shallow, ShallowWrapper } from "enzyme";
 
-import { HelloWorldSample, HelloWorldSampleProps } from "../HelloWorldSample";
+import { HelloWorldSample, HelloWorldSampleProps } from "../UserInformation";
 
 describe("HelloWorldSample", () => {
     const createHelloWorld = (props: HelloWorldSampleProps): ShallowWrapper => shallow(<HelloWorldSample {...props} />);

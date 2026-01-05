@@ -2,13 +2,8 @@ import { useEffect, useState } from "react";
 import { ValueStatus } from "mendix";
 import { DynamicNavigationContainerProps } from "../types/widget.types";
 import { MenuItemData } from "../types/menu.types";
-
-/** Mendix 내부 attribute 추출 */
-function getMxAttributes(item: any): Record<string, { value: any }> {
-    const symbol = Object.getOwnPropertySymbols(item).find(sym => sym.toString().includes("mxObject"));
-
-    return symbol ? item[symbol]?._jsonData?.attributes ?? {} : {};
-}
+import getMxAttributes from "src/components/utils/mxHelper";
+import { ObjectItem } from "mendix";
 
 /** Association value → GUID */
 function getAssociatedGuid(value: any): string | null {
@@ -29,12 +24,12 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
         /** Resource GUID → attributes */
         const resourceMap = new Map<string, Record<string, { value: any }>>();
 
-        Resource.items?.forEach(resource => {
+        Resource.items?.forEach((resource: ObjectItem) => {
             resourceMap.set(resource.id, getMxAttributes(resource));
         });
 
         const result: MenuItemData[] =
-            menuDataSource.items?.map(menu => {
+            menuDataSource.items?.map((menu: ObjectItem) => {
                 const attrs = getMxAttributes(menu);
 
                 const resourceGuid = getAssociatedGuid(attrs["PortalModule.SyMenu_SyResource"]?.value);
