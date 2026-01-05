@@ -7,12 +7,12 @@
     --animation-duration: 300ms;
     --sidebar-width: 260px;
     --topbar-height: 60px;
-    --depth-0-bg: #ffffff;
-    --depth-1-bg: #f8f9fa;
-    --depth-2-bg: #fafbfc;
-    --depth-3-bg: #fcfdfe;
+    --depth-0-bg: #020557;
+    --depth-1-bg: #020557;
+    --depth-2-bg: #020557;
+    --depth-3-bg: #020557;
     --border-color: #e8e8e8;
-    --hover-bg: rgba(24, 144, 255, 0.08);
+    --hover-bg: rgba(255, 255, 255, 0.1);
     --active-bg: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
     --active-bg-solid: #1890ff;
     --text-primary: #1f2937;
@@ -68,24 +68,27 @@
             font-weight: 600;
             font-size: 15px;
             background-color: var(--depth-0-bg);
+            color: var(--text-active);
         }
 
         &.depth-1 > .nav-item-content {
             padding: 14px 20px 14px 40px;
             font-size: 14px;
             background-color: var(--depth-1-bg);
+            color: var(--text-active);
         }
 
         &.depth-2 > .nav-item-content {
             padding: 12px 20px 12px 60px;
             font-size: 13px;
             background-color: var(--depth-2-bg);
+            color: var(--text-active);
         }
 
         &.depth-3 > .nav-item-content {
             padding: 12px 20px 12px 80px;
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--text-active);
             background-color: var(--depth-3-bg);
         }
 
@@ -103,11 +106,11 @@
 
         // 활성 상태
         &.active > .nav-item-content {
-            background: var(--active-bg);
-            background-color: var(--active-bg-solid);
-            color: var(--text-active);
+            background: var(--active-bg) !important;
+            background-color: var(--active-bg-solid) !important;
+            color: var(--text-active) !important;
             font-weight: 600;
-            border-left: 4px solid color.scale(#1890ff, $lightness: -15%);
+            border-left: 4px solid var(--active-border-color) !important;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
             position: relative;
 
@@ -122,11 +125,11 @@
             }
 
             .nav-icon {
-                color: var(--text-active);
+                color: var(--text-active) !important;
             }
 
             .nav-label {
-                color: var(--text-active);
+                color: var(--text-active)!important;
             }
         }
     }
@@ -157,7 +160,7 @@
             min-width: 22px;
             height: 22px;
             font-size: 18px;
-            color: var(--text-secondary);
+            color: var(--text-active);
             transition: all 0.2s ease;
 
             i {
@@ -175,7 +178,7 @@
             display: block;
             transition: opacity var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1),
                 width var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--text-primary);
+            color: var(--text-active);
             font-weight: 500;
         }
 
@@ -201,6 +204,7 @@
 
             &:active {
                 transform: rotate(-90deg) scale(0.95);
+                
             }
 
             &:focus {
@@ -334,10 +338,96 @@
     }
 
     &.layout-vertical {
-        &.collapsed .nav-toggle-btn {
-            right: -24px;
+      width: var(--sidebar-width);
+      max-width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+
+      &.collapsed {
+          width: 60px;
+          max-width: 60px;
+          min-width: 60px;
+
+          .nav-sidebar {
+              width: 60px;
+              max-width: 60px;
+              min-width: 60px;
+          }
+
+          .nav-toggle-btn {
+              right: -24px;
+          }
+      }
+  }
+
+  // 사이드바 스타일
+  .nav-sidebar {
+      width: var(--sidebar-width);
+      max-width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background-color: var(--depth-0-bg);
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      overflow-x: hidden;
+  }
+
+    // 헤더 스타일 (홈 버튼과 컨트롤 버튼)
+    .nav-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--mx-navigation-background, #020557);
+
+        .nav-title {
+            flex: 0 0 auto;
+        }
+
+        .nav-title-button {
+            border: none;
+            background-color: #24276c !important;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            border-radius: 8px;
+
+            &:hover {
+                background-color: #494b80 !important;
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+                transform: translateX(2px);
+            }
+
+            &:active {
+                transform: translateX(1px);
+            }
+
+            &:focus {
+                outline: 2px solid var(--theme-color);
+                outline-offset: 4px;
+                border-radius: 8px;
+            }
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
         }
     }
+
     // 펼치기 버튼 (+ 아이콘)
     .nav-control-btn.expand-all {
         &::before,
@@ -483,7 +573,8 @@
             min-height: var(--topbar-height); // 👈 최소 높이도 고정
             // max-height: var(--topbar-height); // 👈 최대 높이도 고정
             overflow: visible; // 👈 드롭다운이 잘리지 않도록
-            position: relative;
+            position: relative; // 👈 position 추가 (z-index가 작동하도록)
+            z-index: 1000; // 👈 z-index 설정 (페이지 요소보다 위에 표시)
 
             .nav-topbar-inner {
                 display: flex;
@@ -560,6 +651,7 @@
                 flex: 1;
                 overflow: visible; // 👈 드롭다운이 잘리지 않도록
                 position: relative; // 👈 드롭다운 위치 기준점
+                z-index: auto; // 👈 부모 z-index 상속 (스태킹 컨텍스트 생성 안 함)
                 // 가로 메뉴 스타일 추가
                 .horizontal-menu-depth-0 {
                     position: relative;
@@ -672,7 +764,7 @@
                         box-shadow: var(--shadow-lg);
                         margin-top: 8px; // 👈 상단 여백 추가
                         margin-bottom: 0;
-                        z-index: 9999 !important; // 👈 다른 요소 위에 표시 hs
+                        z-index: 1001 !important; // 👈 topbar보다 1 높게 (페이지 요소 위에 표시)
                         list-style: none;
                         padding: 8px 0;
                         margin-left: 0;
@@ -749,7 +841,7 @@
                                 margin-left: 0; // 👈 좌측 마진 제거
                                 margin-top: 4px; // 👈 상단 마진 추가
                                 margin-bottom: 0; // 👈 하단 마진 제거
-                                z-index: 9999 !important; // 👈 더 높은 z-index hs
+                                z-index: 1002 !important; // 👈 depth-1보다 1 높게
                                 padding-left: 24px; // 👈 들여쓰기 추가하여 트리 구조처럼 보이도록
                                 flex-shrink: 0; // 👈 축소되지 않도록
                                 // depth-2 서브메뉴는 border와 shadow 제거
@@ -763,7 +855,7 @@
                                 // depth-2의 서브메뉴 아이템들 (adminpage, masterpage 등)
                                 .horizontal-menu-item {
                                     position: relative; // 👈 추가
-                                    z-index: 10000 !important; // 👈 추가
+                                    z-index: auto; // 👈 부모 z-index 상속
 
                                     .horizontal-menu-item-content {
                                         padding-left: 32px; // 👈 더 깊은 들여쓰기
@@ -774,7 +866,7 @@
                                         cursor: pointer; // 👈 추가 (클릭 가능하다는 시각적 피드백) hs
                                         pointer-events: auto; // 👈 추가 (명시적으로 클릭 이벤트 활성화) hs
                                         position: relative; // 👈 추가
-                                        z-index: 10001 !important; // 👈 추가
+                                        z-index: auto; // 👈 부모 z-index 상속
 
                                         &:hover {
                                             background: transparent; // 👈 호버 시에도 배경 없음
@@ -885,6 +977,7 @@
 
                     &:active {
                         background-color: rgba(24, 144, 255, 0.15);
+                        background-color : rgba(36,39,108,0.15);
                     }
 
                     &:focus {

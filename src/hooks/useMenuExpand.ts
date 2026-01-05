@@ -43,9 +43,10 @@ export function useMenuExpand(
     const expandAll = () => {
         setIsAllExpanded(true);
         setState((prev: NavigationState) => {
-            const newTree = expandAllMenus(prev.menuTree, false);
+            const newTree = expandAllMenus(prev.menuTree, true);
             console.log("newTree", newTree)
-            saveExpandedMenuIds([]);
+            const expandedIds = getExpandedMenuIds(newTree);
+            saveExpandedMenuIds(expandedIds);
 
             return {
                 ...prev,

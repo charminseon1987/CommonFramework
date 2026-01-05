@@ -58,9 +58,19 @@ export function MenuItem({
 
   // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
   const handleContentClick = (e: React.MouseEvent): void => {
-    // 화살표 버튼 클릭이 아닐 때만 메뉴 클릭 처리
+    // 화살표 버튼 클릭이 아닐 때만 처리
     const target = e.target as HTMLElement;
-    if (!target.closest('.nav-arrow')) {
+    if (target.closest('.nav-arrow')) {
+      return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
+    }
+    
+    // 자식이 있는 경우: 확장/축소
+    if (canExpand) {
+      e.preventDefault();
+      e.stopPropagation();
+      onToggleExpand(item.menuId);
+    } else {
+      // 자식이 없는 경우: 페이지 이동
       handleMenuClick(e);
     }
   };
@@ -68,7 +78,13 @@ export function MenuItem({
   const handleContentKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleMenuClick(e as any);
+      // 자식이 있는 경우: 확장/축소
+      if (canExpand) {
+        onToggleExpand(item.menuId);
+      } else {
+        // 자식이 없는 경우: 페이지 이동
+        handleMenuClick(e as any);
+      }
     }
   };
 
