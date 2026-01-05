@@ -338,6 +338,61 @@
             right: -24px;
         }
     }
+
+    // 헤더 스타일 (홈 버튼과 컨트롤 버튼)
+    .nav-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--mx-navigation-background, #020557);
+
+        .nav-title {
+            flex: 0 0 auto;
+        }
+
+        .nav-title-button {
+            border: none;
+            background-color: #24276c !important;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            border-radius: 8px;
+
+            &:hover {
+                background-color: #494b80 !important;
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+                transform: translateX(2px);
+            }
+
+            &:active {
+                transform: translateX(1px);
+            }
+
+            &:focus {
+                outline: 2px solid var(--theme-color);
+                outline-offset: 4px;
+                border-radius: 8px;
+            }
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+    }
+
     // 펼치기 버튼 (+ 아이콘)
     .nav-control-btn.expand-all {
         &::before,
