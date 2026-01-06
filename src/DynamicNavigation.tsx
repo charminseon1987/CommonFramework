@@ -58,6 +58,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                 placeholder.style.overflow = "auto";
                 placeholder.style.flexShrink = "0";
                 placeholder.style.flexGrow = "0";
+                placeholder.style.paddingTop = "72px"; // nav-header 높이만큼 여백 추가
             }
         }
     }, [props.layout]);
@@ -180,19 +181,29 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
      * ================================================================== */
     return (
         <div className={containerClasses}>
-            <aside className="nav-sidebar" role="navigation">
-                {/* 헤더 */}
-                <div className="nav-header">
-                    <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                        홈
+            {/* 헤더 */}
+            <div className="nav-header">
+                {/* 접기 버튼 */}
+                {props.collapsible && (
+                    <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
+                        <span className="nav-toggle-icon">
+                            <span className="hamburger-line" />
+                            <span className="hamburger-line" />
+                            <span className="hamburger-line" />
+                        </span>
                     </button>
+                )}
+                <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
+                    홈
+                </button>
 
-                    <div className="nav-controls">
-                        <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
-                        <button className="nav-control-btn collapse-all" onClick={handleCollapseAll} type="button" />
-                    </div>
+                <div className="nav-controls">
+                    <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
+                    <button className="nav-control-btn collapse-all" onClick={handleCollapseAll} type="button" />
                 </div>
+            </div>
 
+            <aside className="nav-sidebar" role="navigation">
                 {/* 메뉴 */}
                 <nav className="nav-content">
                     <NavigationMenu
@@ -205,17 +216,6 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         showDepthIndicator={props.showDepthIndicator}
                     />
                 </nav>
-
-                {/* 접기 버튼 */}
-                {props.collapsible && (
-                    <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
-                        <span className="nav-toggle-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d={isCollapsed ? "M5 2L9 7L5 12" : "M9 2L5 7L9 12"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </span>
-                    </button>
-                )}
             </aside>
         </div>
     );

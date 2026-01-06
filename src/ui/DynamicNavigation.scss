@@ -19,6 +19,7 @@
     overflow: auto !important;
     flex-shrink: 0 !important;
     flex-grow: 0 !important;
+    padding-top: 72px !important; // nav-header 높이만큼 여백 추가
 }
 
 .bangarlab-navigation {
@@ -302,57 +303,59 @@
         }
     }
 
-    // 사이드바 토글 버튼 (→/← 버튼)
+    // 사이드바 토글 버튼 (햄버거 버튼)
     .nav-toggle-btn {
-        position: absolute;
-        top: 20px;
-        right: -32px;
-        width: 32px;
-        height: 40px;
-        min-height: 40px;
-        max-height: 40px;
-        border: 1.5px solid var(--border-color);
-        border-left: none;
-        border-radius: 0 12px 12px 0;
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        position: relative;
+        width: 44px;
+        height: 44px;
+        padding: 12px;
+        border: none;
+        background: transparent;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: var(--shadow-lg);
-        z-index: 1001;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 0;
-        margin: 0;
-        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        margin-right: 12px;
 
         .nav-toggle-icon {
-            width: 14px;
-            height: 14px;
-            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 20px;
+            height: 20px;
+            color: var(--text-active);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            .hamburger-line {
+                width: 20px;
+                height: 2.5px;
+                background-color: currentColor;
+                border-radius: 2px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform-origin: center;
+            }
         }
 
         &:hover {
-            background: linear-gradient(135deg, var(--hover-bg) 0%, rgba(24, 144, 255, 0.12) 100%);
-            border-color: var(--theme-color);
-            transform: translateX(-2px);
-            box-shadow: var(--shadow-lg), 0 0 0 4px rgba(24, 144, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
 
             .nav-toggle-icon {
-                color: var(--theme-color);
-                transform: scale(1.1);
+                color: var(--text-active);
             }
         }
 
         &:active {
-            transform: translateX(0);
+            transform: scale(0.95);
         }
 
         &:focus {
             outline: 2px solid var(--theme-color);
             outline-offset: 2px;
-            border-radius: 0 12px 12px 0;
+            border-radius: 8px;
         }
     }
 
@@ -374,10 +377,6 @@
               max-width: 60px;
               min-width: 60px;
           }
-
-          .nav-toggle-btn {
-              right: -24px;
-          }
       }
   }
 
@@ -387,6 +386,7 @@
       max-width: 100% !important;
       min-width: 100% !important;
       height: 100vh;
+      margin-top: 72px; // nav-header 높이만큼 여백 추가
       display: flex;
       flex-direction: column;
       position: relative;
@@ -398,12 +398,18 @@
 
     // 헤더 스타일 (홈 버튼과 컨트롤 버튼)
     .nav-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 16px 20px;
         border-bottom: 1px solid var(--border-color);
         background-color: var(--mx-navigation-background, #020557);
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
 
         .nav-title {
             flex: 0 0 auto;
