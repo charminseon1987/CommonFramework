@@ -30,6 +30,10 @@
                 <caption>Resource Data Source</caption>
                 <description>List of Resource items from microflow</description>
             </property>
+            <property key="Icon" type="datasource" isList="true" required="false">
+                <caption>Icon Data Source</caption>
+                <description>List of Icon items with System.Image association from microflow</description>
+            </property>
         </propertyGroup>
         
          <!-- Layout Configuration -->

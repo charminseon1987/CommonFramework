@@ -23,6 +23,9 @@ export interface MenuItemData {
     iconClass?: string;
     resourceEnabledTF?: boolean;
 
+    // 이미지 정보 (System.Image association을 통해)
+    imageInfo?: ImageInfo;
+
     // Mendix Object
     guid?: string;
 }
@@ -83,4 +86,14 @@ export interface MenuCache {
     data: MenuTreeNode[];
     timestamp: number;
     userId: string;
+}
+
+/**
+ * Mendix System.Image 엔티티의 이미지 정보
+ */
+export interface ImageInfo {
+    guid: string;
+    changedDate: number;
+    name: string;
+    publicThumbnailPath?: string; // PublicThumbnailPath가 있으면 우선 사용
 }

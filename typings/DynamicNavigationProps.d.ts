@@ -24,6 +24,7 @@ export interface DynamicNavigationContainerProps {
     menuDataSource: ListValue;
     currentUser: CurrentUserType[];
     Resource: ListValue;
+    Icon?: ListValue;
     layout: LayoutEnum;
     sidebarWidth: string;
     topbarHeight: string;
@@ -57,6 +58,7 @@ export interface DynamicNavigationPreviewProps {
     menuDataSource: {} | { caption: string } | { type: string } | null;
     currentUser: CurrentUserPreviewType[];
     Resource: {} | { caption: string } | { type: string } | null;
+    Icon: {} | { caption: string } | { type: string } | null;
     layout: LayoutEnum;
     sidebarWidth: string;
     topbarHeight: string;

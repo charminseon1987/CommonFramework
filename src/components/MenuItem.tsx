@@ -3,6 +3,7 @@
 import { ReactElement, createElement } from 'react';
 import classNames from 'classnames';
 import { MenuTreeNode } from '../types/menu.types';
+import { buildMendixImageUrl } from '../utils/imageUtils';
 
 interface MenuItemProps {
   item: MenuTreeNode;
@@ -105,6 +106,17 @@ export function MenuItem({
           <span className="nav-icon" aria-hidden="true">
             <i className={item.iconClass}></i>
           </span>
+        )}
+
+        {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
+        {layout === 'vertical' && item.imageInfo && item.imageInfo.guid && (
+          <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
+            <img 
+              className="img-thumbnail" 
+              alt="" 
+              src={buildMendixImageUrl(item.imageInfo, true)}
+            />
+          </div>
         )}
 
         {/* 메뉴명 - aria-expanded 속성 없음 (확장/축소와 무관) */}

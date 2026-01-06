@@ -189,6 +189,30 @@
             }
         }
 
+        // Mendix 이미지 뷰어 스타일
+        .mx-image-viewer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            min-width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            margin: 0;
+
+            &.mx-image-viewer-responsive {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .img-thumbnail {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+            }
+        }
+
         .nav-label {
             flex: 1;
             overflow: hidden;

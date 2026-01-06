@@ -12,6 +12,7 @@ export interface DynamicNavigationContainerProps {
     menuDataSource: ListValue;
     currentUser?: ListValue;
     Resource?: ListValue;
+    Icon?: ListValue;
     // Attributes
     menuId: ListAttributeValue<string>;
     menuName: ListAttributeValue<string>;
