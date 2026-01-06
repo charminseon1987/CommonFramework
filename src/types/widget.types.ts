@@ -41,6 +41,7 @@ export interface DynamicNavigationContainerProps {
     // Behavior
     onMenuClick: ActionValue;
     onAuthFailed?: ActionValue;
+    onLogout?: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     maxDepth: number;
