@@ -339,3 +339,35 @@ export function buildDepthMap(nodes: MenuTreeNode[], map: Record<number, MenuTre
 
     return map;
 }
+
+/**
+ * localStorage에 collapsed 상태 저장
+ */
+const COLLAPSED_STORAGE_KEY = "bangarlab-nav-collapsed-state";
+
+export const saveCollapsedState = (isCollapsed: boolean): void => {
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            localStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify(isCollapsed));
+        }
+    } catch (error) {
+        console.warn("[MenuHelpers] Failed to save collapsed state to localStorage:", error);
+    }
+};
+
+/**
+ * localStorage에서 collapsed 상태 로드
+ */
+export const loadCollapsedState = (): boolean => {
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            const stored = localStorage.getItem(COLLAPSED_STORAGE_KEY);
+            if (stored !== null) {
+                return JSON.parse(stored) as boolean;
+            }
+        }
+    } catch (error) {
+        console.warn("[MenuHelpers] Failed to load collapsed state from localStorage:", error);
+    }
+    return false;
+};

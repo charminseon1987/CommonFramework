@@ -57,6 +57,11 @@ export function MenuItem({
     }
   );
 
+  // 아이콘과 이미지 존재 여부 확인
+  const hasIcon = item.iconClass && item.iconClass.trim() !== '';
+  const hasImage = layout === 'vertical' && item.imageInfo && item.imageInfo.guid;
+  const hasAnyIcon = hasIcon || hasImage;
+
   // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
   const handleContentClick = (e: React.MouseEvent): void => {
     // 화살표 버튼 클릭이 아닐 때만 처리
@@ -93,7 +98,10 @@ export function MenuItem({
     <li className={itemClasses} data-menu-id={item.menuId}>
       {/* nav-item-content div에 클릭 이벤트 추가 (아이콘 클릭 시에도 동작) */}
       <div 
-        className="nav-item-content" 
+        className={classNames('nav-item-content', {
+          'no-icon': !hasAnyIcon,
+          'has-icon': hasAnyIcon
+        })} 
         data-menu-name={item.menuName}
         onClick={handleContentClick}
         onKeyDown={handleContentKeyDown}

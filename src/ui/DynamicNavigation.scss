@@ -402,10 +402,20 @@
               min-width: 60px !important;
           }
 
+          // 기본적으로 nav-label 숨김
           .nav-label {
               opacity: 0;
               width: 0;
               overflow: hidden;
+          }
+
+          // 아이콘과 이미지가 모두 없을 때 nav-label 표시
+          .nav-item-content.no-icon .nav-label {
+              opacity: 1;
+              width: auto;
+              overflow: visible;
+              white-space: nowrap;
+              text-overflow: ellipsis;
           }
       }
   }

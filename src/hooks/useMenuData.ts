@@ -59,146 +59,219 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
     const [menuData, setMenuData] = useState<MenuItemData[] | null>(null);
 
     useEffect(() => {
+        // 메뉴 데이터소스와 Resource가 사용 가능한지 확인
         if (menuDataSource.status !== ValueStatus.Available || Resource?.status !== ValueStatus.Available) {
+            // 데이터가 아직 로드되지 않았으면 기존 데이터 유지 (새로고침 시 이미지 유지)
+            if (menuDataSource.status === ValueStatus.Loading || Resource?.status === ValueStatus.Loading) {
+                return;
+            }
+            // 에러 상태가 아니면 기존 데이터 유지
             return;
         }
 
-        /** Resource GUID → attributes */
-        const resourceMap = new Map<string, Record<string, { value: any }>>();
+        try {
+            /** Resource GUID → attributes */
+            const resourceMap = new Map<string, Record<string, { value: any }>>();
 
-        Resource.items?.forEach(resource => {
-            resourceMap.set(resource.id, getMxAttributes(resource));
-        });
+            if (Resource.items && Array.isArray(Resource.items)) {
+                Resource.items.forEach(resource => {
+                    try {
+                        if (resource && resource.id) {
+                            resourceMap.set(resource.id, getMxAttributes(resource));
+                        }
+                    } catch (error) {
+                        console.warn('[Resource] Failed to process resource:', resource?.id, error);
+                    }
+                });
+            }
 
-        /** Icon GUID → ImageInfo */
-        const iconImageMap = new Map<string, ImageInfo>();
+            /** Icon GUID → ImageInfo */
+            const iconImageMap = new Map<string, ImageInfo>();
 
-        if (Icon?.status === ValueStatus.Available && Icon.items) {
-            console.debug('[Icon] Icon datasource available, items count:', Icon.items.length);
-            
-            Icon.items.forEach(icon => {
-                // Icon 엔티티 자체가 System.Image를 상속하거나 직접 이미지 정보를 포함
-                // Icon 엔티티를 직접 extractImageInfo로 처리
-                const imageInfo = extractImageInfo(icon);
+            // Icon 데이터소스가 사용 가능하면 처리 (없어도 계속 진행)
+            if (Icon?.status === ValueStatus.Available && Icon.items && Array.isArray(Icon.items)) {
+                console.debug('[Icon] Icon datasource available, items count:', Icon.items.length);
                 
-                if (imageInfo) {
-                    // Icon ID를 문자열로 정규화하여 저장
-                    const iconIdStr = String(icon.id);
-                    iconImageMap.set(iconIdStr, imageInfo);
-                    console.debug('[Icon] Successfully mapped Icon:', iconIdStr, 'to ImageInfo:', imageInfo);
-                } else {
-                    // 디버깅: 이미지 정보 추출 실패
-                    const iconAttrs = getMxAttributes(icon);
-                    const allAttrKeys = Object.keys(iconAttrs);
-                    console.warn('[Icon] Failed to extract image info from Icon:', icon.id, 'Available attributes:', allAttrKeys);
-                }
-            });
-            
-            console.debug('[Icon] Icon map size after processing:', iconImageMap.size, 'Icon IDs:', Array.from(iconImageMap.keys()));
-        } else {
-            // 디버깅: Icon 데이터소스가 없거나 사용 불가
-            console.warn('[Icon] Icon datasource not available. Status:', Icon?.status, 'Items:', Icon?.items?.length ?? 0);
-        }
+                Icon.items.forEach(icon => {
+                    try {
+                        if (!icon || !icon.id) {
+                            return;
+                        }
+                        
+                        // Icon 엔티티 자체가 System.Image를 상속하거나 직접 이미지 정보를 포함
+                        // Icon 엔티티를 직접 extractImageInfo로 처리
+                        const imageInfo = extractImageInfo(icon);
+                        
+                        if (imageInfo && imageInfo.guid) {
+                            // Icon ID를 문자열로 정규화하여 저장
+                            const iconIdStr = String(icon.id);
+                            iconImageMap.set(iconIdStr, imageInfo);
+                            console.debug('[Icon] Successfully mapped Icon:', iconIdStr, 'to ImageInfo:', imageInfo);
+                        } else {
+                            // 디버깅: 이미지 정보 추출 실패
+                            const iconAttrs = getMxAttributes(icon);
+                            const allAttrKeys = Object.keys(iconAttrs);
+                            console.debug('[Icon] Failed to extract image info from Icon:', icon.id, 'Available attributes:', allAttrKeys);
+                        }
+                    } catch (error) {
+                        console.warn('[Icon] Error processing icon:', icon?.id, error);
+                    }
+                });
+                
+                console.debug('[Icon] Icon map size after processing:', iconImageMap.size, 'Icon IDs:', Array.from(iconImageMap.keys()));
+            } else if (Icon) {
+                // Icon 데이터소스가 있지만 아직 로드되지 않았거나 사용 불가
+                console.debug('[Icon] Icon datasource status:', Icon.status, 'Items:', Icon.items?.length ?? 0);
+            }
 
-        const result: MenuItemData[] =
-            menuDataSource.items?.map(menu => {
-                const attrs = getMxAttributes(menu);
+            const result: MenuItemData[] =
+                menuDataSource.items?.map(menu => {
+                    try {
+                        const attrs = getMxAttributes(menu);
 
-                const resourceGuid = getAssociatedGuid(attrs["PortalModule.SyMenu_SyResource"]?.value);
+                        const resourceGuid = getAssociatedGuid(attrs["PortalModule.SyMenu_SyResource"]?.value);
 
-                const resourceAttrs = resourceGuid ? resourceMap.get(resourceGuid) : undefined;
+                        const resourceAttrs = resourceGuid ? resourceMap.get(resourceGuid) : undefined;
 
-                // 이미지 정보 추출
-                // 1. Icon association을 통해 Icon GUID 찾기
-                const iconGuid = getAssociatedGuid(
-                    attrs["PortalModule.SyMenu_Icon"]?.value ||
-                    attrs["SyMenu_Icon"]?.value ||
-                    attrs["Icon"]?.value ||
-                    attrs["MenuIcon"]?.value
-                );
-
+                // 이미지 정보 추출 (여러 fallback 경로 시도)
                 let imageInfo: ImageInfo | undefined = undefined;
 
-                // 2. Icon Map에서 이미지 정보 조회
-                if (iconGuid) {
-                    // Icon GUID를 문자열로 정규화하여 조회
-                    const iconGuidStr = String(iconGuid);
-                    if (iconImageMap.has(iconGuidStr)) {
-                        imageInfo = iconImageMap.get(iconGuidStr);
-                    } else {
-                        // 디버깅: Icon GUID는 있지만 Map에 없음
-                        console.warn('[Client] Icon GUID found but not in map:', iconGuidStr, 'Type:', typeof iconGuid, 'Available Icon IDs:', Array.from(iconImageMap.keys()));
-                        console.warn('[Client] Icon datasource status:', Icon?.status, 'Icon items count:', Icon?.items?.length ?? 0);
-                        
-                        // 타입 불일치 디버깅: Map의 키들과 비교
-                        const mapKeys = Array.from(iconImageMap.keys());
-                        const matchingKey = mapKeys.find(key => String(key) === iconGuidStr || key === iconGuid);
-                        if (matchingKey) {
-                            console.warn('[Client] Found matching key with different type:', matchingKey, 'Using it...');
-                            imageInfo = iconImageMap.get(matchingKey);
-                        }
-                    }
-                }
+                try {
+                    // 1. Icon association을 통해 Icon GUID 찾기
+                    const iconGuid = getAssociatedGuid(
+                        attrs["PortalModule.SyMenu_Icon"]?.value ||
+                        attrs["SyMenu_Icon"]?.value ||
+                        attrs["Icon"]?.value ||
+                        attrs["MenuIcon"]?.value
+                    );
 
-                // 3. Icon이 없거나 Icon Map에 없는 경우, 직접 이미지 association 확인
-                if (!imageInfo) {
-                    const imageObj = 
-                        attrs["System.Image"]?.value || 
-                        attrs["Image"]?.value ||
-                        attrs["PortalModule.SyMenu_Image"]?.value ||
-                        attrs["SyMenu_Image"]?.value ||
-                        resourceAttrs?.["System.Image"]?.value ||
-                        resourceAttrs?.["Image"]?.value;
-                    
-                    if (imageObj) {
-                        // 이미지 객체가 직접 전달된 경우
-                        if (typeof imageObj === 'object' && imageObj.id) {
-                            imageInfo = extractImageInfo(imageObj);
-                            if (!imageInfo) {
-                                console.debug('Failed to extract image info from direct image object:', imageObj);
-                            }
+                    // 2. Icon Map에서 이미지 정보 조회
+                    if (iconGuid) {
+                        // Icon GUID를 문자열로 정규화하여 조회
+                        const iconGuidStr = String(iconGuid);
+                        if (iconImageMap.has(iconGuidStr)) {
+                            imageInfo = iconImageMap.get(iconGuidStr);
                         } else {
-                            // GUID만 있는 경우 (fallback)
-                            const imageGuid = getAssociatedGuid(imageObj);
-                            if (imageGuid) {
-                                imageInfo = {
-                                    guid: String(imageGuid),
-                                    changedDate: 0,
-                                    name: ''
-                                };
+                            // 타입 불일치 디버깅: Map의 키들과 비교
+                            const mapKeys = Array.from(iconImageMap.keys());
+                            const matchingKey = mapKeys.find(key => String(key) === iconGuidStr || key === iconGuid);
+                            if (matchingKey) {
+                                console.debug('[Client] Found matching key with different type:', matchingKey, 'Using it...');
+                                imageInfo = iconImageMap.get(matchingKey);
+                            } else if (Icon?.status === ValueStatus.Available) {
+                                // Icon 데이터소스가 사용 가능한데 Map에 없으면 디버깅 로그만 출력 (에러 아님)
+                                console.debug('[Client] Icon GUID found but not in map:', iconGuidStr, 'Available Icon IDs:', Array.from(iconImageMap.keys()));
                             }
                         }
                     }
+
+                    // 3. Icon이 없거나 Icon Map에 없는 경우, 직접 이미지 association 확인
+                    if (!imageInfo) {
+                        const imageObj = 
+                            attrs["System.Image"]?.value || 
+                            attrs["Image"]?.value ||
+                            attrs["PortalModule.SyMenu_Image"]?.value ||
+                            attrs["SyMenu_Image"]?.value ||
+                            resourceAttrs?.["System.Image"]?.value ||
+                            resourceAttrs?.["Image"]?.value;
+                        
+                        if (imageObj) {
+                            try {
+                                // 이미지 객체가 직접 전달된 경우
+                                if (typeof imageObj === 'object' && imageObj.id) {
+                                    imageInfo = extractImageInfo(imageObj);
+                                    if (!imageInfo) {
+                                        // GUID만 있는 경우 fallback 시도
+                                        const imageGuid = imageObj.id ? String(imageObj.id) : null;
+                                        if (imageGuid) {
+                                            imageInfo = {
+                                                guid: imageGuid,
+                                                changedDate: 0,
+                                                name: ''
+                                            };
+                                        }
+                                    }
+                                } else {
+                                    // GUID만 있는 경우 (fallback)
+                                    const imageGuid = getAssociatedGuid(imageObj);
+                                    if (imageGuid) {
+                                        imageInfo = {
+                                            guid: String(imageGuid),
+                                            changedDate: 0,
+                                            name: ''
+                                        };
+                                    }
+                                }
+                            } catch (error) {
+                                console.warn('[Image] Error extracting image info from imageObj:', error);
+                                // GUID만 추출 시도
+                                try {
+                                    const imageGuid = getAssociatedGuid(imageObj);
+                                    if (imageGuid) {
+                                        imageInfo = {
+                                            guid: String(imageGuid),
+                                            changedDate: 0,
+                                            name: ''
+                                        };
+                                    }
+                                } catch (fallbackError) {
+                                    console.warn('[Image] Fallback GUID extraction also failed:', fallbackError);
+                                }
+                            }
+                        }
+                    }
+
+                    // 디버깅: 최종 이미지 정보 확인
+                    if (imageInfo) {
+                        console.debug('[Image] Image info found for menu:', attrs.MenuName?.value, 'GUID:', imageInfo.guid);
+                    }
+                } catch (error) {
+                    console.warn('[Image] Error during image info extraction for menu:', attrs.MenuName?.value, error);
+                    // 에러가 발생해도 계속 진행 (이미지가 없어도 메뉴는 표시)
                 }
 
-                // 디버깅: 최종 이미지 정보 확인
-                if (imageInfo) {
-                    console.debug('Image info found for menu:', attrs.MenuName?.value, imageInfo);
-                }
+                        return {
+                            menuId: String(attrs.MenuId?.value ?? ""),
+                            menuName: String(attrs.MenuName?.value ?? ""),
+                            parentMenuId: attrs.ParentId?.value ?? null,
+                            depth: Number(attrs.Depth?.value ?? 0),
+                            sortNo: Number(attrs.SortNo?.value ?? 0),
+                            displayYn: attrs.DisplayYn?.value ?? "Y",
+                            enabledTF: attrs.EnableTF?.value !== false,
 
-                return {
-                    menuId: String(attrs.MenuId?.value ?? ""),
-                    menuName: String(attrs.MenuName?.value ?? ""),
-                    parentMenuId: attrs.ParentId?.value ?? null,
-                    depth: Number(attrs.Depth?.value ?? 0),
-                    sortNo: Number(attrs.SortNo?.value ?? 0),
-                    displayYn: attrs.DisplayYn?.value ?? "Y",
-                    enabledTF: attrs.EnableTF?.value !== false,
+                            // 🔗 Resource에서 가져오는 값
+                            pageURL: resourceAttrs?.PageUrl?.value,
+                            resourceName: resourceAttrs?.ResourceName?.value,
+                            resourceType: resourceAttrs?.ResourceType?.value,
+                            iconClass: resourceAttrs?.IconClass?.value,
 
-                    // 🔗 Resource에서 가져오는 값
-                    pageURL: resourceAttrs?.PageUrl?.value,
-                    resourceName: resourceAttrs?.ResourceName?.value,
-                    resourceType: resourceAttrs?.ResourceType?.value,
-                    iconClass: resourceAttrs?.IconClass?.value,
+                            // 이미지 정보
+                            imageInfo: imageInfo,
 
-                    // 이미지 정보
-                    imageInfo: imageInfo,
+                            guid: menu.id
+                        };
+                    } catch (error) {
+                        console.error('[Menu] Error processing menu item:', menu?.id, error);
+                        // 에러가 발생한 메뉴는 기본값으로 반환
+                        return {
+                            menuId: String(menu?.id ?? ""),
+                            menuName: "Error",
+                            parentMenuId: null,
+                            depth: 0,
+                            sortNo: 0,
+                            displayYn: "N",
+                            enabledTF: false,
+                            imageInfo: undefined,
+                            guid: menu?.id
+                        };
+                    }
+                }) ?? [];
 
-                    guid: menu.id
-                };
-            }) ?? [];
-
-        setMenuData(result);
+            setMenuData(result);
+        } catch (error) {
+            console.error('[MenuData] Error processing menu data:', error);
+            // 에러가 발생해도 기존 데이터는 유지 (새로고침 시 이미지 유지)
+        }
     }, [menuDataSource.status, menuDataSource.items, Resource?.status, Resource?.items, Icon?.status, Icon?.items]);
 
     return menuData;

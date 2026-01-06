@@ -13,6 +13,7 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
+import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
@@ -33,6 +34,16 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const handleHomeClick = useHomeNavigation(setState);
 
     const menuPositions = useMenuPositions(isAllExpanded);
+
+    /* ------------------------------------------------------------------
+     * collapsed 상태 복원 (초기 마운트 시에만)
+     * ------------------------------------------------------------------ */
+    useEffect(() => {
+        if (props.layout === "vertical") {
+            const savedCollapsedState = loadCollapsedState();
+            setIsCollapsed(savedCollapsedState);
+        }
+    }, [props.layout]);
 
     /* ------------------------------------------------------------------
      * 레이아웃 스타일 주입 (20:80 비율)
@@ -85,7 +96,13 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     };
 
     const handleToggleCollapse = () => {
-        setIsCollapsed(prev => !prev);
+        setIsCollapsed(prev => {
+            const newState = !prev;
+            if (props.layout === "vertical") {
+                saveCollapsedState(newState);
+            }
+            return newState;
+        });
     };
 
     const handleExpandAll = () => {
