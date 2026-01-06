@@ -24,7 +24,6 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const { state, setState } = useNavigationState(menuData);
     // User domain
     const userData = useUserData(props);
-    console.log("userData from home", userData);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -156,7 +155,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
      * ================================================================== */
     return (
         <div>
-            <UserInformation user={userData?.[0]} />
+            <UserInformation user={userData?.[0]} onLogout={props.onLogout}/>
             <div className={containerClasses}>
                 <aside className="nav-sidebar" role="navigation">
                     {/* 헤더 */}
@@ -188,17 +187,30 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         />
                     </nav>
 
-                {/* 접기 버튼 */}
-                {props.collapsible && (
-                    <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
-                        <span className="nav-toggle-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d={isCollapsed ? "M5 2L9 7L5 12" : "M9 2L5 7L9 12"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </span>
-                    </button>
-                )}
-            </aside>
+                    {/* 접기 버튼 */}
+                    {props.collapsible && (
+                        <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
+                            <span className="nav-toggle-icon">
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 14 14"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d={isCollapsed ? "M5 2L9 7L5 12" : "M9 2L5 7L9 12"}
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            </span>
+                        </button>
+                    )}
+                </aside>
+            </div>
         </div>
     );
 }

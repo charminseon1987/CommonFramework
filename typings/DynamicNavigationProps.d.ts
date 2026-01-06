@@ -21,7 +21,7 @@ export interface DynamicNavigationContainerProps {
     sidebarWidth: string;
     topbarHeight: string;
     collapsible: boolean;
-    onMenuClick?: ActionValue;
+    onLogout?: ActionValue;
     onAuthFailed?: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
@@ -54,7 +54,7 @@ export interface DynamicNavigationPreviewProps {
     sidebarWidth: string;
     topbarHeight: string;
     collapsible: boolean;
-    onMenuClick: {} | null;
+    onLogout: {} | null;
     onAuthFailed: {} | null;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;

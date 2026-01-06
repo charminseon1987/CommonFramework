@@ -36,6 +36,7 @@ export interface MenuProps {
     resourceEnabledTF?: ListAttributeValue<boolean>;
 
     // Layout
+    maxDepth: number;
     layout: "vertical" | "horizontal";
     position: "left" | "top";
     sidebarWidth: string;
@@ -43,11 +44,10 @@ export interface MenuProps {
     collapsible: boolean;
 
     // Behavior
-    onMenuClick: ActionValue;
+    onLogout: ActionValue;
     onAuthFailed?: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
-    maxDepth: number;
     enableDynamicAuth: boolean;
 
     // Appearance

@@ -66,9 +66,9 @@
         
         <!-- Behavior -->
         <propertyGroup caption="Behavior">
-            <property key="onMenuClick" type="action" required="true">
-                <caption>On Menu Click</caption>
-                <description>Action when menu item is clicked</description>
+            <property key="onLogout" type="action" required="true">
+                <caption>onLogout</caption>
+                <description>Action when user logged out</description>
             </property>
             
             <property key="onAuthFailed" type="action" required="false">
