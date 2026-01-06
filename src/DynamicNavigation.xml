@@ -29,6 +29,11 @@
                 <caption>Current User</caption>
                 <description>Current logged-in user object</description>
             </property>
+            <property key="Icon" type="datasource" isList="true" required="false">
+                <caption>Icon Data Source</caption>
+                <description>List of Icon items with System.Image association from microflow</description>
+            </property>
+        </propertyGroup>
         
         </propertyGroup>
 

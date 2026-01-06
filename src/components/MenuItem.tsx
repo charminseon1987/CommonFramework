@@ -1,8 +1,9 @@
 // src/components/MenuItem.tsx
 
-import { ReactElement, createElement } from 'react';
+import { ReactElement, createElement, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { MenuTreeNode } from '../types/menu.types';
+import { buildMendixImageUrl, buildMendixImageUrlAsync } from '../utils/imageUtils';
 
 interface MenuItemProps {
   item: MenuTreeNode;
@@ -30,6 +31,43 @@ export function MenuItem({
   const hasChildren = item.children && item.children.length > 0;
   const canExpand = hasChildren && depth < maxDepth;
 
+  // 이미지 URL을 state로 관리 (vertical layout일 때만)
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  // 이미지 URL 비동기 로드 (vertical layout일 때만)
+  useEffect(() => {
+    if (layout === 'vertical' && item.imageInfo && item.imageInfo.guid) {
+      let isMounted = true;
+
+      const loadImageUrl = async () => {
+        try {
+          const url = await buildMendixImageUrlAsync(item.imageInfo!, true);
+          if (isMounted && url) {
+            setImageUrl(url);
+          }
+        } catch (error) {
+          console.warn('[MenuItem] Failed to load image URL:', error);
+          if (isMounted) {
+            // 에러 발생 시 동기 함수로 fallback
+            const fallbackUrl = buildMendixImageUrl(item.imageInfo!, true);
+            if (fallbackUrl) {
+              setImageUrl(fallbackUrl);
+            }
+          }
+        }
+      };
+
+      loadImageUrl();
+
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      // vertical layout이 아니거나 이미지가 없으면 state 초기화
+      setImageUrl(null);
+    }
+  }, [layout, item.imageInfo?.guid]);
+
     // 메뉴명 클릭 핸들러 (메뉴 클릭만, 확장/축소는 하지 않음)
     const handleMenuClick = (e: React.MouseEvent): void => {
         e.preventDefault();
@@ -55,6 +93,11 @@ export function MenuItem({
       'has-children': hasChildren
     }
   );
+
+  // 아이콘과 이미지 존재 여부 확인
+  const hasIcon = item.iconClass && item.iconClass.trim() !== '';
+  const hasImage = layout === 'vertical' && item.imageInfo && item.imageInfo.guid;
+  const hasAnyIcon = hasIcon || hasImage;
 
   // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
   const handleContentClick = (e: React.MouseEvent): void => {
@@ -92,7 +135,10 @@ export function MenuItem({
     <li className={itemClasses} data-menu-id={item.menuId}>
       {/* nav-item-content div에 클릭 이벤트 추가 (아이콘 클릭 시에도 동작) */}
       <div 
-        className="nav-item-content" 
+        className={classNames('nav-item-content', {
+          'no-icon': !hasAnyIcon,
+          'has-icon': hasAnyIcon
+        })} 
         data-menu-name={item.menuName}
         onClick={handleContentClick}
         onKeyDown={handleContentKeyDown}
@@ -105,6 +151,17 @@ export function MenuItem({
           <span className="nav-icon" aria-hidden="true">
             <i className={item.iconClass}></i>
           </span>
+        )}
+
+        {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
+        {layout === 'vertical' && item.imageInfo && item.imageInfo.guid && imageUrl && (
+          <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
+            <img 
+              className="img-thumbnail" 
+              alt="" 
+              src={imageUrl}
+            />
+          </div>
         )}
 
         {/* 메뉴명 - aria-expanded 속성 없음 (확장/축소와 무관) */}

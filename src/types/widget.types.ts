@@ -17,6 +17,7 @@ export interface MenuProps {
     // Data Source
     menuDataSource: ListValue;
     Resource?: ListValue;
+    Icon?: ListValue;
     // Attributes
     menuId: ListAttributeValue<string>;
     menuName: ListAttributeValue<string>;
@@ -46,6 +47,7 @@ export interface MenuProps {
     // Behavior
     onLogout: ActionValue;
     onAuthFailed?: ActionValue;
+    onLogout?: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;

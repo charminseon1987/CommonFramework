@@ -1,5 +1,5 @@
 // src/BangarlabDynamicNavigation.tsx
-import { ReactElement, createElement, useState } from "react";
+import { ReactElement, createElement, useState, useEffect } from "react";
 import classNames from "classnames";
 import { DynamicNavigationContainerProps } from "./types/widget.types";
 import { NavigationMenu } from "./components/NavigationMenu";
@@ -15,6 +15,7 @@ import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
 import useUserData from "./hooks/useUserData";
 import { UserInformation } from "./components/UserInformation";
+import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
@@ -38,6 +39,45 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const menuPositions = useMenuPositions(isAllExpanded);
 
     /* ------------------------------------------------------------------
+     * collapsed 상태 복원 (초기 마운트 시에만)
+     * ------------------------------------------------------------------ */
+    useEffect(() => {
+        if (props.layout === "vertical") {
+            const savedCollapsedState = loadCollapsedState();
+            setIsCollapsed(savedCollapsedState);
+        }
+    }, [props.layout]);
+
+    /* ------------------------------------------------------------------
+     * 레이아웃 스타일 주입 (20:80 비율)
+     * ------------------------------------------------------------------ */
+    useEffect(() => {
+        if (props.layout === "vertical") {
+            // 부모 컨테이너 찾기
+            const container = document.querySelector(".mx-scrollcontainer-wrapper") as HTMLElement;
+            if (container) {
+                container.style.display = "flex";
+                container.style.flexDirection = "row";
+                container.style.height = "100vh";
+                container.style.overflow = "hidden";
+                container.style.width = "100%";
+            }
+
+            // 페이지 콘텐츠 영역
+            const placeholder = document.querySelector(".mx-scrollcontainer-wrapper > .mx-placeholder") as HTMLElement;
+            if (placeholder) {
+                placeholder.style.width = "80%";
+                placeholder.style.maxWidth = "80%";
+                placeholder.style.minWidth = "80%";
+                placeholder.style.overflow = "auto";
+                placeholder.style.flexShrink = "0";
+                placeholder.style.flexGrow = "0";
+                placeholder.style.paddingTop = "72px"; // nav-header 높이만큼 여백 추가
+            }
+        }
+    }, [props.layout]);
+
+    /* ------------------------------------------------------------------
      * handlers
      * ------------------------------------------------------------------ */
     const handleMenuClickWrapper = (menuId: string, pageURL: string | undefined, hasChildren: boolean) => {
@@ -59,7 +99,13 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     };
 
     const handleToggleCollapse = () => {
-        setIsCollapsed(prev => !prev);
+        setIsCollapsed(prev => {
+            const newState = !prev;
+            if (props.layout === "vertical") {
+                saveCollapsedState(newState);
+            }
+            return newState;
+        });
     };
 
     const handleExpandAll = () => {
@@ -70,6 +116,12 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const handleCollapseAll = () => {
         collapseAll();
         setIsAllExpanded(false);
+    };
+
+    const handleLogout = () => {
+        if (props.onLogout?.canExecute) {
+            props.onLogout.execute();
+        }
     };
 
     /* ------------------------------------------------------------------
@@ -114,8 +166,23 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                             />
                         </nav>
 
-                        {/* 오른쪽 : 전체 펼치기 */}
+                        {/* 오른쪽 : 로그아웃 및 전체 펼치기 */}
                         <div className="nav-topbar-right">
+                            {props.onLogout && (
+                                <button
+                                    className="nav-logout-btn-horizontal"
+                                    onClick={handleLogout}
+                                    type="button"
+                                    aria-label="로그아웃"
+                                >
+                                    <span className="nav-logout-icon">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H6M10.6667 11.3333L14 8M14 8L10.6667 4.66667M14 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </span>
+                                    <span className="nav-logout-text">로그아웃</span>
+                                </button>
+                            )}
                             <button
                                 className={classNames("hamburger-btn", {
                                     "is-open": isAllExpanded
@@ -164,53 +231,36 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                             홈
                         </button>
 
-                        <div className="nav-controls">
-                            <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
-                            <button
-                                className="nav-control-btn collapse-all"
-                                onClick={handleCollapseAll}
-                                type="button"
-                            />
-                        </div>
+                    <div className="nav-controls">
+                        <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
+                        <button className="nav-control-btn collapse-all" onClick={handleCollapseAll} type="button" />
                     </div>
+                </div>
 
-                    {/* 메뉴 */}
-                    <nav className="nav-content">
-                        <NavigationMenu
-                            menuItems={state.menuTree}
-                            activeMenuId={state.activeMenuId}
-                            onMenuClick={handleMenuClickWrapper}
-                            onToggleExpand={toggleExpand}
-                            depth={0}
-                            maxDepth={props.maxDepth}
-                            showDepthIndicator={props.showDepthIndicator}
-                        />
-                    </nav>
+                {/* 메뉴 */}
+                <nav className="nav-content">
+                    <NavigationMenu
+                        menuItems={state.menuTree}
+                        activeMenuId={state.activeMenuId}
+                        onMenuClick={handleMenuClickWrapper}
+                        onToggleExpand={toggleExpand}
+                        depth={0}
+                        maxDepth={props.maxDepth}
+                        showDepthIndicator={props.showDepthIndicator}
+                    />
+                </nav>
 
-                    {/* 접기 버튼 */}
-                    {props.collapsible && (
-                        <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
-                            <span className="nav-toggle-icon">
-                                <svg
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 14 14"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d={isCollapsed ? "M5 2L9 7L5 12" : "M9 2L5 7L9 12"}
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            </span>
-                        </button>
-                    )}
-                </aside>
-            </div>
+                {/* 접기 버튼 */}
+                {props.collapsible && (
+                    <button className="nav-toggle-btn" onClick={handleToggleCollapse} type="button">
+                        <span className="nav-toggle-icon">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d={isCollapsed ? "M5 2L9 7L5 12" : "M9 2L5 7L9 12"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                )}
+            </aside>
         </div>
     );
 }

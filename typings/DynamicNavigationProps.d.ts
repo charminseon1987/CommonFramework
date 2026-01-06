@@ -15,7 +15,6 @@ export interface DynamicNavigationContainerProps {
     tabIndex?: number;
     menuDataSource: ListValue;
     Resource: ListValue;
-    currentUser?: ListValue;
     layout: LayoutEnum;
     maxDepth: number;
     sidebarWidth: string;
@@ -48,7 +47,6 @@ export interface DynamicNavigationPreviewProps {
     translate: (text: string) => string;
     menuDataSource: {} | { caption: string } | { type: string } | null;
     Resource: {} | { caption: string } | { type: string } | null;
-    currentUser: {} | { caption: string } | { type: string } | null;
     layout: LayoutEnum;
     maxDepth: number | null;
     sidebarWidth: string;
