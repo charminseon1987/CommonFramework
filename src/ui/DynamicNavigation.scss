@@ -2,6 +2,25 @@
 
 @use "sass:color";
 
+// Mendix 컨테이너 레이아웃: 네비게이션과 페이지를 가로로 배치
+:global(.mx-scrollcontainer-wrapper) {
+    display: flex !important;
+    flex-direction: row !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    width: 100% !important;
+}
+
+// 페이지 콘텐츠 영역: 화면 너비의 80%를 차지하고 스크롤 가능
+:global(.mx-scrollcontainer-wrapper > .mx-placeholder) {
+    width: 80% !important;
+    max-width: 80% !important;
+    min-width: 80% !important;
+    overflow: auto !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+}
+
 .bangarlab-navigation {
     --theme-color: #1890ff;
     --animation-duration: 300ms;
@@ -338,9 +357,12 @@
     }
 
     &.layout-vertical {
-      width: var(--sidebar-width);
-      max-width: var(--sidebar-width);
-      min-width: var(--sidebar-width);
+      width: 20% !important;
+      max-width: 20% !important;
+      min-width: 20% !important;
+      height: 100vh !important;
+      flex-shrink: 0 !important;
+      flex-grow: 0 !important;
 
       &.collapsed {
           width: 60px;
@@ -361,9 +383,9 @@
 
   // 사이드바 스타일
   .nav-sidebar {
-      width: var(--sidebar-width);
-      max-width: var(--sidebar-width);
-      min-width: var(--sidebar-width);
+      width: 100% !important; // 부모 컨테이너(20%)의 100%를 차지
+      max-width: 100% !important;
+      min-width: 100% !important;
       height: 100vh;
       display: flex;
       flex-direction: column;

@@ -1,5 +1,5 @@
 // src/BangarlabDynamicNavigation.tsx
-import { ReactElement, createElement, useState } from "react";
+import { ReactElement, createElement, useState, useEffect } from "react";
 import classNames from "classnames";
 import { DynamicNavigationContainerProps } from "./types/widget.types";
 import { NavigationMenu } from "./components/NavigationMenu";
@@ -33,6 +33,34 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const handleHomeClick = useHomeNavigation(setState);
 
     const menuPositions = useMenuPositions(isAllExpanded);
+
+    /* ------------------------------------------------------------------
+     * 레이아웃 스타일 주입 (20:80 비율)
+     * ------------------------------------------------------------------ */
+    useEffect(() => {
+        if (props.layout === "vertical") {
+            // 부모 컨테이너 찾기
+            const container = document.querySelector(".mx-scrollcontainer-wrapper") as HTMLElement;
+            if (container) {
+                container.style.display = "flex";
+                container.style.flexDirection = "row";
+                container.style.height = "100vh";
+                container.style.overflow = "hidden";
+                container.style.width = "100%";
+            }
+
+            // 페이지 콘텐츠 영역
+            const placeholder = document.querySelector(".mx-scrollcontainer-wrapper > .mx-placeholder") as HTMLElement;
+            if (placeholder) {
+                placeholder.style.width = "80%";
+                placeholder.style.maxWidth = "80%";
+                placeholder.style.minWidth = "80%";
+                placeholder.style.overflow = "auto";
+                placeholder.style.flexShrink = "0";
+                placeholder.style.flexGrow = "0";
+            }
+        }
+    }, [props.layout]);
 
     /* ------------------------------------------------------------------
      * handlers
