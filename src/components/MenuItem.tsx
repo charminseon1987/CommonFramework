@@ -1,9 +1,9 @@
 // src/components/MenuItem.tsx
 
-import { ReactElement, createElement } from 'react';
+import { ReactElement, createElement, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { MenuTreeNode } from '../types/menu.types';
-import { buildMendixImageUrl } from '../utils/imageUtils';
+import { buildMendixImageUrl, buildMendixImageUrlAsync } from '../utils/imageUtils';
 
 interface MenuItemProps {
   item: MenuTreeNode;
@@ -30,6 +30,43 @@ export function MenuItem({
 }: MenuItemProps): ReactElement {
   const hasChildren = item.children && item.children.length > 0;
   const canExpand = hasChildren && depth < maxDepth;
+
+  // 이미지 URL을 state로 관리 (vertical layout일 때만)
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  // 이미지 URL 비동기 로드 (vertical layout일 때만)
+  useEffect(() => {
+    if (layout === 'vertical' && item.imageInfo && item.imageInfo.guid) {
+      let isMounted = true;
+
+      const loadImageUrl = async () => {
+        try {
+          const url = await buildMendixImageUrlAsync(item.imageInfo!, true);
+          if (isMounted && url) {
+            setImageUrl(url);
+          }
+        } catch (error) {
+          console.warn('[MenuItem] Failed to load image URL:', error);
+          if (isMounted) {
+            // 에러 발생 시 동기 함수로 fallback
+            const fallbackUrl = buildMendixImageUrl(item.imageInfo!, true);
+            if (fallbackUrl) {
+              setImageUrl(fallbackUrl);
+            }
+          }
+        }
+      };
+
+      loadImageUrl();
+
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      // vertical layout이 아니거나 이미지가 없으면 state 초기화
+      setImageUrl(null);
+    }
+  }, [layout, item.imageInfo?.guid]);
 
     // 메뉴명 클릭 핸들러 (메뉴 클릭만, 확장/축소는 하지 않음)
     const handleMenuClick = (e: React.MouseEvent): void => {
@@ -117,12 +154,12 @@ export function MenuItem({
         )}
 
         {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
-        {layout === 'vertical' && item.imageInfo && item.imageInfo.guid && (
+        {layout === 'vertical' && item.imageInfo && item.imageInfo.guid && imageUrl && (
           <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
             <img 
               className="img-thumbnail" 
               alt="" 
-              src={buildMendixImageUrl(item.imageInfo, true)}
+              src={imageUrl}
             />
           </div>
         )}
