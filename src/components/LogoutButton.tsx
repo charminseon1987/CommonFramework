@@ -2,15 +2,31 @@ import { ReactElement, createElement } from "react";
 import { ActionValue } from "mendix";
 
 interface LogoutButtonProps {
-    onLogout: ActionValue;
+    onLogout?: ActionValue;
+    className?: string;
 }
 
-export default function LogoutButton({ onLogout }: LogoutButtonProps): ReactElement {
+export default function LogoutButton({ onLogout, className }: LogoutButtonProps): ReactElement {
     const handleLogout = () => {
         if (onLogout && onLogout.canExecute) {
             onLogout.execute();
         }
     };
 
-    return <button onClick={handleLogout}>로그아웃</button>;
+    return (
+        <button className={className} onClick={handleLogout} type="button" aria-label="로그아웃">
+            <span className="nav-logout-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H6M10.6667 11.3333L14 8M14 8L10.6667 4.66667M14 8H6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+            </span>
+            <span className="nav-logout-text">로그아웃</span>
+        </button>
+    );
 }

@@ -45,9 +45,8 @@ export interface MenuProps {
     collapsible: boolean;
 
     // Behavior
-    onLogout: ActionValue;
     onAuthFailed?: ActionValue;
-    onLogout?: ActionValue;
+    onLogout: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;
