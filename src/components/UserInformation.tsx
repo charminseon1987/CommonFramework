@@ -1,7 +1,6 @@
 import { ReactElement, createElement } from "react";
 import { UserData } from "src/types/user.types";
 
-
 interface UserInformationProps {
     user?: UserData;
 }
