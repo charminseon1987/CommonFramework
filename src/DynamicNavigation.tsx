@@ -13,7 +13,7 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
-import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
+import { saveCollapsedState, loadCollapsedState } from "./components/utils/menuHelpers";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
@@ -31,22 +31,33 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const { toggleExpand, toggleExpandHorizontal, expandAll, collapseAll } = useMenuExpand(setState, setIsAllExpanded);
 
     const { navigate } = useMenuNavigation(props);
-    const handleHomeClick = useHomeNavigation(setState);
+    const homeNavigationHandler = useHomeNavigation(setState);
+    
+    // 홈 버튼 클릭 핸들러 (collapsed 상태 유지)
+    const handleHomeClick = () => {
+        // 홈 버튼 클릭 시 현재 collapsed 상태를 localStorage에 저장
+        // 페이지가 다시 렌더링되어도 동일한 collapsed 상태가 복원됨
+        if (props.layout === "vertical") {
+            saveCollapsedState(isCollapsed);
+        }
+        homeNavigationHandler();
+    };
 
     const menuPositions = useMenuPositions(isAllExpanded);
 
     /* ------------------------------------------------------------------
-     * collapsed 상태 복원 (초기 마운트 시에만)
+     * collapsed 상태 복원 (localStorage에서 저장된 상태 복원)
      * ------------------------------------------------------------------ */
     useEffect(() => {
         if (props.layout === "vertical") {
+            // localStorage에서 저장된 collapsed 상태 복원 (값이 없으면 false)
             const savedCollapsedState = loadCollapsedState();
             setIsCollapsed(savedCollapsedState);
         }
     }, [props.layout]);
 
     /* ------------------------------------------------------------------
-     * 레이아웃 스타일 주입 (20:80 비율)
+     * 레이아웃 스타일 주입 (15:85 비율)
      * ------------------------------------------------------------------ */
     useEffect(() => {
         if (props.layout === "vertical") {
@@ -63,9 +74,9 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             // 페이지 콘텐츠 영역
             const placeholder = document.querySelector(".mx-scrollcontainer-wrapper > .mx-placeholder") as HTMLElement;
             if (placeholder) {
-                placeholder.style.width = "80%";
-                placeholder.style.maxWidth = "80%";
-                placeholder.style.minWidth = "80%";
+                placeholder.style.width = "85%";
+                placeholder.style.maxWidth = "85%";
+                placeholder.style.minWidth = "85%";
                 placeholder.style.overflow = "auto";
                 placeholder.style.flexShrink = "0";
                 placeholder.style.flexGrow = "0";
@@ -252,6 +263,8 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         depth={0}
                         maxDepth={props.maxDepth}
                         showDepthIndicator={props.showDepthIndicator}
+                        isCollapsed={isCollapsed}
+                        onToggleCollapse={handleToggleCollapse}
                     />
                 </nav>
                 {/* 로그아웃 버튼 */}

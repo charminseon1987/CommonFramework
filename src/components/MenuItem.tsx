@@ -15,6 +15,8 @@ interface MenuItemProps {
   maxDepth: number;
   showDepthIndicator: boolean;
   layout?: 'vertical' | 'horizontal';
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export function MenuItem({
@@ -26,7 +28,9 @@ export function MenuItem({
   depth,
   maxDepth,
   showDepthIndicator,
-  layout = 'vertical'
+  layout = 'vertical',
+  isCollapsed = false,
+  onToggleCollapse
 }: MenuItemProps): ReactElement {
   const hasChildren = item.children && item.children.length > 0;
   const canExpand = hasChildren && depth < maxDepth;
@@ -107,6 +111,19 @@ export function MenuItem({
       return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
     }
     
+    // nav-item-content 요소 찾기
+    const contentElement = target.closest('.nav-item-content') as HTMLElement;
+    const isNoIcon = contentElement?.classList.contains('no-icon');
+    
+    // depth-0 이하이고 collapsed 상태인 경우: collapsed 해제
+    // 또는 no-icon 클래스를 가진 nav-item-content 클릭 시 collapsed 해제
+    if (isCollapsed && onToggleCollapse && (depth <= 0 || isNoIcon)) {
+      e.preventDefault();
+      e.stopPropagation();
+      onToggleCollapse();
+      return;
+    }
+    
     // 자식이 있는 경우: 확장/축소
     if (canExpand) {
       e.preventDefault();
@@ -128,6 +145,15 @@ export function MenuItem({
         // 자식이 없는 경우: 페이지 이동
         handleMenuClick(e as any);
       }
+    }
+  };
+
+  // depth 인디케이터 클릭 핸들러 (collapsed 상태일 때만 네비게이션 펼치기)
+  const handleDepthIndicatorClick = (e: React.MouseEvent): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isCollapsed && onToggleCollapse) {
+      onToggleCollapse();
     }
   };
 
@@ -193,7 +219,12 @@ export function MenuItem({
 
         {/* Depth 표시 (개발용) */}
         {showDepthIndicator && (
-          <span className="nav-depth-indicator" aria-label={`Depth ${depth}`}>
+          <span 
+            className="nav-depth-indicator" 
+            aria-label={`Depth ${depth}`}
+            onClick={handleDepthIndicatorClick}
+            style={isCollapsed ? { cursor: 'pointer' } : undefined}
+          >
             D{depth}
           </span>
         )}
@@ -214,6 +245,8 @@ export function MenuItem({
               maxDepth={maxDepth}
               showDepthIndicator={showDepthIndicator}
               layout={layout}
+              isCollapsed={isCollapsed}
+              onToggleCollapse={onToggleCollapse}
             />
           ))}
         </ul>

@@ -11,11 +11,11 @@
     width: 100% !important;
 }
 
-// 페이지 콘텐츠 영역: 화면 너비의 80%를 차지하고 스크롤 가능
+// 페이지 콘텐츠 영역: 화면 너비의 85%를 차지하고 스크롤 가능
 :global(.mx-scrollcontainer-wrapper > .mx-placeholder) {
-    width: 80% !important;
-    max-width: 80% !important;
-    min-width: 80% !important;
+    width: 85% !important;
+    max-width: 85% !important;
+    min-width: 85% !important;
     overflow: auto !important;
     flex-shrink: 0 !important;
     flex-grow: 0 !important;
@@ -84,7 +84,7 @@
 
         // Depth별 들여쓰기
         &.depth-0 > .nav-item-content {
-            padding: 16px 20px;
+            padding: 16px 10px;
             font-weight: 600;
             font-size: 15px;
             background-color: var(--depth-0-bg);
@@ -92,21 +92,21 @@
         }
 
         &.depth-1 > .nav-item-content {
-            padding: 14px 20px 14px 40px;
+            padding: 14px 20px 14px 52px;
             font-size: 14px;
             background-color: var(--depth-1-bg);
             color: var(--text-active);
         }
 
         &.depth-2 > .nav-item-content {
-            padding: 12px 20px 12px 60px;
+            padding: 12px 20px 12px 93px;
             font-size: 13px;
             background-color: var(--depth-2-bg);
             color: var(--text-active);
         }
 
         &.depth-3 > .nav-item-content {
-            padding: 12px 20px 12px 80px;
+            padding: 12px 20px 12px 116px;
             font-size: 13px;
             color: var(--text-active);
             background-color: var(--depth-3-bg);
@@ -385,9 +385,9 @@
     }
 
     &.layout-vertical {
-      width: 20% !important;
-      max-width: 20% !important;
-      min-width: 20% !important;
+      width: 15% !important;
+      max-width: 15% !important;
+      min-width: 15% !important;
       height: 100vh !important;
       flex-shrink: 0 !important;
       flex-grow: 0 !important;
@@ -420,6 +420,21 @@
               overflow: visible;
               white-space: nowrap;
               text-overflow: ellipsis;
+          }
+
+          // collapsed 상태일 때 depth 인디케이터 클릭 가능 스타일
+          .nav-depth-indicator {
+              cursor: pointer;
+              transition: all 0.2s ease;
+              
+              &:hover {
+                  background: linear-gradient(135deg, rgba(24, 144, 255, 0.2) 0%, rgba(24, 144, 255, 0.15) 100%);
+                  transform: scale(1.05);
+              }
+              
+              &:active {
+                  transform: scale(0.95);
+              }
           }
       }
   }
