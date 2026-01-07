@@ -13,6 +13,8 @@ interface NavigationMenuProps {
     maxDepth?: number;
     showDepthIndicator?: boolean;
     layout?: "vertical" | "horizontal";
+    isCollapsed?: boolean;
+    onUncollapse?: () => void;
 }
 
 export function NavigationMenu({
@@ -23,7 +25,9 @@ export function NavigationMenu({
     depth = 0,
     maxDepth = 2,
     showDepthIndicator = false,
-    layout = "vertical"
+    layout = "vertical",
+    isCollapsed = false,
+    onUncollapse
 }: NavigationMenuProps): ReactElement {
     if (!menuItems || menuItems.length === 0) {
         return (
@@ -48,6 +52,8 @@ export function NavigationMenu({
                     maxDepth={maxDepth}
                     showDepthIndicator={showDepthIndicator}
                     layout={layout}
+                    isCollapsed={isCollapsed}
+                    onUncollapse={onUncollapse}
                 />
             ))}
         </ul>

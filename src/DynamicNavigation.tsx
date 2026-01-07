@@ -100,6 +100,10 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             return next;
         });
     };
+    const handleUncollapse = () => {
+        setIsCollapsed(false);
+        saveCollapsedState(false);
+    };
     const handleMenuClickWrapper = (menuId: string, pageURL: string | undefined, hasChildren: boolean) => {
         // children 있는 메뉴는 페이지 이동 안 함
         if (hasChildren) return;
@@ -229,6 +233,8 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                             depth={0}
                             maxDepth={props.maxDepth}
                             showDepthIndicator={props.showDepthIndicator}
+                            isCollapsed={isCollapsed}
+                            onUncollapse={handleUncollapse}
                         />
                         <LogoutButton className="nav-logout-btn" onLogout={props.onLogout} />
                     </nav>
