@@ -37,7 +37,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
 
     const { navigate } = useMenuNavigation(props);
     const homeNavigationHandler = useHomeNavigation(setState);
-    
+
     // 홈 버튼 클릭 핸들러 (collapsed 상태 유지)
     const handleHomeClick = () => {
         // 홈 버튼 클릭 시 현재 collapsed 상태를 localStorage에 저장
