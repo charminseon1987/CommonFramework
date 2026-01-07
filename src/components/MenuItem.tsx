@@ -1,76 +1,76 @@
 // src/components/MenuItem.tsx
 
-import { ReactElement, createElement, useState, useEffect } from 'react';
-import classNames from 'classnames';
-import { MenuTreeNode } from '../types/menu.types';
-import { buildMendixImageUrl, buildMendixImageUrlAsync } from '../utils/imageUtils';
+import { ReactElement, createElement, useState, useEffect } from "react";
+import classNames from "classnames";
+import { MenuTreeNode } from "../types/menu.types";
+import { buildMendixImageUrl, buildMendixImageUrlAsync } from "../utils/imageUtils";
 
 interface MenuItemProps {
-  item: MenuTreeNode;
-  isActive: boolean;
-  activeMenuId: string | null;
-  onMenuClick: (menuId: string, pageURL: string | undefined, hasChildren: boolean, depth: number) => void;
-  onToggleExpand: (menuId: string) => void;
-  depth: number;
-  maxDepth: number;
-  showDepthIndicator: boolean;
-  layout?: 'vertical' | 'horizontal';
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
+    item: MenuTreeNode;
+    isActive: boolean;
+    activeMenuId: string | null;
+    onMenuClick: (menuId: string, pageURL: string | undefined, hasChildren: boolean, depth: number) => void;
+    onToggleExpand: (menuId: string) => void;
+    depth: number;
+    maxDepth: number;
+    showDepthIndicator: boolean;
+    layout?: "vertical" | "horizontal";
+    isCollapsed?: boolean;
+    onToggleCollapse?: () => void;
 }
 
 export function MenuItem({
-  item,
-  isActive,
-  activeMenuId,
-  onMenuClick,
-  onToggleExpand,
-  depth,
-  maxDepth,
-  showDepthIndicator,
-  layout = 'vertical',
-  isCollapsed = false,
-  onToggleCollapse
+    item,
+    isActive,
+    activeMenuId,
+    onMenuClick,
+    onToggleExpand,
+    depth,
+    maxDepth,
+    showDepthIndicator,
+    layout = "vertical",
+    isCollapsed = false,
+    onToggleCollapse
 }: MenuItemProps): ReactElement {
-  const hasChildren = item.children && item.children.length > 0;
-  const canExpand = hasChildren && depth < maxDepth;
+    const hasChildren = item.children && item.children.length > 0;
+    const canExpand = hasChildren && depth < maxDepth;
 
-  // 이미지 URL을 state로 관리 (vertical layout일 때만)
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+    // 이미지 URL을 state로 관리 (vertical layout일 때만)
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  // 이미지 URL 비동기 로드 (vertical layout일 때만)
-  useEffect(() => {
-    if (layout === 'vertical' && item.imageInfo && item.imageInfo.guid) {
-      let isMounted = true;
+    // 이미지 URL 비동기 로드 (vertical layout일 때만)
+    useEffect(() => {
+        if (layout === "vertical" && item.imageInfo && item.imageInfo.guid) {
+            let isMounted = true;
 
-      const loadImageUrl = async () => {
-        try {
-          const url = await buildMendixImageUrlAsync(item.imageInfo!, true);
-          if (isMounted && url) {
-            setImageUrl(url);
-          }
-        } catch (error) {
-          console.warn('[MenuItem] Failed to load image URL:', error);
-          if (isMounted) {
-            // 에러 발생 시 동기 함수로 fallback
-            const fallbackUrl = buildMendixImageUrl(item.imageInfo!, true);
-            if (fallbackUrl) {
-              setImageUrl(fallbackUrl);
-            }
-          }
+            const loadImageUrl = async () => {
+                try {
+                    const url = await buildMendixImageUrlAsync(item.imageInfo!, true);
+                    if (isMounted && url) {
+                        setImageUrl(url);
+                    }
+                } catch (error) {
+                    console.warn("[MenuItem] Failed to load image URL:", error);
+                    if (isMounted) {
+                        // 에러 발생 시 동기 함수로 fallback
+                        const fallbackUrl = buildMendixImageUrl(item.imageInfo!, true);
+                        if (fallbackUrl) {
+                            setImageUrl(fallbackUrl);
+                        }
+                    }
+                }
+            };
+
+            loadImageUrl();
+
+            return () => {
+                isMounted = false;
+            };
+        } else {
+            // vertical layout이 아니거나 이미지가 없으면 state 초기화
+            setImageUrl(null);
         }
-      };
-
-      loadImageUrl();
-
-      return () => {
-        isMounted = false;
-      };
-    } else {
-      // vertical layout이 아니거나 이미지가 없으면 state 초기화
-      setImageUrl(null);
-    }
-  }, [layout, item.imageInfo?.guid]);
+    }, [layout, item.imageInfo?.guid]);
 
     // 메뉴명 클릭 핸들러 (메뉴 클릭만, 확장/축소는 하지 않음)
     const handleMenuClick = (e: React.MouseEvent): void => {
@@ -79,178 +79,144 @@ export function MenuItem({
         onMenuClick(item.menuId, item.pageURL, hasChildren, depth);
     };
 
-  // 화살표 버튼 클릭 핸들러 (확장/축소만)
-  const handleArrowClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (canExpand) {
-      onToggleExpand(item.menuId);
-    }
-  };
+    // 화살표 버튼 클릭 핸들러 (확장/축소만)
+    const handleArrowClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (canExpand) {
+            onToggleExpand(item.menuId);
+        }
+    };
 
-  const itemClasses = classNames(
-    'nav-item',
-    `depth-${depth}`,
-    {
-      'active': isActive,
-      'expanded': item.isExpanded,
-      'has-children': hasChildren
-    }
-  );
+    const itemClasses = classNames("nav-item", `depth-${depth}`, {
+        active: isActive,
+        expanded: item.isExpanded,
+        "has-children": hasChildren
+    });
 
-  // 아이콘과 이미지 존재 여부 확인
-  const hasIcon = item.iconClass && item.iconClass.trim() !== '';
-  const hasImage = layout === 'vertical' && item.imageInfo && item.imageInfo.guid;
-  const hasAnyIcon = hasIcon || hasImage;
+    // 아이콘과 이미지 존재 여부 확인
+    const hasIcon = item.iconClass && item.iconClass.trim() !== "";
+    const hasImage = layout === "vertical" && item.imageInfo && item.imageInfo.guid;
+    const hasAnyIcon = hasIcon || hasImage;
 
-  // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
-  const handleContentClick = (e: React.MouseEvent): void => {
-    // 화살표 버튼 클릭이 아닐 때만 처리
-    const target = e.target as HTMLElement;
-    if (target.closest('.nav-arrow')) {
-      return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
-    }
-    
-    // nav-item-content 요소 찾기
-    const contentElement = target.closest('.nav-item-content') as HTMLElement;
-    const isNoIcon = contentElement?.classList.contains('no-icon');
-    
-    // depth-0 이하이고 collapsed 상태인 경우: collapsed 해제
-    // 또는 no-icon 클래스를 가진 nav-item-content 클릭 시 collapsed 해제
-    if (isCollapsed && onToggleCollapse && (depth <= 0 || isNoIcon)) {
-      e.preventDefault();
-      e.stopPropagation();
-      onToggleCollapse();
-      return;
-    }
-    
+    // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
+    const handleContentClick = (e: React.MouseEvent): void => {
+        // 화살표 버튼 클릭이 아닐 때만 처리
+        const target = e.target as HTMLElement;
+        if (target.closest(".nav-arrow")) {
+            return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
+        }
+
+        // nav-item-content 요소 찾기
+        const contentElement = target.closest(".nav-item-content") as HTMLElement;
+        const isNoIcon = contentElement?.classList.contains("no-icon");
+
+        // depth-0 이하이고 collapsed 상태인 경우: collapsed 해제
+        // 또는 no-icon 클래스를 가진 nav-item-content 클릭 시 collapsed 해제
+        if (isCollapsed && onToggleCollapse && (depth <= 0 || isNoIcon)) {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleCollapse();
+            return;
+        }
+
+        // 자식이 있는 경우: 확장/축소
+        if (canExpand) {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleExpand(item.menuId);
+        } else {
+            // 자식이 없는 경우: 페이지 이동
+            handleMenuClick(e);
+        }
+    };
+
     // 자식이 있는 경우: 확장/축소
     if (canExpand) {
-      e.preventDefault();
-      e.stopPropagation();
-      onToggleExpand(item.menuId);
-    } else {
-      // 자식이 없는 경우: 페이지 이동
-      handleMenuClick(e);
-    }
-  };
-
-  const handleContentKeyDown = (e: React.KeyboardEvent): void => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      // 자식이 있는 경우: 확장/축소
-      if (canExpand) {
+        e.preventDefault();
+        e.stopPropagation();
         onToggleExpand(item.menuId);
-      } else {
+    } else {
         // 자식이 없는 경우: 페이지 이동
-        handleMenuClick(e as any);
-      }
+        handleMenuClick(e);
     }
-  };
 
-  // depth 인디케이터 클릭 핸들러 (collapsed 상태일 때만 네비게이션 펼치기)
-  const handleDepthIndicatorClick = (e: React.MouseEvent): void => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isCollapsed && onToggleCollapse) {
-      onToggleCollapse();
-    }
-  };
+    // depth 인디케이터 클릭 핸들러 (collapsed 상태일 때만 네비게이션 펼치기)
+    const handleDepthIndicatorClick = (e: React.MouseEvent): void => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isCollapsed && onToggleCollapse) {
+            onToggleCollapse();
+        }
+    };
+    return (
+        <li className={itemClasses} data-menu-id={item.menuId}>
+            {/* nav-item-content div에 클릭 이벤트 추가 (아이콘 클릭 시에도 동작) */}
+            <div
+                className={classNames("nav-item-content", {
+                    "no-icon": !hasAnyIcon,
+                    "has-icon": hasAnyIcon
+                })}
+                data-menu-name={item.menuName}
+                onClick={handleContentClick}
+                onKeyDown={handleContentKeyDown}
+                role="button"
+                tabIndex={0}
+                aria-label={item.menuName}
+            >
+                {/* 아이콘 */}
+                {item.iconClass && item.iconClass.trim() !== "" && (
+                    <span className="nav-icon" aria-hidden="true">
+                        <i className={item.iconClass}></i>
+                    </span>
+                )}
 
-  return (
-    <li className={itemClasses} data-menu-id={item.menuId}>
-      {/* nav-item-content div에 클릭 이벤트 추가 (아이콘 클릭 시에도 동작) */}
-      <div 
-        className={classNames('nav-item-content', {
-          'no-icon': !hasAnyIcon,
-          'has-icon': hasAnyIcon
-        })} 
-        data-menu-name={item.menuName}
-        onClick={handleContentClick}
-        onKeyDown={handleContentKeyDown}
-        role="button"
-        tabIndex={0}
-        aria-label={item.menuName}
-      >
-        {/* 아이콘 */}
-        {item.iconClass && item.iconClass.trim() !== '' && (
-          <span className="nav-icon" aria-hidden="true">
-            <i className={item.iconClass}></i>
-          </span>
-        )}
+                {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
+                {layout === "vertical" && item.imageInfo && item.imageInfo.guid && imageUrl && (
+                    <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
+                        <img className="img-thumbnail" alt="" src={imageUrl} />
+                    </div>
+                )}
 
-        {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
-        {layout === 'vertical' && item.imageInfo && item.imageInfo.guid && imageUrl && (
-          <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
-            <img 
-              className="img-thumbnail" 
-              alt="" 
-              src={imageUrl}
-            />
-          </div>
-        )}
+                {/* 메뉴명 - aria-expanded 속성 없음 (확장/축소와 무관) */}
+                <span className="nav-label" title={item.menuName || ""}>
+                    {item.menuName || "메뉴"}
+                </span>
 
-        {/* 메뉴명 - aria-expanded 속성 없음 (확장/축소와 무관) */}
-        <span 
-          className="nav-label" 
-          title={item.menuName || ''}
-        >
-          {item.menuName || '메뉴'}
-        </span>
+                {/* Depth 표시 (개발용) */}
+                {showDepthIndicator && (
+                    <span
+                        className="nav-depth-indicator"
+                        aria-label={`Depth ${depth}`}
+                        onClick={handleDepthIndicatorClick}
+                        style={isCollapsed ? { cursor: "pointer" } : undefined}
+                    >
+                        D{depth}
+                    </span>
+                )}
+            </div>
 
-        {/* 확장 화살표 버튼 */}
-        {canExpand && (
-          <button
-            type="button"
-            className={classNames('nav-arrow', {
-              'expanded': item.isExpanded,
-              'collapsed': !item.isExpanded
-            })}
-            onClick={handleArrowClick}
-            aria-expanded={item.isExpanded}
-            aria-label={item.isExpanded ? '메뉴 접기' : '메뉴 펼치기'}
-            aria-hidden="false"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-              <path d="M6 9L1 4h10z" />
-            </svg>
-          </button>
-        )}
-
-        {/* Depth 표시 (개발용) */}
-        {showDepthIndicator && (
-          <span 
-            className="nav-depth-indicator" 
-            aria-label={`Depth ${depth}`}
-            onClick={handleDepthIndicatorClick}
-            style={isCollapsed ? { cursor: 'pointer' } : undefined}
-          >
-            D{depth}
-          </span>
-        )}
-      </div>
-
-      {/* 자식 메뉴 - 렌더링 조건 확인 */}
-      {canExpand && item.isExpanded && item.children.length > 0 && (
-        <ul className={`nav-submenu depth-${depth + 1}`} role="menu">
-          {item.children.map(child => (
-            <MenuItem
-              key={child.menuId}
-              item={child}
-              isActive={activeMenuId === child.menuId}
-              activeMenuId={activeMenuId}
-              onMenuClick={onMenuClick}
-              onToggleExpand={onToggleExpand}
-              depth={depth + 1}
-              maxDepth={maxDepth}
-              showDepthIndicator={showDepthIndicator}
-              layout={layout}
-              isCollapsed={isCollapsed}
-              onToggleCollapse={onToggleCollapse}
-            />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+            {/* 자식 메뉴 - 렌더링 조건 확인 */}
+            {canExpand && item.isExpanded && item.children.length > 0 && (
+                <ul className={`nav-submenu depth-${depth + 1}`} role="menu">
+                    {item.children.map(child => (
+                        <MenuItem
+                            key={child.menuId}
+                            item={child}
+                            isActive={activeMenuId === child.menuId}
+                            activeMenuId={activeMenuId}
+                            onMenuClick={onMenuClick}
+                            onToggleExpand={onToggleExpand}
+                            depth={depth + 1}
+                            maxDepth={maxDepth}
+                            showDepthIndicator={showDepthIndicator}
+                            layout={layout}
+                            isCollapsed={isCollapsed}
+                            onToggleCollapse={onToggleCollapse}
+                        />
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
 }
