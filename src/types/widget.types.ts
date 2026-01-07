@@ -2,15 +2,20 @@
 
 import { ActionValue, ListValue, ListAttributeValue } from "mendix";
 import { Big } from "big.js";
+import { UserProps } from "./user.types";
 
 /**
  * Widget Props 인터페이스
  * (XML에서 정의한 properties를 TypeScript로 매핑)
  */
-export interface DynamicNavigationContainerProps {
+export type DynamicNavigationContainerProps = MenuProps &
+    UserProps & {
+        onMenuClick: ActionValue;
+        onAuthFailed?: ActionValue;
+    };
+export interface MenuProps {
     // Data Source
     menuDataSource: ListValue;
-    currentUser?: ListValue;
     Resource?: ListValue;
     Icon?: ListValue;
     // Attributes
@@ -32,6 +37,7 @@ export interface DynamicNavigationContainerProps {
     resourceEnabledTF?: ListAttributeValue<boolean>;
 
     // Layout
+    maxDepth: number;
     layout: "vertical" | "horizontal";
     position: "left" | "top";
     sidebarWidth: string;
@@ -39,12 +45,10 @@ export interface DynamicNavigationContainerProps {
     collapsible: boolean;
 
     // Behavior
-    onMenuClick: ActionValue;
     onAuthFailed?: ActionValue;
-    onLogout?: ActionValue;
+    onLogout: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
-    maxDepth: number;
     enableDynamicAuth: boolean;
 
     // Appearance
