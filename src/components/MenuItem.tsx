@@ -15,8 +15,6 @@ interface MenuItemProps {
     maxDepth: number;
     showDepthIndicator: boolean;
     layout?: "vertical" | "horizontal";
-    isCollapsed?: boolean;
-    onToggleCollapse?: () => void;
 }
 
 export function MenuItem({
@@ -28,9 +26,7 @@ export function MenuItem({
     depth,
     maxDepth,
     showDepthIndicator,
-    layout = "vertical",
-    isCollapsed = false,
-    onToggleCollapse
+    layout = "vertical"
 }: MenuItemProps): ReactElement {
     const hasChildren = item.children && item.children.length > 0;
     const canExpand = hasChildren && depth < maxDepth;
@@ -107,19 +103,6 @@ export function MenuItem({
             return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
         }
 
-        // nav-item-content 요소 찾기
-        const contentElement = target.closest(".nav-item-content") as HTMLElement;
-        const isNoIcon = contentElement?.classList.contains("no-icon");
-
-        // depth-0 이하이고 collapsed 상태인 경우: collapsed 해제
-        // 또는 no-icon 클래스를 가진 nav-item-content 클릭 시 collapsed 해제
-        if (isCollapsed && onToggleCollapse && (depth <= 0 || isNoIcon)) {
-            e.preventDefault();
-            e.stopPropagation();
-            onToggleCollapse();
-            return;
-        }
-
         // 자식이 있는 경우: 확장/축소
         if (canExpand) {
             e.preventDefault();
@@ -131,24 +114,19 @@ export function MenuItem({
         }
     };
 
-    // 자식이 있는 경우: 확장/축소
-    if (canExpand) {
-        e.preventDefault();
-        e.stopPropagation();
-        onToggleExpand(item.menuId);
-    } else {
-        // 자식이 없는 경우: 페이지 이동
-        handleMenuClick(e);
-    }
-
-    // depth 인디케이터 클릭 핸들러 (collapsed 상태일 때만 네비게이션 펼치기)
-    const handleDepthIndicatorClick = (e: React.MouseEvent): void => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (isCollapsed && onToggleCollapse) {
-            onToggleCollapse();
+    const handleContentKeyDown = (e: React.KeyboardEvent): void => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            // 자식이 있는 경우: 확장/축소
+            if (canExpand) {
+                onToggleExpand(item.menuId);
+            } else {
+                // 자식이 없는 경우: 페이지 이동
+                handleMenuClick(e as any);
+            }
         }
     };
+
     return (
         <li className={itemClasses} data-menu-id={item.menuId}>
             {/* nav-item-content div에 클릭 이벤트 추가 (아이콘 클릭 시에도 동작) */}
@@ -183,14 +161,28 @@ export function MenuItem({
                     {item.menuName || "메뉴"}
                 </span>
 
+                {/* 확장 화살표 버튼 */}
+                {canExpand && (
+                    <button
+                        type="button"
+                        className={classNames("nav-arrow", {
+                            expanded: item.isExpanded,
+                            collapsed: !item.isExpanded
+                        })}
+                        onClick={handleArrowClick}
+                        aria-expanded={item.isExpanded}
+                        aria-label={item.isExpanded ? "메뉴 접기" : "메뉴 펼치기"}
+                        aria-hidden="false"
+                    >
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                            <path d="M6 9L1 4h10z" />
+                        </svg>
+                    </button>
+                )}
+
                 {/* Depth 표시 (개발용) */}
                 {showDepthIndicator && (
-                    <span
-                        className="nav-depth-indicator"
-                        aria-label={`Depth ${depth}`}
-                        onClick={handleDepthIndicatorClick}
-                        style={isCollapsed ? { cursor: "pointer" } : undefined}
-                    >
+                    <span className="nav-depth-indicator" aria-label={`Depth ${depth}`}>
                         D{depth}
                     </span>
                 )}
@@ -211,8 +203,6 @@ export function MenuItem({
                             maxDepth={maxDepth}
                             showDepthIndicator={showDepthIndicator}
                             layout={layout}
-                            isCollapsed={isCollapsed}
-                            onToggleCollapse={onToggleCollapse}
                         />
                     ))}
                 </ul>
