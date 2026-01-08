@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ValueStatus } from "mendix";
 import { DynamicNavigationContainerProps } from "../types/widget.types";
 import { MenuItemData, ImageInfo } from "../types/menu.types";
@@ -47,15 +47,22 @@ function extractImageInfo(imageObj: any): ImageInfo | undefined {
 export function useMenuData(props: DynamicNavigationContainerProps): MenuItemData[] | null {
     const { menuDataSource, Resource, Icon } = props;
     const [menuData, setMenuData] = useState<MenuItemData[] | null>(null);
+    // 이전 menuData를 저장하여 iconClass 보존
+    const previousMenuDataRef = useRef<MenuItemData[] | null>(null);
 
     useEffect(() => {
-        // 메뉴 데이터소스와 Resource가 사용 가능한지 확인
-        if (menuDataSource.status !== ValueStatus.Available || Resource?.status !== ValueStatus.Available) {
-            // 데이터가 아직 로드되지 않았으면 기존 데이터 유지 (새로고침 시 이미지 유지)
-            if (menuDataSource.status === ValueStatus.Loading || Resource?.status === ValueStatus.Loading) {
+        // 메뉴 데이터소스가 사용 가능한지 확인 (Resource는 선택적)
+        if (menuDataSource.status !== ValueStatus.Available) {
+            // 메뉴 데이터가 로딩 중이면 기존 데이터 유지
+            if (menuDataSource.status === ValueStatus.Loading) {
                 return;
             }
             // 에러 상태가 아니면 기존 데이터 유지
+            return;
+        }
+
+        // Resource가 있지만 아직 로딩 중이면 기존 데이터 유지 (iconClass 보존)
+        if (Resource && Resource.status === ValueStatus.Loading) {
             return;
         }
 
@@ -63,7 +70,7 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
             /** Resource GUID → attributes */
             const resourceMap = new Map<string, Record<string, { value: any }>>();
 
-            if (Resource.items && Array.isArray(Resource.items)) {
+            if (Resource && Resource.items && Array.isArray(Resource.items)) {
                 Resource.items.forEach(resource => {
                     try {
                         if (resource && resource.id) {
@@ -122,6 +129,16 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
             } else if (Icon) {
                 // Icon 데이터소스가 있지만 아직 로드되지 않았거나 사용 불가
                 console.debug("[Icon] Icon datasource status:", Icon.status, "Items:", Icon.items?.length ?? 0);
+            }
+
+            // 이전 menuData에서 menuId별 iconClass 맵 생성 (보존용)
+            const previousIconClassMap = new Map<string, string>();
+            if (previousMenuDataRef.current) {
+                previousMenuDataRef.current.forEach(item => {
+                    if (item.iconClass && item.iconClass.trim() !== "") {
+                        previousIconClassMap.set(item.menuId, item.iconClass);
+                    }
+                });
             }
 
             const result: MenuItemData[] =
@@ -253,8 +270,25 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                             // 에러가 발생해도 계속 진행 (이미지가 없어도 메뉴는 표시)
                         }
 
+                        // iconClass 안전 처리: Resource에서 가져오거나, 없으면 이전 값 보존
+                        const menuId = String(attrs.MenuId?.value ?? "");
+                        let iconClass: string | undefined = undefined;
+                        
+                        if (Resource?.status === ValueStatus.Available && resourceAttrs?.IconClass?.value) {
+                            // Resource가 로드되었고 IconClass가 있으면 사용
+                            const resourceIconClass = resourceAttrs.IconClass.value;
+                            iconClass = resourceIconClass && String(resourceIconClass).trim() !== "" 
+                                ? String(resourceIconClass).trim() 
+                                : undefined;
+                        }
+                        
+                        // Resource에서 iconClass를 가져오지 못했으면 이전 값 보존
+                        if (!iconClass && previousIconClassMap.has(menuId)) {
+                            iconClass = previousIconClassMap.get(menuId);
+                        }
+
                         return {
-                            menuId: String(attrs.MenuId?.value ?? ""),
+                            menuId: menuId,
                             menuName: String(attrs.MenuName?.value ?? ""),
                             parentMenuId: attrs.ParentId?.value ?? null,
                             depth: Number(attrs.Depth?.value ?? 0),
@@ -266,7 +300,7 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                             pageURL: resourceAttrs?.PageUrl?.value,
                             resourceName: resourceAttrs?.ResourceName?.value,
                             resourceType: resourceAttrs?.ResourceType?.value,
-                            iconClass: resourceAttrs?.IconClass?.value,
+                            iconClass: iconClass,
 
                             // 이미지 정보
                             imageInfo: imageInfo,
@@ -290,7 +324,9 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                     }
                 }) ?? [];
 
+            // menuData 업데이트 및 이전 데이터 참조 업데이트
             setMenuData(result);
+            previousMenuDataRef.current = result;
         } catch (error) {
             console.error("[MenuData] Error processing menu data:", error);
             // 에러가 발생해도 기존 데이터는 유지 (새로고침 시 이미지 유지)

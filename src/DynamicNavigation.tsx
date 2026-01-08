@@ -18,6 +18,7 @@ import { UserInformation } from "./components/UserInformation";
 import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
+import logoImage from "./assets/logo.png";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
@@ -156,7 +157,65 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         {/* 왼쪽 : 홈 */}
                         <div className="nav-topbar-left">
                             <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                                홈
+                                <img src={logoImage} alt="logo" />
+                            </button>
+                        </div>
+
+                        {/* 중앙 : depth 0 메뉴 */}
+                        <nav className="nav-topbar-center">
+                            <HorizontalNavigationMenu
+                                menuItems={state.menuTree}
+                                activeMenuId={state.activeMenuId}
+                                onHorizontalMenuClick={handleHorizontalMenuClick}
+                                onToggleExpand={toggleExpandHorizontal}
+                                onToggleExpandNormal={toggleExpand}
+                                depth={0}
+                                maxDepth={props.maxDepth}
+                                showDepthIndicator={props.showDepthIndicator}
+                            />
+                        </nav>
+
+                        {/* 오른쪽 : 로그아웃 및 전체 펼치기 */}
+                        <div className="nav-topbar-right">
+                            {props.onLogout && (
+                                <LogoutButton className="nav-logout-btn-horizontal" onLogout={props.onLogout} />
+                            )}
+                            <HamburgerButton isOpen={isAllExpanded} onClick={() => setIsAllExpanded(prev => !prev)} />
+                        </div>
+                    </div>
+
+                    {/* ===============================
+                     * Mega / Full Menu
+                     * =============================== */}
+                    {isAllExpanded && (
+                        <FullMenu
+                            menuTree={state.menuTree}
+                            isOpen={isAllExpanded}
+                            activeMenuId={state.activeMenuId}
+                            menuPositions={menuPositions}
+                            isAllExpanded={isAllExpanded}
+                            onMenuClick={(menuId, pageURL) => {
+                                handleHorizontalMenuClick(menuId, pageURL, false);
+                            }}
+                        />
+                    )}
+                </header>
+            </div>
+        );
+    }
+     /* ==================================================================
+     * TOPBAR FULLWIDTH
+     * ================================================================== */
+
+     if (props.layout === "topbar_fullwidth") {
+        return (
+            <div className={containerClasses}>
+                <header className="nav-topbar" role="navigation">
+                    <div className="nav-topbar-inner">
+                        {/* 왼쪽 : 홈 */}
+                        <div className="nav-topbar-left">
+                            <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
+                                <img src={logoImage} alt="logo" />
                             </button>
                         </div>
 
@@ -212,7 +271,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                 <div className="nav-header">
                     {props.collapsible && <HamburgerButton onClick={handleToggleCollapse} />}
                     <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                        홈
+                        <img src={logoImage} alt="logo" />
                     </button>
 
                     <UserInformation user={userData?.[0]} />
@@ -242,4 +301,5 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             </div>
         </div>
     );
+
 }
