@@ -119,7 +119,7 @@ DynamicFramework-main/
 ├── CustomWidget/              ← ✅ 업로드됨
 │   └── CommonFramework/
 │       ├── src/               ← ✅ 소스 코드
-│       │   ├── BangarlabDynamicNavigation.tsx
+│       │   ├── DynamicNavigation.tsx
 │       │   ├── components/
 │       │   │   ├── NavigationMenu.tsx
 │       │   │   └── horizontal/
@@ -278,6 +278,6 @@ git push origin main
 - **작성자**: CBG Development Team
 - **작성일**: 2025년 12월 24일
 - **프로젝트**: DynamicFramework-main
-- **Widget**: BangarlabDynamicNavigation
+- **Widget**: DynamicNavigation
 
 ---

@@ -141,7 +141,7 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                 });
             }
 
-            const result: MenuItemData[] =
+            const result =
                 menuDataSource.items?.map(menu => {
                     try {
                         const attrs = getMxAttributes(menu);
@@ -157,9 +157,9 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                             // 1. Icon association을 통해 Icon GUID 찾기
                             const iconGuid = getAssociatedGuid(
                                 attrs["PortalModule.SyMenu_Icon"]?.value ||
-                                    attrs["SyMenu_Icon"]?.value ||
-                                    attrs["Icon"]?.value ||
-                                    attrs["MenuIcon"]?.value
+                                attrs["SyMenu_Icon"]?.value ||
+                                attrs["Icon"]?.value ||
+                                attrs["MenuIcon"]?.value
                             );
 
                             // 2. Icon Map에서 이미지 정보 조회
@@ -273,15 +273,15 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                         // iconClass 안전 처리: Resource에서 가져오거나, 없으면 이전 값 보존
                         const menuId = String(attrs.MenuId?.value ?? "");
                         let iconClass: string | undefined = undefined;
-                        
+
                         if (Resource?.status === ValueStatus.Available && resourceAttrs?.IconClass?.value) {
                             // Resource가 로드되었고 IconClass가 있으면 사용
                             const resourceIconClass = resourceAttrs.IconClass.value;
-                            iconClass = resourceIconClass && String(resourceIconClass).trim() !== "" 
-                                ? String(resourceIconClass).trim() 
+                            iconClass = resourceIconClass && String(resourceIconClass).trim() !== ""
+                                ? String(resourceIconClass).trim()
                                 : undefined;
                         }
-                        
+
                         // Resource에서 iconClass를 가져오지 못했으면 이전 값 보존
                         if (!iconClass && previousIconClassMap.has(menuId)) {
                             iconClass = previousIconClassMap.get(menuId);
@@ -302,11 +302,15 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                             resourceType: resourceAttrs?.ResourceType?.value,
                             iconClass: iconClass,
 
-                        imageInfo: undefined,
+                            imageInfo: undefined,
 
-                        guid: menu.id
-                    };
-                }) ?? [];
+                            guid: menu.id
+                        };
+                    } catch (error) {
+                        console.warn("[MenuData] Error processing menu item:", menu?.id, error);
+                        return null;
+                    }
+                }).filter(item => item !== null) as MenuItemData[] ?? [];
 
             // menuData 업데이트 및 이전 데이터 참조 업데이트
             setMenuData(result);
@@ -317,43 +321,6 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
         }
     }, [menuDataSource.status, menuDataSource.items, Resource?.status, Resource?.items]);
 
-    useEffect(() => {
-        if (Icon?.status !== ValueStatus.Available || !Icon.items || !menuData) {
-            return;
-        }
-
-        const iconImageMap = new Map<string, ImageInfo>();
-
-        Icon.items.forEach(icon => {
-            const imageInfo = extractImageInfo(icon);
-            console.log("imageInfo", imageInfo)
-            console.log("icon", icon)
-            if (imageInfo?.guid) {
-                iconImageMap.set(String(icon.id), imageInfo);
-            }
-        });
-
-        setMenuData(prev => {
-            if (!prev) return prev;
-
-            return prev.map(menu => {
-                const attrs = getMxAttributes(menu);
-
-                const iconGuid = getAssociatedGuid(
-                    attrs["PortalModule.SyMenu_Icon"]?.value || attrs["SyMenu_Icon"]?.value || attrs["Icon"]?.value
-                );
-
-                if (iconGuid && iconImageMap.has(String(iconGuid))) {
-                    return {
-                        ...menu,
-                        imageInfo: iconImageMap.get(String(iconGuid))
-                    };
-                }
-
-                return menu;
-            });
-        });
-    }, [Icon?.status, Icon?.items]);
 
     return menuData;
 }
