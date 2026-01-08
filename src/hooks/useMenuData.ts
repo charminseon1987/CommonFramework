@@ -302,26 +302,10 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
                             resourceType: resourceAttrs?.ResourceType?.value,
                             iconClass: iconClass,
 
-                            // 이미지 정보
-                            imageInfo: imageInfo,
+                        imageInfo: undefined,
 
-                            guid: menu.id
-                        };
-                    } catch (error) {
-                        console.error("[Menu] Error processing menu item:", menu?.id, error);
-                        // 에러가 발생한 메뉴는 기본값으로 반환
-                        return {
-                            menuId: String(menu?.id ?? ""),
-                            menuName: "Error",
-                            parentMenuId: null,
-                            depth: 0,
-                            sortNo: 0,
-                            displayYn: "N",
-                            enabledTF: false,
-                            imageInfo: undefined,
-                            guid: menu?.id
-                        };
-                    }
+                        guid: menu.id
+                    };
                 }) ?? [];
 
             // menuData 업데이트 및 이전 데이터 참조 업데이트
@@ -331,7 +315,45 @@ export function useMenuData(props: DynamicNavigationContainerProps): MenuItemDat
             console.error("[MenuData] Error processing menu data:", error);
             // 에러가 발생해도 기존 데이터는 유지 (새로고침 시 이미지 유지)
         }
-    }, [menuDataSource.status, menuDataSource.items, Resource?.status, Resource?.items, Icon?.status, Icon?.items]);
+    }, [menuDataSource.status, menuDataSource.items, Resource?.status, Resource?.items]);
+
+    useEffect(() => {
+        if (Icon?.status !== ValueStatus.Available || !Icon.items || !menuData) {
+            return;
+        }
+
+        const iconImageMap = new Map<string, ImageInfo>();
+
+        Icon.items.forEach(icon => {
+            const imageInfo = extractImageInfo(icon);
+            console.log("imageInfo", imageInfo)
+            console.log("icon", icon)
+            if (imageInfo?.guid) {
+                iconImageMap.set(String(icon.id), imageInfo);
+            }
+        });
+
+        setMenuData(prev => {
+            if (!prev) return prev;
+
+            return prev.map(menu => {
+                const attrs = getMxAttributes(menu);
+
+                const iconGuid = getAssociatedGuid(
+                    attrs["PortalModule.SyMenu_Icon"]?.value || attrs["SyMenu_Icon"]?.value || attrs["Icon"]?.value
+                );
+
+                if (iconGuid && iconImageMap.has(String(iconGuid))) {
+                    return {
+                        ...menu,
+                        imageInfo: iconImageMap.get(String(iconGuid))
+                    };
+                }
+
+                return menu;
+            });
+        });
+    }, [Icon?.status, Icon?.items]);
 
     return menuData;
 }
