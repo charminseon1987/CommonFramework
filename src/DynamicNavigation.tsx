@@ -13,8 +13,6 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
-// import useUserData from "./hooks/useUserData";
-// import { UserInformation } from "./components/UserInformation";
 import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
@@ -29,7 +27,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     // const userData = useUserData(props);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    console.log("menuData", menuData)
+    console.log("menuData", menuData);
     /* ------------------------------------------------------------------
      * hooks
      * ------------------------------------------------------------------ */
@@ -62,45 +60,6 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         }
     }, [props.layout]);
 
-    /* ------------------------------------------------------------------
-     * 레이아웃 스타일 주입 (15:85 비율)
-     * ------------------------------------------------------------------ */
-    // useEffect(() => {
-    //     if (props.layout === "vertical") {
-    //         // 부모 컨테이너 찾기
-    //         const container = document.querySelector(".mx-scrollcontainer-wrapper") as HTMLElement;
-    //         if (container) {
-    //             container.style.display = "flex";
-    //             container.style.flexDirection = "row";
-    //             container.style.height = "100vh";
-    //             container.style.overflow = "hidden";
-    //             container.style.width = "100%";
-    //         }
-
-    //         // 페이지 콘텐츠 영역
-    //         const placeholder = document.querySelector(".mx-scrollcontainer-wrapper > .mx-placeholder") as HTMLElement;
-    //         if (placeholder) {
-    //             placeholder.style.width = "85%";
-    //             placeholder.style.maxWidth = "85%";
-    //             placeholder.style.minWidth = "85%";
-    //             placeholder.style.overflow = "auto";
-    //             placeholder.style.flexShrink = "0";
-    //             placeholder.style.flexGrow = "0";
-    //             placeholder.style.paddingTop = "72px"; // nav-header 높이만큼 여백 추가
-    //         }
-    //     }
-    // }, [props.layout]);
-
-    /* ------------------------------------------------------------------
-     * handlers
-     * ------------------------------------------------------------------ */
-    // const handleToggleCollapse = () => {
-    //     setIsCollapsed(prev => {
-    //         const next = !prev;
-    //         saveCollapsedState(next);
-    //         return next;
-    //     });
-    // };
     const handleMenuClickWrapper = (menuId: string, pageURL: string | undefined, hasChildren: boolean) => {
         // children 있는 메뉴는 페이지 이동 안 함
         if (hasChildren) return;
@@ -206,19 +165,6 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     return (
         <div>
             <div className={containerClasses}>
-                {/* <div className="nav-header">
-                    {props.collapsible && <HamburgerButton onClick={handleToggleCollapse} />}
-                    <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                        홈
-                    </button>
-
-                    <UserInformation user={userData?.[0]} />
-                    <div className="nav-controls">
-                        <button className="nav-control-btn expand-all" onClick={handleExpandAll} type="button" />
-                        <button className="nav-control-btn collapse-all" onClick={handleCollapseAll} type="button" />
-                    </div> 
-                </div> */}
-
                 <aside className="nav-sidebar" role="navigation">
                     {/* 메뉴 */}
                     <nav className="nav-content">
