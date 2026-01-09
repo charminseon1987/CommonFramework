@@ -60,6 +60,52 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             // localStorage에서 저장된 collapsed 상태 복원 (값이 없으면 false)
             const savedCollapsedState = loadCollapsedState();
             setIsCollapsed(savedCollapsedState);
+            
+            // 호버 전 초기 collapsed 상태 저장 - 실제 DOM 상태 확인
+            // DOM이 준비된 후 실제 상태를 확인하여 저장
+            setTimeout(() => {
+                if (originalCollapsedStateRef.current === null) {
+                    const button = findSidebarToggleButton();
+                    const scrollContainer = findScrollContainer();
+                    
+                    let actualCollapsedState = true; // 기본값: collapsed 상태
+                    
+                    // 버튼의 aria-expanded 속성 확인
+                    if (button) {
+                        const ariaExpanded = button.getAttribute("aria-expanded");
+                        // aria-expanded="false"이면 collapsed 상태(true)
+                        // aria-expanded="true"이면 expanded 상태(false)
+                        if (ariaExpanded === "true") {
+                            actualCollapsedState = false;
+                        } else {
+                            actualCollapsedState = true;
+                        }
+                        console.log("버튼 aria-expanded 확인:", ariaExpanded, "=> collapsed:", actualCollapsedState);
+                    }
+                    
+                    // 스크롤 컨테이너의 mx-scrollcontainer-open 클래스 확인
+                    if (scrollContainer) {
+                        const hasOpenClass = scrollContainer.classList.contains('mx-scrollcontainer-open');
+                        // mx-scrollcontainer-open 클래스가 없으면 collapsed 상태(true)
+                        // mx-scrollcontainer-open 클래스가 있으면 expanded 상태(false)
+                        if (hasOpenClass) {
+                            actualCollapsedState = false;
+                        } else {
+                            actualCollapsedState = true;
+                        }
+                        console.log("스크롤 컨테이너 클래스 확인:", hasOpenClass, "=> collapsed:", actualCollapsedState);
+                    }
+                    
+                    // 버튼과 스크롤 컨테이너를 모두 찾지 못한 경우 localStorage 값 사용
+                    if (!button && !scrollContainer) {
+                        actualCollapsedState = savedCollapsedState !== null && savedCollapsedState !== undefined ? savedCollapsedState : true;
+                        console.log("DOM 요소를 찾지 못해 localStorage 값 사용:", actualCollapsedState);
+                    }
+                    
+                    originalCollapsedStateRef.current = actualCollapsedState;
+                    console.log("호버 전 초기 collapsed 상태 저장 (실제 DOM 상태 확인):", originalCollapsedStateRef.current);
+                }
+            }, 100); // DOM이 준비될 때까지 약간의 지연
         }
     }, [props.layout]);
 
@@ -122,10 +168,11 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         console.log("현재 isCollapsed 상태:", isCollapsed);
         console.log("저장된 원래 collapsed 상태:", originalCollapsedStateRef.current);
         
-        // 원래 collapsed 상태 저장 (한 번만 저장)
+        // 원래 collapsed 상태가 저장되지 않았을 경우 안전장치 (이미 useEffect에서 저장되어야 함)
         if (originalCollapsedStateRef.current === null) {
-            originalCollapsedStateRef.current = isCollapsed;
-            console.log("원래 collapsed 상태 저장:", originalCollapsedStateRef.current);
+            // 안전장치: 현재 상태를 저장 (null이면 true로 저장)
+            originalCollapsedStateRef.current = isCollapsed !== null && isCollapsed !== undefined ? isCollapsed : true;
+            console.log("안전장치: 원래 collapsed 상태 저장 (null이면 true):", originalCollapsedStateRef.current);
         }
         
         // 사이드바 펼치기 (collapsed 상태인 경우에만)
@@ -174,17 +221,37 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         console.log("사이드바 호버 종료");
         console.log("현재 isCollapsed 상태:", isCollapsed);
         console.log("저장된 원래 collapsed 상태:", originalCollapsedStateRef.current);
-        
-        // 원래 collapsed 상태로 복원
-        if (originalCollapsedStateRef.current !== null) {
-            setIsCollapsed(originalCollapsedStateRef.current);
-            console.log("사이드바를 원래 상태로 복원 (isCollapsed:", originalCollapsedStateRef.current, ")");
-        } else {
-            console.log("원래 collapsed 상태가 저장되지 않아 복원하지 않음");
-        }
+        console.log("저장된 원래 collapsed 상태 타입:", typeof originalCollapsedStateRef.current);
+        console.log("저장된 원래 collapsed 상태 === true:", originalCollapsedStateRef.current === true);
+        console.log("저장된 원래 collapsed 상태 === false:", originalCollapsedStateRef.current === false);
         
         const button = findSidebarToggleButton();
         const scrollContainer = findScrollContainer();
+        
+        // 원래 collapsed 상태로 복원
+        if (originalCollapsedStateRef.current !== null) {
+            const shouldBeCollapsed = originalCollapsedStateRef.current;
+            console.log("복원할 상태 (shouldBeCollapsed):", shouldBeCollapsed);
+            setIsCollapsed(shouldBeCollapsed);
+            console.log("사이드바를 원래 상태로 복원 (isCollapsed:", shouldBeCollapsed, ")");
+            
+            // mx-scrollcontainer-open 클래스 제거/유지 (원래 상태에 따라)
+            if (scrollContainer) {
+                if (shouldBeCollapsed === true) {
+                    // 원래 collapsed 상태였으면 클래스 제거
+                    scrollContainer.classList.remove('mx-scrollcontainer-open');
+                    console.log("원래 상태가 접혀진 상태(true)였으므로 mx-scrollcontainer-open 클래스 제거 완료");
+                } else {
+                    // 원래 펼쳐진 상태였으면 클래스 유지
+                    if (!scrollContainer.classList.contains('mx-scrollcontainer-open')) {
+                        scrollContainer.classList.add('mx-scrollcontainer-open');
+                    }
+                    console.log("원래 상태가 펼쳐진 상태(false)였으므로 mx-scrollcontainer-open 클래스 유지");
+                }
+            }
+        } else {
+            console.log("원래 collapsed 상태가 저장되지 않아 복원하지 않음");
+        }
         
         if (button) {
             // 원래 값으로 복원
@@ -199,15 +266,10 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             }
         }
         
-        // mx-scrollcontainer-open 클래스 제거 (원래 상태가 collapsed인 경우)
-        if (scrollContainer) {
-            if (originalCollapsedStateRef.current === true) {
-                scrollContainer.classList.remove('mx-scrollcontainer-open');
-                console.log("mx-scrollcontainer-open 클래스 제거 완료 (원래 collapsed 상태로 복원)");
-            } else {
-                console.log("원래 상태가 펼쳐진 상태였으므로 mx-scrollcontainer-open 클래스 유지");
-            }
-        }
+        // ref 초기화 (다음 호버를 위해)
+        originalCollapsedStateRef.current = null;
+        originalAriaExpandedRef.current = null;
+        console.log("ref 초기화 완료");
     };
 
     const handleUncollapse = () => {
