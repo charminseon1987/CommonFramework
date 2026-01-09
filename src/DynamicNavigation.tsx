@@ -1,5 +1,5 @@
 // src/BangarlabDynamicNavigation.tsx
-import { ReactElement, createElement, useState, useEffect } from "react";
+import { ReactElement, createElement, useState, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { DynamicNavigationContainerProps } from "./types/widget.types";
 import { NavigationMenu } from "./components/NavigationMenu";
@@ -28,6 +28,8 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     // const userData = useUserData(props);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const originalAriaExpandedRef = useRef<string | null>(null);
+    const originalCollapsedStateRef = useRef<boolean | null>(null);
     console.log("menuData", menuData);
     /* ------------------------------------------------------------------
      * hooks
@@ -60,6 +62,153 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             setIsCollapsed(savedCollapsedState);
         }
     }, [props.layout]);
+
+    /* ------------------------------------------------------------------
+     * 사이드바 호버 시 sidebarToggle3 버튼의 aria-expanded 제어
+     * ------------------------------------------------------------------ */
+    const findSidebarToggleButton = (): HTMLButtonElement | null => {
+        // 여러 방법으로 버튼 찾기 시도
+        const selectors = [
+            'button[data-button-id="l.Atlas_Core.Atlas_Default.sidebarToggle3"]',
+            'button.mx-name-sidebarToggle3',
+            'button[class*="sidebarToggle3"]',
+            'button[aria-controls*="toggleable"]',
+            'button.toggle-btn[aria-haspopup="menu"]'
+        ];
+
+        for (const selector of selectors) {
+            const button = document.querySelector<HTMLButtonElement>(selector);
+            if (button) {
+                return button;
+            }
+        }
+
+        // 모든 버튼을 순회하며 sidebarToggle3가 포함된 버튼 찾기
+        const allButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('button'));
+        for (const button of allButtons) {
+            const className = button.className || '';
+            const dataButtonId = button.getAttribute('data-button-id') || '';
+            if (className.includes('sidebarToggle3') || dataButtonId.includes('sidebarToggle3')) {
+                return button;
+            }
+        }
+
+        return null;
+    };
+
+    const findScrollContainer = (): HTMLElement | null => {
+        // mx-scrollcontainer 요소 찾기
+        const containers = document.querySelectorAll<HTMLElement>('.mx-scrollcontainer');
+        for (const container of Array.from(containers)) {
+            // aria-controls에 toggleable이 포함된 컨테이너 찾기
+            const button = findSidebarToggleButton();
+            if (button) {
+                const ariaControls = button.getAttribute('aria-controls');
+                if (ariaControls && container.id === ariaControls) {
+                    return container;
+                }
+            }
+            // 또는 sidebarToggle3 버튼과 관련된 컨테이너 찾기
+            if (container.classList.contains('mx-scrollcontainer-horizontal') && 
+                container.classList.contains('mx-scrollcontainer-fixed')) {
+                return container;
+            }
+        }
+        return null;
+    };
+
+    const handleSidebarMouseEnter = () => {
+        console.log("사이드바 호버 시작");
+        console.log("현재 isCollapsed 상태:", isCollapsed);
+        console.log("저장된 원래 collapsed 상태:", originalCollapsedStateRef.current);
+        
+        // 원래 collapsed 상태 저장 (한 번만 저장)
+        if (originalCollapsedStateRef.current === null) {
+            originalCollapsedStateRef.current = isCollapsed;
+            console.log("원래 collapsed 상태 저장:", originalCollapsedStateRef.current);
+        }
+        
+        // 사이드바 펼치기 (collapsed 상태인 경우에만)
+        if (isCollapsed) {
+            setIsCollapsed(false);
+            console.log("사이드바 펼침 (isCollapsed: false로 변경)");
+        } else {
+            console.log("사이드바가 이미 펼쳐져 있음 (isCollapsed가 이미 false)");
+        }
+        
+        // 약간의 지연을 두고 버튼과 스크롤 컨테이너 찾기 (동적 생성 대응)
+        setTimeout(() => {
+            const button = findSidebarToggleButton();
+            const scrollContainer = findScrollContainer();
+            
+            if (button) {
+                console.log("버튼 찾음:", button);
+                // 원래 값 저장 (한 번만 저장)
+                if (originalAriaExpandedRef.current === null) {
+                    originalAriaExpandedRef.current = button.getAttribute("aria-expanded");
+                    console.log("원래 aria-expanded 값 저장:", originalAriaExpandedRef.current);
+                }
+                // aria-expanded를 true로 설정
+                button.setAttribute("aria-expanded", "true");
+                console.log("aria-expanded를 true로 설정 완료");
+            } else {
+                console.warn("sidebarToggle3 버튼을 찾을 수 없습니다.");
+            }
+            
+            // mx-scrollcontainer-open 클래스 추가
+            if (scrollContainer) {
+                console.log("스크롤 컨테이너 찾음:", scrollContainer);
+                if (!scrollContainer.classList.contains('mx-scrollcontainer-open')) {
+                    scrollContainer.classList.add('mx-scrollcontainer-open');
+                    console.log("mx-scrollcontainer-open 클래스 추가 완료");
+                } else {
+                    console.log("mx-scrollcontainer-open 클래스가 이미 있음");
+                }
+            } else {
+                console.warn("스크롤 컨테이너를 찾을 수 없습니다.");
+            }
+        }, 10);
+    };
+
+    const handleSidebarMouseLeave = () => {
+        console.log("사이드바 호버 종료");
+        console.log("현재 isCollapsed 상태:", isCollapsed);
+        console.log("저장된 원래 collapsed 상태:", originalCollapsedStateRef.current);
+        
+        // 원래 collapsed 상태로 복원
+        if (originalCollapsedStateRef.current !== null) {
+            setIsCollapsed(originalCollapsedStateRef.current);
+            console.log("사이드바를 원래 상태로 복원 (isCollapsed:", originalCollapsedStateRef.current, ")");
+        } else {
+            console.log("원래 collapsed 상태가 저장되지 않아 복원하지 않음");
+        }
+        
+        const button = findSidebarToggleButton();
+        const scrollContainer = findScrollContainer();
+        
+        if (button) {
+            // 원래 값으로 복원
+            if (originalAriaExpandedRef.current === null) {
+                // 원래 속성이 없었던 경우 제거
+                button.removeAttribute("aria-expanded");
+                console.log("aria-expanded 속성 제거");
+            } else {
+                // 원래 값으로 복원
+                button.setAttribute("aria-expanded", originalAriaExpandedRef.current);
+                console.log("aria-expanded를 원래 값으로 복원:", originalAriaExpandedRef.current);
+            }
+        }
+        
+        // mx-scrollcontainer-open 클래스 제거 (원래 상태가 collapsed인 경우)
+        if (scrollContainer) {
+            if (originalCollapsedStateRef.current === true) {
+                scrollContainer.classList.remove('mx-scrollcontainer-open');
+                console.log("mx-scrollcontainer-open 클래스 제거 완료 (원래 collapsed 상태로 복원)");
+            } else {
+                console.log("원래 상태가 펼쳐진 상태였으므로 mx-scrollcontainer-open 클래스 유지");
+            }
+        }
+    };
 
     const handleUncollapse = () => {
         setIsCollapsed(false);
@@ -228,7 +377,12 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     return (
         <div>
             <div className={containerClasses}>
-                <aside className="nav-sidebar" role="navigation">
+                <aside 
+                    className="nav-sidebar" 
+                    role="navigation"
+                    onMouseEnter={handleSidebarMouseEnter}
+                    onMouseLeave={handleSidebarMouseLeave}
+                >
                     {/* 메뉴 */}
                     <nav className="nav-content">
                         <NavigationMenu

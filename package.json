@@ -10,7 +10,7 @@
   },
   "license": "Apache-2.0",
   "config": {
-    "projectPath": "C:/Users/SBT Global/Mendix/DynamicFramework-main",
+    "projectPath": "C:/Users/SBT Global/Mendix/CommonFramework-main",
     "mendixHost": "http://localhost:8080",
     "developmentPort": 3000
   },
