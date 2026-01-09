@@ -6,7 +6,7 @@ import {
     expandAllMenus,
     getExpandedMenuIds,
     saveExpandedMenuIds
-} from "../components/utils/menuHelpers";
+} from "../utils/menuHelpers";
 
 export function useMenuExpand(
     setState: Dispatch<SetStateAction<NavigationState>>,

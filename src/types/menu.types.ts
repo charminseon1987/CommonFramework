@@ -97,3 +97,5 @@ export interface ImageInfo {
     name: string;
     publicThumbnailPath?: string; // PublicThumbnailPath가 있으면 우선 사용
 }
+
+

@@ -1,4 +1,4 @@
-import { saveActiveMenuId, saveExpandedMenuIds } from "../components/utils/menuHelpers";
+import { saveActiveMenuId, saveExpandedMenuIds } from "../utils/menuHelpers";
 
 export function useMenuNavigation(props: any) {
     const navigate = (menuId: string, pageURL?: string, shouldClose = false) => {

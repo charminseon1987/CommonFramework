@@ -5,7 +5,7 @@ import {
     restoreMenuExpansion,
     loadExpandedMenuIds,
     loadActiveMenuId
-} from "../components/utils/menuHelpers";
+} from "../utils/menuHelpers";
 
 export function useNavigationState(menuData: MenuItemData[] | null) {
     const [state, setState] = useState<NavigationState>({
