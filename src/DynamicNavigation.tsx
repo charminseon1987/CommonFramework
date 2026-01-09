@@ -61,9 +61,12 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             const savedCollapsedState = loadCollapsedState();
             setIsCollapsed(savedCollapsedState);
             
+            let clickHandler: ((e: MouseEvent) => void) | null = null;
+            let buttonElement: HTMLButtonElement | null = null;
+            
             // 호버 전 초기 collapsed 상태 저장 - 실제 DOM 상태 확인
             // DOM이 준비된 후 실제 상태를 확인하여 저장
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 if (originalCollapsedStateRef.current === null) {
                     const button = findSidebarToggleButton();
                     const scrollContainer = findScrollContainer();
@@ -105,7 +108,60 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                     originalCollapsedStateRef.current = actualCollapsedState;
                     console.log("호버 전 초기 collapsed 상태 저장 (실제 DOM 상태 확인):", originalCollapsedStateRef.current);
                 }
+                
+                // 토글바 버튼 클릭 이벤트 리스너 추가 (토글 기능)
+                buttonElement = findSidebarToggleButton();
+                if (buttonElement) {
+                    clickHandler = (e: MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log("토글바 버튼 클릭 - 토글 기능 실행");
+                        
+                        // 현재 상태를 확인하고 토글
+                        // isCollapsed가 true이면 false로, false이면 true로 변경
+                        setIsCollapsed(prevCollapsed => {
+                            const newCollapsed = !prevCollapsed;
+                            console.log("토글: isCollapsed", prevCollapsed, "=>", newCollapsed);
+                            
+                            // localStorage에 새 상태 저장
+                            saveCollapsedState(newCollapsed);
+                            
+                            // originalCollapsedStateRef도 업데이트 (호버 해제 시 올바른 상태로 복원)
+                            originalCollapsedStateRef.current = newCollapsed;
+                            
+                            // 스크롤 컨테이너 클래스 토글
+                            const scrollContainer = findScrollContainer();
+                            if (scrollContainer) {
+                                if (newCollapsed) {
+                                    scrollContainer.classList.remove('mx-scrollcontainer-open');
+                                    console.log("mx-scrollcontainer-open 클래스 제거 (접힘)");
+                                } else {
+                                    scrollContainer.classList.add('mx-scrollcontainer-open');
+                                    console.log("mx-scrollcontainer-open 클래스 추가 (펼침)");
+                                }
+                            }
+                            
+                            // aria-expanded 속성 토글
+                            if (buttonElement) {
+                                buttonElement.setAttribute("aria-expanded", newCollapsed ? "false" : "true");
+                                console.log("aria-expanded 설정:", newCollapsed ? "false" : "true");
+                            }
+                            
+                            return newCollapsed;
+                        });
+                    };
+                    
+                    buttonElement.addEventListener('click', clickHandler, true); // capture phase에서 처리
+                }
             }, 100); // DOM이 준비될 때까지 약간의 지연
+            
+            // cleanup 함수
+            return () => {
+                clearTimeout(timeoutId);
+                if (buttonElement && clickHandler) {
+                    buttonElement.removeEventListener('click', clickHandler, true);
+                }
+            };
         }
     }, [props.layout]);
 
