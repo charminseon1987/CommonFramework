@@ -2,22 +2,21 @@
 
 import { ActionValue, ListValue, ListAttributeValue } from "mendix";
 import { Big } from "big.js";
-import { UserProps } from "./user.types";
 
 /**
  * Widget Props 인터페이스
  * (XML에서 정의한 properties를 TypeScript로 매핑)
  */
-export type DynamicNavigationContainerProps = MenuProps &
-    UserProps & {
-        onMenuClick: ActionValue;
-        onAuthFailed?: ActionValue;
-    };
+export type DynamicNavigationContainerProps = MenuProps & {
+    onMenuClick: ActionValue;
+    onAuthFailed?: ActionValue;
+};
 export interface MenuProps {
     // Data Source
     menuDataSource: ListValue;
     Resource?: ListValue;
     Icon?: ListValue;
+    bookmark?: ListValue;
     // Attributes
     menuId: ListAttributeValue<string>;
     menuName: ListAttributeValue<string>;
