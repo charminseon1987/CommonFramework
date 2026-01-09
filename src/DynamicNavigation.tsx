@@ -13,22 +13,22 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
-import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
+import { loadCollapsedState, saveCollapsedState } from "./utils/menuHelpers";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
-import logoImage from "./assets/logo.png";
+import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
+// import logoImage from "./assets/logo.png";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
      * 데이터 & 상태
      * ------------------------------------------------------------------ */
-    const menuData = useMenuData(props);
-    const { state, setState } = useNavigationState(menuData);
-    // User domain
     // const userData = useUserData(props);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    console.log("menuData", menuData);
+    const [activeTab, setActiveTab] = useState<NavigationTabKey>("all");
+    const menuData = useMenuData(props, activeTab);
+    const { state, setState } = useNavigationState(menuData);
     /* ------------------------------------------------------------------
      * hooks
      * ------------------------------------------------------------------ */
@@ -82,17 +82,6 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         }
         navigate(menuId, pageURL);
     };
-
-    // const handleExpandAll = () => {
-    //     expandAll();
-    //     setIsAllExpanded(true);
-    // };
-
-    // const handleCollapseAll = () => {
-    //     collapseAll();
-    //     setIsAllExpanded(false);
-    // };
-
     /* ------------------------------------------------------------------
      * 클래스
      * ------------------------------------------------------------------ */
@@ -117,7 +106,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         {/* 왼쪽 : 홈 */}
                         <div className="nav-topbar-left">
                             <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                                <img src={logoImage} alt="logo" />
+                                {/* <img src={logoImage} alt="logo" /> */}
                             </button>
                         </div>
 
@@ -163,11 +152,11 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             </div>
         );
     }
-     /* ==================================================================
+    /* ==================================================================
      * TOPBAR FULLWIDTH
      * ================================================================== */
 
-     if (props.layout === "topbar_fullwidth") {
+    if (props.layout === "topbar_fullwidth") {
         return (
             <div className={containerClasses}>
                 <header className="nav-topbar" role="navigation">
@@ -175,7 +164,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         {/* 왼쪽 : 홈 */}
                         <div className="nav-topbar-left">
                             <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                                <img src={logoImage} alt="logo" />
+                                {/* <img src={logoImage} alt="logo" /> */}
                             </button>
                         </div>
 
@@ -229,7 +218,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         <div>
             <div className={containerClasses}>
                 <aside className="nav-sidebar" role="navigation">
-                    {/* 메뉴 */}
+                    <NavigationTab value={activeTab} onChange={setActiveTab} />
                     <nav className="nav-content">
                         <NavigationMenu
                             menuItems={state.menuTree}
@@ -248,5 +237,4 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             </div>
         </div>
     );
-
 }
