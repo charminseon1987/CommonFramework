@@ -47,7 +47,7 @@ function extractImageInfo(imageObj: any): ImageInfo | undefined {
 export function useMenuData(props: DynamicNavigationContainerProps): MenuItemData[] | null {
     const { menuDataSource, Resource, Icon, bookmark } = props;
     const [menuData, setMenuData] = useState<MenuItemData[] | null>(null);
-
+    console.log("bookmark", bookmark);
     useEffect(() => {
         // 메뉴 데이터소스와 Resource가 사용 가능한지 확인
         if (menuDataSource.status !== ValueStatus.Available || Resource?.status !== ValueStatus.Available) {
