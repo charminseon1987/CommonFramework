@@ -217,7 +217,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     return (
         <div>
             <div className={containerClasses}>
-                <aside className="nav-sidebar" role="navigation">
+                <aside className={classNames("nav-sidebar", { collapsed: isCollapsed })} role="navigation">
                     <NavigationTab value={activeTab} onChange={setActiveTab} />
                     <nav className="nav-content">
                         <NavigationMenu
