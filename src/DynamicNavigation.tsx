@@ -15,15 +15,17 @@ import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
 import useUserData from "./hooks/useUserData";
 import { UserInformation } from "./components/UserInformation";
-import { loadCollapsedState, saveCollapsedState } from "./components/utils/menuHelpers";
+import { loadCollapsedState, saveCollapsedState } from "./utils/menuHelpers";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
+import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
     /* ------------------------------------------------------------------
      * 데이터 & 상태
      * ------------------------------------------------------------------ */
-    const menuData = useMenuData(props);
+    const [activeTab, setActiveTab] = useState<NavigationTabKey>("all");
+    const menuData = useMenuData(props, activeTab);
     const { state, setState } = useNavigationState(menuData);
     // User domain
     const userData = useUserData(props);
@@ -37,7 +39,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
 
     const { navigate } = useMenuNavigation(props);
     const homeNavigationHandler = useHomeNavigation(setState);
-    
+
     // 홈 버튼 클릭 핸들러 (collapsed 상태 유지)
     const handleHomeClick = () => {
         // 홈 버튼 클릭 시 현재 collapsed 상태를 localStorage에 저장
@@ -60,7 +62,10 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             setIsCollapsed(savedCollapsedState);
         }
     }, [props.layout]);
-
+    const handleUncollapse = () => {
+        setIsCollapsed(false);
+        saveCollapsedState(false);
+    };
     /* ------------------------------------------------------------------
      * 레이아웃 스타일 주입 (15:85 비율)
      * ------------------------------------------------------------------ */
@@ -219,7 +224,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                 </div>
 
                 <aside className="nav-sidebar" role="navigation">
-                    {/* 메뉴 */}
+                    <NavigationTab value={activeTab} onChange={setActiveTab} />
                     <nav className="nav-content">
                         <NavigationMenu
                             menuItems={state.menuTree}
@@ -229,6 +234,8 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                             depth={0}
                             maxDepth={props.maxDepth}
                             showDepthIndicator={props.showDepthIndicator}
+                            isCollapsed={isCollapsed}
+                            onUncollapse={handleUncollapse}
                         />
                         <LogoutButton className="nav-logout-btn" onLogout={props.onLogout} />
                     </nav>

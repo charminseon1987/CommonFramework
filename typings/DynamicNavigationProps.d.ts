@@ -15,6 +15,7 @@ export interface DynamicNavigationContainerProps {
     tabIndex?: number;
     menuDataSource: ListValue;
     Resource: ListValue;
+    bookmark: ListValue;
     currentUser?: ListValue;
     Icon?: ListValue;
     layout: LayoutEnum;
@@ -49,6 +50,7 @@ export interface DynamicNavigationPreviewProps {
     translate: (text: string) => string;
     menuDataSource: {} | { caption: string } | { type: string } | null;
     Resource: {} | { caption: string } | { type: string } | null;
+    bookmark: {} | { caption: string } | { type: string } | null;
     currentUser: {} | { caption: string } | { type: string } | null;
     Icon: {} | { caption: string } | { type: string } | null;
     layout: LayoutEnum;

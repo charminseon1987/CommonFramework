@@ -15,6 +15,8 @@ interface MenuItemProps {
     maxDepth: number;
     showDepthIndicator: boolean;
     layout?: "vertical" | "horizontal";
+    isCollapsed?: boolean;
+    onUncollapse?: () => void;
 }
 
 export function MenuItem({
@@ -26,7 +28,9 @@ export function MenuItem({
     depth,
     maxDepth,
     showDepthIndicator,
-    layout = "vertical"
+    layout = "vertical",
+    isCollapsed = false,
+    onUncollapse
 }: MenuItemProps): ReactElement {
     const hasChildren = item.children && item.children.length > 0;
     const canExpand = hasChildren && depth < maxDepth;
@@ -101,6 +105,12 @@ export function MenuItem({
         const target = e.target as HTMLElement;
         if (target.closest(".nav-arrow")) {
             return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
+        }
+
+        // collapsed 상태 해제 조건 확인 (기존 클릭 로직 전에 수행)
+        // 조건: layout === "vertical" && isCollapsed === true && (depth >= 0 || no-icon)
+        if (layout === "vertical" && isCollapsed === true && onUncollapse && (depth >= 0 || !hasAnyIcon)) {
+            onUncollapse();
         }
 
         // 자식이 있는 경우: 확장/축소
@@ -203,6 +213,8 @@ export function MenuItem({
                             maxDepth={maxDepth}
                             showDepthIndicator={showDepthIndicator}
                             layout={layout}
+                            isCollapsed={isCollapsed}
+                            onUncollapse={onUncollapse}
                         />
                     ))}
                 </ul>

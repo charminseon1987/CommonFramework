@@ -18,6 +18,7 @@ export interface MenuProps {
     menuDataSource: ListValue;
     Resource?: ListValue;
     Icon?: ListValue;
+    bookmark?: ListValue;
     // Attributes
     menuId: ListAttributeValue<string>;
     menuName: ListAttributeValue<string>;

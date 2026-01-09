@@ -1,6 +1,6 @@
 import { ValueStatus } from "mendix";
 import { useEffect, useState } from "react";
-import getMxAttributes from "src/components/utils/mxHelper";
+import getMxAttributes from "src/utils/mxHelper";
 import { UserData, UserProps } from "src/types/user.types";
 
 export default function useUserData(props: UserProps): UserData[] | null {

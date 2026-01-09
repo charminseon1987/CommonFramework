@@ -18,7 +18,10 @@
                 <caption>Resource Data Source</caption>
                 <description>List of Resource items from microflow</description>
             </property>
-
+            <property key="bookmark" type="datasource" isList="true" required="true">
+                <caption>Bookmark Menu Source</caption>
+                <description>List of bookmarked menu items from microflow</description>
+            </property>
             <property key="currentUser" type="datasource" isList="true" required="false">
                 <caption>Current User</caption>
                 <description>Current logged-in user object</description>

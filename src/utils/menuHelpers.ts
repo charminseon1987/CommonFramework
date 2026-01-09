@@ -1,6 +1,6 @@
 // src/utils/menuHelpers.ts
 
-import { MenuItemData, MenuTreeNode } from "../../types/menu.types";
+import { MenuItemData, MenuTreeNode } from "../types/menu.types";
 
 /**
  * Flat 메뉴 리스트를 트리 구조로 변환
