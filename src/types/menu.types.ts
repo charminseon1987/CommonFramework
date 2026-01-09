@@ -55,7 +55,7 @@ export interface NavigationState {
 /**
  * 레이아웃 타입
  */
-export type NavigationLayout = "vertical" | "horizontal";
+export type NavigationLayout = "vertical" | "horizontal" | "topbar_fullwidth";
 export type NavigationPosition = "left" | "top";
 
 /**

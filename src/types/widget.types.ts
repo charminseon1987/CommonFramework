@@ -37,7 +37,7 @@ export interface MenuProps {
 
     // Layout
     maxDepth: number;
-    layout: "vertical" | "horizontal";
+    layout: "vertical" | "horizontal" | "topbar_fullwidth";
     position: "left" | "top";
     sidebarWidth: string;
     topbarHeight: string;
@@ -66,7 +66,7 @@ export interface MenuProps {
  * Preview Props (Studio Pro 에디터용)
  */
 export interface DynamicNavigationPreviewProps {
-    layout: "vertical" | "horizontal";
+    layout: "vertical" | "horizontal" | "topbar_fullwidth";
     position: "left" | "top";
     sidebarWidth: string;
     topbarHeight: string;

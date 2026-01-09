@@ -115,6 +115,53 @@ export const toggleDepth0MenuExpand = (tree: MenuTreeNode[], menuId: string): Me
 };
 
 /**
+ * 같은 depth 레벨의 메뉴 확장 상태 토글 (다른 같은 depth 메뉴는 자동으로 닫기)
+ * Vertical 레이아웃에서 사용 - 모든 depth에서 작동
+ */
+export const toggleSameDepthMenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTreeNode[] => {
+    // 먼저 menuId를 가진 노드를 찾아서 depth 확인
+    const targetNode = findMenuNode(tree, menuId);
+    if (!targetNode) {
+        // 메뉴를 찾지 못하면 기존 toggleMenuExpand 동작
+        return toggleMenuExpand(tree, menuId);
+    }
+
+    const targetDepth = targetNode.depth;
+
+    // 재귀적으로 트리를 순회하며 같은 depth의 형제 메뉴들을 닫는 함수
+    const toggleSameDepth = (nodes: MenuTreeNode[]): MenuTreeNode[] => {
+        return nodes.map(item => {
+            if (item.menuId === menuId) {
+                // 클릭한 메뉴는 토글
+                return {
+                    ...item,
+                    isExpanded: !item.isExpanded,
+                    children: item.children.length > 0 ? toggleSameDepth(item.children) : []
+                };
+            } else if (item.depth === targetDepth) {
+                // 같은 depth의 다른 메뉴는 닫기
+                return {
+                    ...item,
+                    isExpanded: false,
+                    children:
+                        item.children.length > 0
+                            ? expandAllMenus(item.children, false) // 하위 메뉴도 모두 닫기
+                            : []
+                };
+            } else {
+                // 다른 depth는 재귀적으로 처리
+                return {
+                    ...item,
+                    children: item.children.length > 0 ? toggleSameDepth(item.children) : []
+                };
+            }
+        });
+    };
+
+    return toggleSameDepth(tree);
+};
+
+/**
  * 모든 메뉴 확장/축소
  */
 export const expandAllMenus = (tree: MenuTreeNode[], expand: boolean): MenuTreeNode[] => {

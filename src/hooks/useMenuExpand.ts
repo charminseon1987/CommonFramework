@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 import { NavigationState } from "../types/menu.types";
 import {
-    toggleMenuExpand,
     toggleDepth0MenuExpand,
+    toggleSameDepthMenuExpand,
     expandAllMenus,
     getExpandedMenuIds,
     saveExpandedMenuIds
@@ -15,7 +15,8 @@ export function useMenuExpand(
     const toggleExpand = (menuId: string) => {   
         setIsAllExpanded(false);    
         setState((prev: NavigationState) => {
-            const newTree = toggleMenuExpand(prev.menuTree, menuId);
+            // Vertical layout에서 같은 depth의 메뉴를 닫기 위해 toggleSameDepthMenuExpand 사용
+            const newTree = toggleSameDepthMenuExpand(prev.menuTree, menuId);
             const expandedIds = getExpandedMenuIds(newTree);
             saveExpandedMenuIds(expandedIds);
 
