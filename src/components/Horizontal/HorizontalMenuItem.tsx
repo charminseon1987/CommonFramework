@@ -61,17 +61,34 @@ export function HorizontalMenuItem({
 
     // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
     const handleContentClick = (e: React.MouseEvent): void => {
-        // 화살표 버튼 클릭이 아닐 때만 메뉴 클릭 처리
+        // 화살표 버튼 클릭이 아닐 때만 처리
         const target = e.target as HTMLElement;
-        if (!target.closest(".horizontal-menu-item-arrow")) {
-            handleHorizontalMenuClick(e);
+        if (target.closest(".horizontal-menu-item-arrow")) {
+            return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
         }
+        
+        // depth 0이고 자식이 있는 경우: 토글 기능 추가
+        if (depth === 0 && hasChildren) {
+            e.preventDefault();
+            e.stopPropagation();
+            // 현재 열려있으면 닫고, 닫혀있으면 열기
+            onToggleExpand(item.menuId);
+            return;
+        }
+        
+        // 그 외의 경우: 기존 동작 (페이지 이동 또는 하위 메뉴 처리)
+        handleHorizontalMenuClick(e);
     };
 
     const handleContentKeyDown = (e: React.KeyboardEvent): void => {
         if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            handleHorizontalMenuClick(e as any);
+            // depth 0이고 자식이 있는 경우: 토글 기능 추가
+            if (depth === 0 && hasChildren) {
+                onToggleExpand(item.menuId);
+            } else {
+                handleHorizontalMenuClick(e as any);
+            }
         }
     };
 
