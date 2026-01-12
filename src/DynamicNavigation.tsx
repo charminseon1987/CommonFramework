@@ -2,6 +2,7 @@
 import { ReactElement, createElement, useState, useEffect } from "react";
 import classNames from "classnames";
 import { DynamicNavigationContainerProps } from "./types/widget.types";
+import { NavigationState } from "./types/menu.types";
 import { NavigationMenu } from "./components/NavigationMenu";
 import { HorizontalNavigationMenu } from "./components/Horizontal/HorizontalNavigationMenu";
 import { useMenuData } from "./hooks/useMenuData";
@@ -15,7 +16,7 @@ import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
 import useUserData from "./hooks/useUserData";
 import { UserInformation } from "./components/UserInformation";
-import { loadCollapsedState, saveCollapsedState } from "./utils/menuHelpers";
+import { saveCollapsedState, restoreExpansionOnHover, collapseAllSubMenus } from "./utils/menuHelpers";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
 import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
@@ -30,7 +31,9 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     // User domain
     const userData = useUserData(props);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    // Vertical layout일 때 초기 상태를 collapsed로 시작
+    const [isCollapsed, setIsCollapsed] = useState(() => props.layout === "vertical");
+    const [isHovered, setIsHovered] = useState(false);
     /* ------------------------------------------------------------------
      * hooks
      * ------------------------------------------------------------------ */
@@ -57,14 +60,66 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
      * ------------------------------------------------------------------ */
     useEffect(() => {
         if (props.layout === "vertical") {
-            // localStorage에서 저장된 collapsed 상태 복원 (값이 없으면 false)
-            const savedCollapsedState = loadCollapsedState();
-            setIsCollapsed(savedCollapsedState);
+            // localStorage에서 저장된 collapsed 상태 복원
+            // 값이 있으면 그것을 사용하고, 없으면 초기값(true) 유지
+            try {
+                if (typeof window !== "undefined" && window.localStorage) {
+                    const stored = localStorage.getItem("bangarlab-nav-collapsed-state");
+                    if (stored !== null) {
+                        const savedCollapsedState = JSON.parse(stored) as boolean;
+                        // 호버 중이 아닐 때만 상태 업데이트
+                        if (!isHovered) {
+                            setIsCollapsed(savedCollapsedState);
+                        }
+                    }
+                    // 값이 없으면 초기값(true) 유지
+                }
+            } catch (error) {
+                console.warn("[DynamicNavigation] Failed to load collapsed state:", error);
+                // 에러 발생 시 초기값(true) 유지
+            }
         }
     }, [props.layout]);
     const handleUncollapse = () => {
         setIsCollapsed(false);
         saveCollapsedState(false);
+    };
+
+    /* ------------------------------------------------------------------
+     * 호버 이벤트 핸들러 (vertical layout 전용)
+     * ------------------------------------------------------------------ */
+    const handleMouseEnter = () => {
+        if (props.layout === "vertical") {
+            console.log("[DynamicNavigation] Mouse enter - restoring expansion from localStorage");
+            // 호버 상태 설정
+            setIsHovered(true);
+            // 호버 시 collapsed 클래스 제거 (펼쳐진 상태로 변경)
+            setIsCollapsed(false);
+            // localStorage에 저장된 확장 상태로 메뉴 복원
+            setState((prev: NavigationState) => {
+                const restoredTree = restoreExpansionOnHover(prev.menuTree);
+                console.log("[DynamicNavigation] Restored tree:", restoredTree.map(item => ({ menuId: item.menuId, isExpanded: item.isExpanded })));
+                return {
+                    ...prev,
+                    menuTree: restoredTree
+                };
+            });
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (props.layout === "vertical") {
+            console.log("[DynamicNavigation] Mouse leave - collapsing all submenus");
+            // 호버 상태 해제
+            setIsHovered(false);
+            // 호버 해제 시 collapsed 클래스 다시 적용
+            setIsCollapsed(true);
+            // 모든 하위 메뉴를 접고 최상위 뎁스만 표시
+            setState((prev: NavigationState) => ({
+                ...prev,
+                menuTree: collapseAllSubMenus(prev.menuTree)
+            }));
+        }
     };
     /* ------------------------------------------------------------------
      * 레이아웃 스타일 주입 (15:85 비율)
@@ -223,7 +278,12 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                     </div> */}
                 </div>
 
-                <aside className="nav-sidebar" role="navigation">
+                <aside 
+                    className="nav-sidebar" 
+                    role="navigation"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
                     <NavigationTab value={activeTab} onChange={setActiveTab} />
                     <nav className="nav-content">
                         <NavigationMenu

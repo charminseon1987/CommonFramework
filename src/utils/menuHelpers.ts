@@ -566,3 +566,39 @@ export const collapseMenuOnHoverLeave = (tree: MenuTreeNode[], menuId: string): 
 
     return collapseMenu(tree, menuId);
 };
+
+/**
+ * 호버 해제 시 모든 하위 메뉴를 접고 최상위 뎁스만 표시
+ * (전체 네비게이션 영역 호버 해제 시 사용)
+ */
+export const collapseAllSubMenus = (tree: MenuTreeNode[]): MenuTreeNode[] => {
+    return tree.map(item => ({
+        ...item,
+        // depth-0 메뉴는 유지하되, 모든 하위 메뉴는 접기
+        isExpanded: false,
+        children: item.children.length > 0 ? collapseAllSubMenus(item.children) : []
+    }));
+};
+
+/**
+ * 호버 시 localStorage에 저장된 확장 상태로 메뉴 복원
+ * (전체 네비게이션 영역 호버 시 사용)
+ */
+export const restoreExpansionOnHover = (tree: MenuTreeNode[]): MenuTreeNode[] => {
+    const savedExpandedIds = loadExpandedMenuIds();
+    const expandedSet = new Set(savedExpandedIds.map(id => String(id)));
+    
+    console.log("[restoreExpansionOnHover] Saved expanded IDs:", savedExpandedIds);
+    console.log("[restoreExpansionOnHover] Expanded set:", Array.from(expandedSet));
+
+    return tree.map(item => {
+        const shouldExpand = expandedSet.has(String(item.menuId));
+        console.log(`[restoreExpansionOnHover] Menu ${item.menuId} (${item.menuName}): shouldExpand=${shouldExpand}`);
+        return {
+            ...item,
+            // localStorage에 저장된 확장 상태 적용
+            isExpanded: shouldExpand,
+            children: item.children.length > 0 ? restoreExpansionOnHover(item.children) : []
+        };
+    });
+};
