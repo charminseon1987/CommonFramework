@@ -5,6 +5,7 @@ import { MenuItemData } from "../types/menu.types";
 
 import buildMenuData from "src/utils/buildMenuData";
 import { buildResourceMap } from "src/utils/buildResourceMap";
+import buildIconMap from "src/utils/buildIconMap";
 import getMenuSource from "./getMenuSource";
 
 export type MenuSourceItem = ObjectItem;
@@ -20,6 +21,7 @@ export function useMenuData(props: DynamicNavigationContainerProps, mode: "all" 
 
         const sourceItems = getMenuSource(mode, menuDataSource.items, bookmark?.items);
         const resourceMap = buildResourceMap(Resource);
+        const iconImageMap = buildIconMap(Icon);
 
         const previousIconClassMap = new Map<string, string>();
         previousMenuDataRef.current?.forEach(item => {
@@ -28,7 +30,7 @@ export function useMenuData(props: DynamicNavigationContainerProps, mode: "all" 
             }
         });
 
-        const result = buildMenuData(sourceItems, resourceMap);
+        const result = buildMenuData(sourceItems, resourceMap, iconImageMap);
 
         setMenuData(result);
         previousMenuDataRef.current = result;

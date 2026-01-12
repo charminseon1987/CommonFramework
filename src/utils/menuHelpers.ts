@@ -94,14 +94,22 @@ export const toggleMenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTree
 /**
  * Depth 0 메뉴의 확장 상태 토글 (다른 depth 0 메뉴는 자동으로 닫기)
  * Horizontal 레이아웃에서 사용
+ * 
+ * 동작 방식:
+ * - tree.map이 최상위 레벨(depth-0)의 모든 메뉴를 처리
+ * - 클릭한 메뉴(menuId)는 토글 (isExpanded 반전)
+ * - 클릭한 메뉴를 제외한 모든 depth-0 메뉴는 isExpanded = false로 설정
+ * - 하위 메뉴도 모두 닫기 (expandAllMenus로 재귀적으로 처리)
  */
 export const toggleDepth0MenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTreeNode[] => {
     return tree.map(item => {
-        if (item.menuId === menuId) {
+        // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+        if (String(item.menuId) === String(menuId)) {
             // 클릭한 메뉴는 토글
             return { ...item, isExpanded: !item.isExpanded };
         } else {
             // 다른 depth 0 메뉴는 닫기
+            // isExpanded를 false로 설정하고, 하위 메뉴도 모두 닫기
             return {
                 ...item,
                 isExpanded: false,
@@ -112,6 +120,57 @@ export const toggleDepth0MenuExpand = (tree: MenuTreeNode[], menuId: string): Me
             };
         }
     });
+};
+
+/**
+ * 같은 depth의 메뉴만 닫기 (depth 1 이상에서 사용)
+ * 
+ * 동작 방식:
+ * - 클릭한 메뉴의 depth를 찾아서 같은 depth의 메뉴만 처리
+ * - 클릭한 메뉴는 토글 (isExpanded 반전)
+ * - 같은 depth의 다른 메뉴는 isExpanded = false로 설정
+ * - 하위 메뉴도 모두 닫기
+ */
+export const toggleSameDepthMenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTreeNode[] => {
+    // 먼저 클릭한 메뉴의 depth 찾기
+    const targetNode = findMenuNode(tree, menuId);
+    if (!targetNode) {
+        // 메뉴를 찾지 못한 경우 원본 반환
+        return tree;
+    }
+    
+    const targetDepth = targetNode.depth;
+    
+    // 같은 depth의 메뉴를 닫는 헬퍼 함수
+    const closeSameDepthMenus = (nodes: MenuTreeNode[], currentDepth: number): MenuTreeNode[] => {
+        return nodes.map(node => {
+            if (currentDepth === targetDepth) {
+                // 같은 depth 레벨
+                // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+                if (String(node.menuId) === String(menuId)) {
+                    // 클릭한 메뉴는 토글
+                    return { ...node, isExpanded: !node.isExpanded };
+                } else {
+                    // 같은 depth의 다른 메뉴는 닫기
+                    return {
+                        ...node,
+                        isExpanded: false,
+                        children: node.children.length > 0 ? expandAllMenus(node.children, false) : []
+                    };
+                }
+            }
+            // 다른 depth 레벨은 재귀적으로 처리
+            if (node.children.length > 0) {
+                return {
+                    ...node,
+                    children: closeSameDepthMenus(node.children, currentDepth + 1)
+                };
+            }
+            return node;
+        });
+    };
+    
+    return closeSameDepthMenus(tree, 0);
 };
 
 /**
@@ -132,7 +191,8 @@ export const findMenuPath = (tree: MenuTreeNode[], menuId: string, path: string[
     for (const item of tree) {
         const currentPath = [...path, item.menuId];
 
-        if (item.menuId === menuId) {
+        // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+        if (String(item.menuId) === String(menuId)) {
             return currentPath;
         }
 
@@ -163,7 +223,8 @@ export const expandMenuPath = (tree: MenuTreeNode[], path: string[]): MenuTreeNo
  */
 export const findMenuNode = (tree: MenuTreeNode[], menuId: string): MenuTreeNode | null => {
     for (const item of tree) {
-        if (item.menuId === menuId) {
+        // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+        if (String(item.menuId) === String(menuId)) {
             return item;
         }
         if (item.children.length > 0) {
@@ -194,6 +255,28 @@ export const flattenMenuTree = (tree: MenuTreeNode[]): MenuTreeNode[] => {
 };
 
 /**
+ * 특정 메뉴의 모든 하위 메뉴 ID를 재귀적으로 추출
+ */
+export const getAllDescendantMenuIds = (node: MenuTreeNode): string[] => {
+    const ids: string[] = [];
+    
+    const collectIds = (nodes: MenuTreeNode[]): void => {
+        nodes.forEach(child => {
+            ids.push(child.menuId);
+            if (child.children.length > 0) {
+                collectIds(child.children);
+            }
+        });
+    };
+    
+    if (node.children.length > 0) {
+        collectIds(node.children);
+    }
+    
+    return ids;
+};
+
+/**
  * 확장된 메뉴 ID 목록 추출
  */
 export const getExpandedMenuIds = (tree: MenuTreeNode[]): string[] => {
@@ -218,11 +301,15 @@ export const getExpandedMenuIds = (tree: MenuTreeNode[]): string[] => {
  * 저장된 확장 상태를 메뉴 트리에 적용
  */
 export const restoreMenuExpansion = (tree: MenuTreeNode[], expandedMenuIds: Set<string> | string[]): MenuTreeNode[] => {
-    const expandedSet = expandedMenuIds instanceof Set ? expandedMenuIds : new Set(expandedMenuIds);
+    // Set에 저장할 때 문자열로 변환하여 일관성 유지
+    const expandedSet = expandedMenuIds instanceof Set 
+        ? new Set(Array.from(expandedMenuIds).map(id => String(id)))
+        : new Set(expandedMenuIds.map(id => String(id)));
 
     return tree.map(item => {
         // 저장된 확장 상태만 적용 (depth와 무관하게 저장된 상태 사용)
-        const shouldExpand = expandedSet.has(item.menuId);
+        // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+        const shouldExpand = expandedSet.has(String(item.menuId));
         return {
             ...item,
             isExpanded: shouldExpand,
@@ -370,4 +457,94 @@ export const loadCollapsedState = (): boolean => {
         console.warn("[MenuHelpers] Failed to load collapsed state from localStorage:", error);
     }
     return false;
+};
+
+/**
+ * 호버 시 메뉴 확장 (localStorage의 확장 상태 참조하여 하위 메뉴도 확장)
+ */
+export const expandMenuOnHover = (tree: MenuTreeNode[], menuId: string): MenuTreeNode[] => {
+    const savedExpandedIds = loadExpandedMenuIds();
+    // Set에 저장할 때 문자열로 변환하여 일관성 유지
+    const expandedSet = new Set(savedExpandedIds.map(id => String(id)));
+
+    // 하위 메뉴들을 localStorage 상태에 따라 확장하는 헬퍼 함수
+    const restoreChildrenExpansion = (children: MenuTreeNode[]): MenuTreeNode[] => {
+        return children.map(child => ({
+            ...child,
+            isExpanded: expandedSet.has(String(child.menuId)),
+            children: child.children.length > 0 ? restoreChildrenExpansion(child.children) : []
+        }));
+    };
+
+    const expandMenuAndChildren = (nodes: MenuTreeNode[], targetId: string): MenuTreeNode[] => {
+        return nodes.map(node => {
+            // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+            if (String(node.menuId) === String(targetId)) {
+                // 호버한 메뉴는 확장
+                return {
+                    ...node,
+                    isExpanded: true,
+                    // 하위 메뉴들도 localStorage에 저장된 확장 상태에 따라 확장
+                    children: node.children.length > 0 ? restoreChildrenExpansion(node.children) : []
+                };
+            }
+            // 하위 메뉴를 재귀적으로 처리
+            if (node.children.length > 0) {
+                return {
+                    ...node,
+                    children: expandMenuAndChildren(node.children, targetId),
+                    // 현재 노드의 확장 상태는 localStorage 상태에 따라 유지
+                    isExpanded: expandedSet.has(String(node.menuId)) || node.isExpanded
+                };
+            }
+            return node;
+        });
+    };
+
+    return expandMenuAndChildren(tree, menuId);
+};
+
+/**
+ * 호버 해제 시 메뉴 축소 (localStorage 상태는 유지)
+ */
+export const collapseMenuOnHoverLeave = (tree: MenuTreeNode[], menuId: string): MenuTreeNode[] => {
+    const savedExpandedIds = loadExpandedMenuIds();
+    // Set에 저장할 때 문자열로 변환하여 일관성 유지
+    const expandedSet = new Set(savedExpandedIds.map(id => String(id)));
+
+    // 하위 메뉴들을 localStorage 상태에 따라 복원하는 헬퍼 함수
+    const restoreChildrenExpansion = (children: MenuTreeNode[]): MenuTreeNode[] => {
+        return children.map(child => ({
+            ...child,
+            isExpanded: expandedSet.has(String(child.menuId)),
+            children: child.children.length > 0 ? restoreChildrenExpansion(child.children) : []
+        }));
+    };
+
+    const collapseMenu = (nodes: MenuTreeNode[], targetId: string): MenuTreeNode[] => {
+        return nodes.map(node => {
+            // menuId를 문자열로 변환하여 비교 (타입 불일치 방지)
+            if (String(node.menuId) === String(targetId)) {
+                // 호버 해제한 메뉴만 축소 (localStorage 상태는 유지)
+                return {
+                    ...node,
+                    isExpanded: false,
+                    // 하위 메뉴는 localStorage 상태에 따라 유지
+                    children: node.children.length > 0 ? restoreChildrenExpansion(node.children) : []
+                };
+            }
+            // 하위 메뉴를 재귀적으로 처리
+            if (node.children.length > 0) {
+                return {
+                    ...node,
+                    children: collapseMenu(node.children, targetId),
+                    // 현재 노드의 확장 상태는 localStorage 상태에 따라 유지
+                    isExpanded: expandedSet.has(String(node.menuId)) || node.isExpanded
+                };
+            }
+            return node;
+        });
+    };
+
+    return collapseMenu(tree, menuId);
 };
