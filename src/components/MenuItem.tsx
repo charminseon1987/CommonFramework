@@ -96,7 +96,8 @@ export function MenuItem({
 
     // 아이콘과 이미지 존재 여부 확인
     const hasIcon = item.iconClass && item.iconClass.trim() !== "";
-    const hasImage = layout === "vertical" && item.imageInfo && item.imageInfo.guid;
+    // 이미지가 실제로 유효한 URL을 가지고 있는지 확인
+    const hasImage = layout === "vertical" && item.imageInfo && item.imageInfo.guid && imageUrl && imageUrl.trim() !== "";
     const hasAnyIcon = hasIcon || hasImage;
 
     // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
@@ -166,7 +167,7 @@ export function MenuItem({
 
                 {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
                 {layout === "vertical" && item.imageInfo && item.imageInfo.guid && imageUrl && (
-                    <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
+                    <div className="mx-image-viewer mx-image-viewer-responsive mx-name-image1" aria-hidden="true">
                         <img className="img-thumbnail" alt="" src={imageUrl} />
                     </div>
                 )}

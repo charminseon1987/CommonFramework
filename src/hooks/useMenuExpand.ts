@@ -34,9 +34,7 @@ export function useMenuExpand(
                 ? toggleDepth0MenuExpand(prev.menuTree, menuId) // depth-0 메뉴: 다른 depth-0 메뉴 자동 닫기
                 : toggleSameDepthMenuExpand(prev.menuTree, menuId); // depth 1 이상: 같은 depth의 메뉴만 닫기
             
-            console.log('[useMenuExpand] newTree depth-0 expanded states:', 
-                newTree.map(item => ({ menuId: item.menuId, depth: item.depth, isExpanded: item.isExpanded }))
-            );
+           
             
             const expandedIds = getExpandedMenuIds(newTree);
             saveExpandedMenuIds(expandedIds);
@@ -66,7 +64,7 @@ export function useMenuExpand(
         setIsAllExpanded(true);
         setState((prev: NavigationState) => {
             const newTree = expandAllMenus(prev.menuTree, true);
-            console.log("newTree", newTree)
+           
             const expandedIds = getExpandedMenuIds(newTree);
             saveExpandedMenuIds(expandedIds);
 
