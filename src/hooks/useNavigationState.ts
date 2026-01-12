@@ -4,10 +4,13 @@ import {
     buildMenuTree,
     restoreMenuExpansion,
     loadExpandedMenuIds,
-    loadActiveMenuId
+    loadActiveMenuId,
+    expandDepth0MenusWithChildren,
+    getExpandedMenuIds,
+    saveExpandedMenuIds
 } from "../utils/menuHelpers";
 
-export function useNavigationState(menuData: MenuItemData[] | null) {
+export function useNavigationState(menuData: MenuItemData[] | null, layout?: "vertical" | "horizontal") {
     const [state, setState] = useState<NavigationState>({
         menuTree: [],
         activeMenuId: null,
@@ -31,8 +34,18 @@ export function useNavigationState(menuData: MenuItemData[] | null) {
         try {
             let tree = buildMenuTree(menuData);
             const savedExpandedIds = loadExpandedMenuIds();
+            
             if (savedExpandedIds.length > 0) {
+                // localStorage에 저장된 확장 상태가 있으면 우선 적용
                 tree = restoreMenuExpansion(tree, savedExpandedIds);
+            } else if (layout === "vertical") {
+                // vertical layout이고 저장된 상태가 없으면 depth-0 메뉴 중 children이 있으면 자동 펼침
+                tree = expandDepth0MenusWithChildren(tree);
+                // 자동 펼쳐진 메뉴 ID를 localStorage에 저장하여 상태 유지
+                const expandedIds = getExpandedMenuIds(tree);
+                if (expandedIds.length > 0) {
+                    saveExpandedMenuIds(expandedIds);
+                }
             }
 
             const activeMenuId = loadActiveMenuId();
@@ -52,7 +65,7 @@ export function useNavigationState(menuData: MenuItemData[] | null) {
                 isLoading: false
             }));
         }
-    }, [menuData]);
+    }, [menuData, layout]);
 
     return { state, setState };
 }

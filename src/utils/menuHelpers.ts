@@ -319,6 +319,24 @@ export const restoreMenuExpansion = (tree: MenuTreeNode[], expandedMenuIds: Set<
 };
 
 /**
+ * Depth-0 메뉴 중 children이 있는 메뉴를 자동으로 펼치기
+ * Vertical layout 전용으로 사용
+ */
+export const expandDepth0MenusWithChildren = (tree: MenuTreeNode[]): MenuTreeNode[] => {
+    return tree.map(item => {
+        // depth-0이고 children이 있으면 자동으로 펼치기
+        if (item.depth === 0 && item.children.length > 0) {
+            return {
+                ...item,
+                isExpanded: true,
+                children: item.children // 하위 메뉴는 재귀적으로 처리하지 않음 (사용자가 직접 펼쳐야 함)
+            };
+        }
+        return item;
+    });
+};
+
+/**
  * localStorage에 확장된 메뉴 ID 목록 저장
  */
 const STORAGE_KEY = "bangarlab-nav-expanded-menu-ids";

@@ -26,7 +26,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
      * ------------------------------------------------------------------ */
     const [activeTab, setActiveTab] = useState<NavigationTabKey>("all");
     const menuData = useMenuData(props, activeTab);
-    const { state, setState } = useNavigationState(menuData);
+    const { state, setState } = useNavigationState(menuData, props.layout);
     // User domain
     const userData = useUserData(props);
     const [isAllExpanded, setIsAllExpanded] = useState(false);
