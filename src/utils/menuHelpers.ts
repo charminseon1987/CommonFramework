@@ -9,18 +9,14 @@ export const buildMenuTree = (flatMenu: MenuItemData[]): MenuTreeNode[] => {
     if (!flatMenu || flatMenu.length === 0) {
         return [];
     }
-
     // 활성화되고 표시 가능한 메뉴만 필터링 (홈 메뉴 제외)
     const activeMenus = flatMenu.filter(
         item => item.enabledTF !== false && (!item.displayYn || item.displayYn === "Y") && item.menuName !== "홈" // 홈 메뉴 항목 제외
     );
-
     // SortNo로 정렬
     const sortedMenus = [...activeMenus].sort((a, b) => a.sortNo - b.sortNo);
-
     // Map으로 변환
     const menuMap = new Map<string, MenuTreeNode>();
-
     sortedMenus.forEach(item => {
         // 모든 메뉴는 기본적으로 접힌 상태로 설정
         const shouldExpand = false;
@@ -36,7 +32,6 @@ export const buildMenuTree = (flatMenu: MenuItemData[]): MenuTreeNode[] => {
 
     // 트리 구조 생성
     const rootItems: MenuTreeNode[] = [];
-
     sortedMenus.forEach(item => {
         const node = menuMap.get(item.menuId);
         if (!node) return;
@@ -67,9 +62,7 @@ export const buildMenuTree = (flatMenu: MenuItemData[]): MenuTreeNode[] => {
             }
         });
     };
-
     sortChildren(rootItems);
-
     return rootItems;
 };
 
@@ -94,7 +87,7 @@ export const toggleMenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTree
 /**
  * Depth 0 메뉴의 확장 상태 토글 (다른 depth 0 메뉴는 자동으로 닫기)
  * Horizontal 레이아웃 및 Vertical 레이아웃의 depth-0 메뉴에서 사용
- * 
+ *
  * 동작:
  * - 클릭한 메뉴는 토글 (열려있으면 닫고, 닫혀있으면 열기)
  * - 다른 모든 depth-0 메뉴는 확실하게 닫기 (isExpanded: false)
@@ -166,10 +159,20 @@ export const toggleSameDepthMenuExpand = (tree: MenuTreeNode[], menuId: string):
             }
         });
     };
-
     return toggleSameDepth(tree);
 };
+export const expandChildrenOfExpandedDepth0 = (tree: MenuTreeNode[]): MenuTreeNode[] => {
+    return tree.map(item => {
+        if (item.isExpanded && item.children.length > 0) {
+            return {
+                ...item,
+                children: expandAllMenus(item.children, true)
+            };
+        }
 
+        return item;
+    });
+};
 /**
  * 모든 메뉴 확장/축소
  */

@@ -9,12 +9,13 @@ interface HorizontalMenuItemProps {
     isActive: boolean;
     activeMenuId: string | null;
     onHorizontalMenuClick: (menuId: string, pageURL: string | undefined, hasChildren: boolean, depth: number) => void;
-    onToggleExpand: (menuId: string) => void;
+    onToggleExpand?: (menuId: string) => void;
     onToggleExpandNormal?: (menuId: string) => void;
+    onToggleExpandAllChildren?: (menuId: string) => void;
     depth: number;
     maxDepth: number;
     showDepthIndicator: boolean;
-    layout?: "vertical" | "horizontal";
+    layout?: "vertical" | "horizontal" | "horizontal-full";
 }
 
 export function HorizontalMenuItem({
@@ -24,6 +25,7 @@ export function HorizontalMenuItem({
     onHorizontalMenuClick,
     onToggleExpand,
     onToggleExpandNormal,
+    onToggleExpandAllChildren,
     depth,
     maxDepth,
     showDepthIndicator,
@@ -42,14 +44,20 @@ export function HorizontalMenuItem({
     const handleArrowClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
         e.stopPropagation();
-        if (canExpand) {
-            // depth 0일 때는 Horizontal 전용 토글 (다른 depth 0 메뉴 닫기)
-            // depth 1 이상일 때는 일반 토글 (해당 메뉴만 토글)
-            if (depth === 0) {
-                onToggleExpand(item.menuId);
-            } else if (onToggleExpandNormal) {
-                onToggleExpandNormal(item.menuId);
-            }
+
+        if (!canExpand) return;
+
+        // ✅ FULL WIDTH
+        if (layout === "horizontal-full") {
+            onToggleExpandAllChildren?.(item.menuId);
+            return;
+        }
+
+        // ✅ NORMAL HORIZONTAL
+        if (depth === 0 && onToggleExpand) {
+            onToggleExpand?.(item.menuId);
+        } else {
+            onToggleExpandNormal?.(item.menuId);
         }
     };
 
@@ -66,16 +74,27 @@ export function HorizontalMenuItem({
         if (target.closest(".horizontal-menu-item-arrow")) {
             return; // 화살표 버튼 클릭은 handleArrowClick에서 처리
         }
-        
+
         // depth 0이고 자식이 있는 경우: 토글 기능 추가
         if (depth === 0 && hasChildren) {
             e.preventDefault();
             e.stopPropagation();
-            // 현재 열려있으면 닫고, 닫혀있으면 열기
-            onToggleExpand(item.menuId);
+
+            if (layout === "horizontal-full") {
+                onToggleExpandAllChildren?.(item.menuId);
+            } else {
+                onToggleExpand?.(item.menuId);
+            }
             return;
         }
-        
+        console.log("CLICK", {
+            menuId: item.menuId,
+            depth,
+            hasChildren,
+            layout,
+            hasToggleExpand: !!onToggleExpand,
+            hasToggleAll: !!onToggleExpandAllChildren
+        });
         // 그 외의 경우: 기존 동작 (페이지 이동 또는 하위 메뉴 처리)
         handleHorizontalMenuClick(e);
     };
@@ -84,7 +103,7 @@ export function HorizontalMenuItem({
         if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             // depth 0이고 자식이 있는 경우: 토글 기능 추가
-            if (depth === 0 && hasChildren) {
+            if (depth === 0 && hasChildren && onToggleExpand) {
                 onToggleExpand(item.menuId);
             } else {
                 handleHorizontalMenuClick(e as any);
@@ -109,7 +128,7 @@ export function HorizontalMenuItem({
                     </span>
                 )}
                 {/* 메뉴명 */}
-                <span className="horizontal-menu-item-label" title={item.menuName || ""}>
+                <span className="horizontal-menu-item-label" title={item.menuName || ""} onClick={handleArrowClick}>
                     {item.menuName || "메뉴"}
                 </span>
                 {/* 확장 화살표 버튼 */}
@@ -125,9 +144,11 @@ export function HorizontalMenuItem({
                         aria-label={item.isExpanded ? "메뉴 접기" : "메뉴 펼치기"}
                         aria-hidden="false"
                     >
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                            <path d="M6 9L1 4h10z" />
-                        </svg>
+                        {layout === "horizontal" && (
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 9L1 4h10z" />
+                            </svg>
+                        )}
                     </button>
                 )}
                 {/* Depth 표시 (개발용) */}
