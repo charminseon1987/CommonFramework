@@ -13,7 +13,7 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
-import { loadCollapsedState, saveCollapsedState } from "./utils/menuHelpers";
+import { loadCollapsedState, saveCollapsedState, loadExpandedMenuIds, restoreMenuExpansion, expandAllMenus } from "./utils/menuHelpers";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
 import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
@@ -239,6 +239,15 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
            
         }
         
+        // localStorage에서 확장 상태 복원
+        const savedExpandedIds = loadExpandedMenuIds();
+        if (savedExpandedIds.length > 0) {
+            setState(prev => ({
+                ...prev,
+                menuTree: restoreMenuExpansion(prev.menuTree, savedExpandedIds)
+            }));
+        }
+        
         // 약간의 지연을 두고 버튼과 스크롤 컨테이너 찾기 (동적 생성 대응)
         setTimeout(() => {
             const button = findSidebarToggleButton();
@@ -316,6 +325,13 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                 
             }
         }
+        
+        // 모든 하위 메뉴 닫기 (최상단 depth만 남기기)
+        // localStorage에는 저장하지 않음 (원래 확장 상태는 유지되어야 함)
+        setState(prev => ({
+            ...prev,
+            menuTree: expandAllMenus(prev.menuTree, false)
+        }));
         
         // ref 초기화 (다음 호버를 위해)
         originalCollapsedStateRef.current = null;
