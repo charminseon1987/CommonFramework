@@ -279,7 +279,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                 </div>
 
                 <aside 
-                    className="nav-sidebar" 
+                    className={classNames("nav-sidebar", { collapsed: isCollapsed })} 
                     role="navigation"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
