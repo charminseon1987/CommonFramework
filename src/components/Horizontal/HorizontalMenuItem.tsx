@@ -1,8 +1,9 @@
 // src/components/horizontal/HorizontalMenuItem.tsx
 
-import { ReactElement, createElement } from "react";
+import { ReactElement, createElement, useState, useEffect } from "react";
 import classNames from "classnames";
 import { MenuTreeNode } from "../../types/menu.types";
+import { buildMendixImageUrl, buildMendixImageUrlAsync } from "../../utils/imageUtils";
 
 interface HorizontalMenuItemProps {
     item: MenuTreeNode;
@@ -31,6 +32,43 @@ export function HorizontalMenuItem({
 }: HorizontalMenuItemProps): ReactElement {
     const hasChildren = item.children && item.children.length > 0;
     const canExpand = hasChildren && depth < maxDepth;
+
+    // 이미지 URL을 state로 관리
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    // 이미지 URL 비동기 로드
+    useEffect(() => {
+        if (item.imageInfo && item.imageInfo.guid) {
+            let isMounted = true;
+
+            const loadImageUrl = async () => {
+                try {
+                    const url = await buildMendixImageUrlAsync(item.imageInfo!, true);
+                    if (isMounted && url) {
+                        setImageUrl(url);
+                    }
+                } catch (error) {
+                    console.warn("[HorizontalMenuItem] Failed to load image URL:", error);
+                    if (isMounted) {
+                        // 에러 발생 시 동기 함수로 fallback
+                        const fallbackUrl = buildMendixImageUrl(item.imageInfo!, true);
+                        if (fallbackUrl) {
+                            setImageUrl(fallbackUrl);
+                        }
+                    }
+                }
+            };
+
+            loadImageUrl();
+
+            return () => {
+                isMounted = false;
+            };
+        } else {
+            // 이미지가 없으면 state 초기화
+            setImageUrl(null);
+        }
+    }, [item.imageInfo?.guid]);
 
     // 메뉴 클릭 핸들러
     const handleHorizontalMenuClick = (e: React.MouseEvent): void => {
@@ -64,14 +102,34 @@ export function HorizontalMenuItem({
         // 화살표 버튼 클릭이 아닐 때만 메뉴 클릭 처리
         const target = e.target as HTMLElement;
         if (!target.closest(".horizontal-menu-item-arrow")) {
-            handleHorizontalMenuClick(e);
+            // pageURL이 있으면 페이지 이동 우선 처리
+            if (item.pageURL) {
+                handleHorizontalMenuClick(e);
+            } else if (canExpand && depth >= 1 && onToggleExpandNormal) {
+                // pageURL이 없고 depth >= 1이고 확장 가능한 경우 확장/축소 처리
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleExpandNormal(item.menuId);
+            } else {
+                // depth === 0이거나 확장 불가능한 경우 기존 동작 (페이지 이동 또는 depth-0 확장)
+                handleHorizontalMenuClick(e);
+            }
         }
     };
 
     const handleContentKeyDown = (e: React.KeyboardEvent): void => {
         if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            handleHorizontalMenuClick(e as any);
+            // pageURL이 있으면 페이지 이동 우선 처리
+            if (item.pageURL) {
+                handleHorizontalMenuClick(e as any);
+            } else if (canExpand && depth >= 1 && onToggleExpandNormal) {
+                // pageURL이 없고 depth >= 1이고 확장 가능한 경우 확장/축소 처리
+                onToggleExpandNormal(item.menuId);
+            } else {
+                // depth === 0이거나 확장 불가능한 경우 기존 동작
+                handleHorizontalMenuClick(e as any);
+            }
         }
     };
 
@@ -91,12 +149,20 @@ export function HorizontalMenuItem({
                         <i className={item.iconClass}></i>
                     </span>
                 )}
+
+                {/* 이미지 */}
+                {item.imageInfo && item.imageInfo.guid && imageUrl && (
+                    <div className="mx-image-viewer mx-image-viewer-responsive mx-name-nav-image" aria-hidden="true">
+                        <img className="img-thumbnail" alt="" src={imageUrl} />
+                    </div>
+                )}
+
                 {/* 메뉴명 */}
                 <span className="horizontal-menu-item-label" title={item.menuName || ""}>
                     {item.menuName || "메뉴"}
                 </span>
                 {/* 확장 화살표 버튼 */}
-                {canExpand && (
+                {hasChildren && (
                     <button
                         type="button"
                         className={classNames("horizontal-menu-item-arrow", {

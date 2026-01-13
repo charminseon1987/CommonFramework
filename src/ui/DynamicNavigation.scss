@@ -753,8 +753,7 @@
             padding: 0;
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
+            background-color: var(--depth-0-bg);
             // height: var(--topbar-height); // 👈 고정 높이 설정
             min-height: var(--topbar-height); // 👈 최소 높이도 고정
             // max-height: var(--topbar-height); // 👈 최대 높이도 고정
@@ -785,12 +784,8 @@
                     margin: 0;
                     font-size: 18px;
                     font-weight: 700;
-                    color: var(--text-primary);
+                    color: var(--text-active);
                     letter-spacing: -0.02em;
-                    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
 
                     .nav-title-button {
                         border: none;
@@ -803,16 +798,23 @@
                         font-size: 18px;
                         font-weight: 700;
                         letter-spacing: -0.02em;
-                        // nav-title의 투명 텍스트 효과 완전히 오버라이드
-                        -webkit-text-fill-color: #1890ff !important;
-                        color: #1890ff !important;
+                        color: var(--text-active) !important;
+                        -webkit-text-fill-color: var(--text-active) !important;
                         background: none !important;
                         -webkit-background-clip: initial !important;
                         background-clip: initial !important;
 
+                        img {
+                            height: auto;
+                            max-height: 32px;
+                            width: auto;
+                            display: block;
+                        }
+
                         &:hover {
-                            color: #096dd9 !important;
-                            -webkit-text-fill-color: #096dd9 !important;
+                            color: var(--text-active) !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            opacity: 0.8;
                             transform: translateX(2px);
                         }
 
@@ -878,16 +880,36 @@
                             background-color: var(--hover-bg);
                         }
 
+                        // Mendix 이미지 뷰어 스타일
+                        .mx-image-viewer {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 24px;
+                            min-width: 24px;
+                            height: 24px;
+                            flex-shrink: 0;
+                            margin: 0;
+
+                            &.mx-image-viewer-responsive {
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .img-thumbnail {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                                display: block;
+                            }
+                        }
+
                         .horizontal-menu-item-label {
                             margin: 0;
                             font-size: 18px;
                             font-weight: 700;
-                            color: var(--text-primary);
+                            color: var(--text-active);
                             letter-spacing: -0.02em;
-                            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            background-clip: text;
                         }
                         .horizontal-menu-item-arrow {
                             border: none;
@@ -901,8 +923,8 @@
                             font-weight: 700;
                             letter-spacing: -0.02em;
                             // nav-title의 투명 텍스트 효과 완전히 오버라이드
-                            -webkit-text-fill-color: #1890ff !important;
-                            color: #1890ff !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            color: var(--text-active) !important;
                             background: none !important;
                             -webkit-background-clip: initial !important;
                             background-clip: initial !important;
@@ -919,8 +941,9 @@
                             }
 
                             &:hover {
-                                color: #096dd9 !important;
-                                -webkit-text-fill-color: #096dd9 !important;
+                                color: var(--text-active) !important;
+                                -webkit-text-fill-color: var(--text-active) !important;
+                                opacity: 0.8;
                                 transform: translateX(2px);
                             }
 
@@ -1450,16 +1473,36 @@
                             background-color: var(--hover-bg);
                         }
 
+                        // Mendix 이미지 뷰어 스타일
+                        .mx-image-viewer {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 24px;
+                            min-width: 24px;
+                            height: 24px;
+                            flex-shrink: 0;
+                            margin: 0;
+
+                            &.mx-image-viewer-responsive {
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .img-thumbnail {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                                display: block;
+                            }
+                        }
+
                         .horizontal-menu-item-label {
                             margin: 0;
                             font-size: 18px;
                             font-weight: 700;
-                            color: var(--text-primary);
+                            color: var(--text-active);
                             letter-spacing: -0.02em;
-                            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            background-clip: text;
                         }
                         .horizontal-menu-item-arrow {
                             border: none;
@@ -1473,8 +1516,8 @@
                             font-weight: 700;
                             letter-spacing: -0.02em;
                             // nav-title의 투명 텍스트 효과 완전히 오버라이드
-                            -webkit-text-fill-color: #1890ff !important;
-                            color: #1890ff !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            color: var(--text-active) !important;
                             background: none !important;
                             -webkit-background-clip: initial !important;
                             background-clip: initial !important;
@@ -1491,8 +1534,9 @@
                             }
 
                             &:hover {
-                                color: #096dd9 !important;
-                                -webkit-text-fill-color: #096dd9 !important;
+                                color: var(--text-active) !important;
+                                -webkit-text-fill-color: var(--text-active) !important;
+                                opacity: 0.8;
                                 transform: translateX(2px);
                             }
 
