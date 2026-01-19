@@ -1,6 +1,6 @@
 // src/hooks/useBookmarkEdit.ts
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { MenuTreeNode } from "../types/menu.types";
 import {
     recalculateDepth,
@@ -23,9 +23,29 @@ export function useBookmarkEdit({ initialTree, onSave }: UseBookmarkEditOptions)
     const [isEditMode, setIsEditMode] = useState(false);
     const [editedTree, setEditedTree] = useState<MenuTreeNode[]>(initialTree);
     const [hasChanges, setHasChanges] = useState(false);
+    const previousInitialTreeRef = useRef<MenuTreeNode[]>(initialTree);
 
     // initialTree가 변경되면 editedTree도 업데이트 (편집 모드가 아닐 때만)
     useEffect(() => {
+        // 배열 참조가 같으면 스킵 (무한 루프 방지)
+        if (previousInitialTreeRef.current === initialTree) {
+            return;
+        }
+
+        // 배열 길이와 내용이 같으면 스킵
+        const isSameTree = 
+            previousInitialTreeRef.current.length === initialTree.length &&
+            previousInitialTreeRef.current.every((item, index) => 
+                item.menuId === initialTree[index]?.menuId
+            );
+
+        if (isSameTree) {
+            previousInitialTreeRef.current = initialTree;
+            return;
+        }
+
+        previousInitialTreeRef.current = initialTree;
+
         if (!isEditMode) {
             setEditedTree(initialTree);
             setHasChanges(false);

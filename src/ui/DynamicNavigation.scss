@@ -447,6 +447,13 @@
                 text-overflow: ellipsis;
             }
         }
+        .nav-sidebar {
+            .nav-content {
+                .bookmark-edit-menu{
+                    color : white;
+                }
+            }
+        }
     }
 
     // 사이드바 스타일

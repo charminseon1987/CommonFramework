@@ -1,5 +1,5 @@
 // src/BangarlabDynamicNavigation.tsx
-import { ReactElement, createElement, useState, useEffect, useRef } from "react";
+import { ReactElement, createElement, useState, useEffect, useRef, useMemo } from "react";
 import classNames from "classnames";
 import { DynamicNavigationContainerProps } from "./types/widget.types";
 import { NavigationMenu } from "./components/NavigationMenu";
@@ -55,7 +55,9 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     }, [allMenuData]);
 
     // 북마크 편집 hook
-    const bookmarkTree = activeTab === "bookmark" ? state.menuTree : [];
+    const bookmarkTree = useMemo(() => {
+        return activeTab === "bookmark" ? state.menuTree : [];
+    }, [activeTab, state.menuTree]);
     const bookmarkEdit = useBookmarkEdit({
         initialTree: bookmarkTree,
         onSave: props.onBookmarkReorganize

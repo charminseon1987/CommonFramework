@@ -1,6 +1,6 @@
 // src/components/BookmarkEditMenu.tsx
 
-import { ReactElement, createElement, useState, useCallback, useMemo, useEffect } from "react";
+import { ReactElement, createElement, useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
     ControlledTreeEnvironment,
     Tree,
@@ -60,15 +60,29 @@ export function BookmarkEditMenu({
             .map(item => item.index);
     });
     const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
+    const previousTreeItemsRef = useRef(treeItems);
 
     // treeItems가 변경되면 expandedItems 업데이트
     useEffect(() => {
+        // treeItems 참조가 같으면 스킵 (무한 루프 방지)
+        if (previousTreeItemsRef.current === treeItems) {
+            return;
+        }
+
+        previousTreeItemsRef.current = treeItems;
+
         const newExpandedItems = Object.values(treeItems)
             .filter(item => item.isFolder && item.children && item.children.length > 0)
             .map(item => item.index);
+        
         setExpandedItems(prev => {
             const newSet = new Set([...prev, ...newExpandedItems]);
-            return Array.from(newSet);
+            const newArray = Array.from(newSet);
+            // 이전 값과 같으면 업데이트하지 않음
+            if (prev.length === newArray.length && prev.every((id, idx) => id === newArray[idx])) {
+                return prev;
+            }
+            return newArray;
         });
     }, [treeItems]);
 
