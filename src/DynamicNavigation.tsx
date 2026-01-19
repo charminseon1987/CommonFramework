@@ -18,11 +18,16 @@ import {
     saveCollapsedState,
     loadExpandedMenuIds,
     restoreMenuExpansion,
-    expandAllMenus
+    expandAllMenus,
+    buildMenuTree
 } from "./utils/menuHelpers";
+import { MenuTreeNode } from "./types/menu.types";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
 import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
+import BookmarkSettingsButton from "./components/BookmarkSettingsButton";
+import { BookmarkEditMenu } from "./components/BookmarkEditMenu";
+import { useBookmarkEdit } from "./hooks/useBookmarkEdit";
 // import logoImage from "./assets/logo.png";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
@@ -38,6 +43,23 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
 
     const menuData = useMenuData(props, activeTab);
     const { state, setState } = useNavigationState(menuData);
+
+    // 전체 메뉴 트리 데이터 (메뉴 추가용)
+    const allMenuData = useMenuData(props, "all");
+    const [allMenuTree, setAllMenuTree] = useState<MenuTreeNode[]>([]);
+    useEffect(() => {
+        if (allMenuData) {
+            const tree = buildMenuTree(allMenuData);
+            setAllMenuTree(tree);
+        }
+    }, [allMenuData]);
+
+    // 북마크 편집 hook
+    const bookmarkTree = activeTab === "bookmark" ? state.menuTree : [];
+    const bookmarkEdit = useBookmarkEdit({
+        initialTree: bookmarkTree,
+        onSave: props.onBookmarkReorganize
+    });
 
     /* ------------------------------------------------------------------
      * hooks
@@ -438,17 +460,38 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                     <NavigationTab value={activeTab} onChange={setActiveTab} />
                     {/* 메뉴 */}
                     <nav className="nav-content">
-                        <NavigationMenu
-                            menuItems={state.menuTree}
-                            activeMenuId={state.activeMenuId}
-                            onMenuClick={handleMenuClickWrapper}
-                            onToggleExpand={toggleExpand}
-                            depth={0}
-                            maxDepth={props.maxDepth}
-                            showDepthIndicator={props.showDepthIndicator}
-                            isCollapsed={isCollapsed}
-                            onUncollapse={handleUncollapse}
-                        />
+                        {activeTab === "bookmark" && bookmarkEdit.isEditMode ? (
+                            <BookmarkEditMenu
+                                menuTree={bookmarkEdit.editedTree}
+                                fullMenuTree={allMenuTree}
+                                onMoveMenuItem={bookmarkEdit.handleMoveMenuItem}
+                                onRemoveMenuItem={bookmarkEdit.handleRemoveMenuItem}
+                                onCreateFolder={bookmarkEdit.handleCreateFolder}
+                                onAddMenus={bookmarkEdit.handleAddMenus}
+                                onSave={bookmarkEdit.handleSave}
+                                onCancel={bookmarkEdit.handleCancel}
+                                hasChanges={bookmarkEdit.hasChanges}
+                                onUpdateTree={bookmarkEdit.updateTree}
+                            />
+                        ) : (
+                            <NavigationMenu
+                                menuItems={activeTab === "bookmark" ? bookmarkEdit.editedTree : state.menuTree}
+                                activeMenuId={state.activeMenuId}
+                                onMenuClick={handleMenuClickWrapper}
+                                onToggleExpand={toggleExpand}
+                                depth={0}
+                                maxDepth={props.maxDepth}
+                                showDepthIndicator={props.showDepthIndicator}
+                                isCollapsed={isCollapsed}
+                                onUncollapse={handleUncollapse}
+                            />
+                        )}
+                        {activeTab === "bookmark" && (
+                            <BookmarkSettingsButton
+                                isEditMode={bookmarkEdit.isEditMode}
+                                onToggleEditMode={bookmarkEdit.toggleEditMode}
+                            />
+                        )}
                         <LogoutButton className="nav-logout-btn" onLogout={props.onLogout} />
                     </nav>
                 </aside>

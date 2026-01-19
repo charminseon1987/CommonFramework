@@ -85,6 +85,11 @@
                 <caption>Enable Dynamic Authorization</caption>
                 <description>Check permissions dynamically</description>
             </property>
+
+            <property key="onBookmarkReorganize" type="action" required="false">
+                <caption>On Bookmark Reorganize</caption>
+                <description>Action to save bookmark reorganization (receives JSON string parameter)</description>
+            </property>
         </propertyGroup>
 
         <!-- Appearance -->

@@ -46,6 +46,7 @@ export interface MenuProps {
     // Behavior
     onAuthFailed?: ActionValue;
     onLogout: ActionValue;
+    onBookmarkReorganize?: ActionValue;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;
