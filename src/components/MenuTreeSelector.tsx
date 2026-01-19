@@ -42,24 +42,6 @@ export function MenuTreeSelector({
                         "is-bookmarked": isBookmarked
                     })}
                 >
-                    {/* Expand/Collapse Button */}
-                    {hasChildren ? (
-                        <button
-                            type="button"
-                            className={classNames("menu-tree-selector-expand-btn", {
-                                expanded: isExpanded
-                            })}
-                            onClick={() => onToggleExpand(item.menuId)}
-                            aria-label={isExpanded ? "접기" : "펼치기"}
-                        >
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                            </svg>
-                        </button>
-                    ) : (
-                        <span className="menu-tree-selector-expand-placeholder" />
-                    )}
-
                     {/* Star Toggle Icon - 모든 항목에 표시 */}
                     <StarToggleIcon
                         isSelected={isSelected}

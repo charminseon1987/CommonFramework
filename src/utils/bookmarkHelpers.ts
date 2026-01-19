@@ -338,13 +338,15 @@ export function addMenusToTree(
     menus: MenuTreeNode[],
     targetFolderId: string | null = null
 ): MenuTreeNode[] {
-    // 이미 북마크에 있는 메뉴 ID 수집
+    console.log("[addMenusToTree] 받은 메뉴 개수:", menus.length);
+    console.log("[addMenusToTree] 받은 메뉴 IDs:", menus.map(m => m.menuId));
+    
+    // 이미 북마크에 있는 메뉴 ID 수집 (폴더 포함, 문자열로 정규화)
     const existingMenuIds = new Set<string>();
     const collectMenuIds = (nodes: MenuTreeNode[]): void => {
         nodes.forEach(node => {
-            if (node.pageURL) {
-                existingMenuIds.add(node.menuId);
-            }
+            // 폴더와 파일 모두 ID 수집
+            existingMenuIds.add(String(node.menuId));
             if (node.children && node.children.length > 0) {
                 collectMenuIds(node.children);
             }
@@ -352,11 +354,20 @@ export function addMenusToTree(
     };
     collectMenuIds(tree);
 
-    // 중복되지 않은 메뉴만 필터링
+    console.log("[addMenusToTree] 기존 북마크 메뉴 IDs:", Array.from(existingMenuIds));
+
+    // 중복되지 않은 메뉴만 필터링 (폴더도 포함)
     const menusToAdd = menus.filter(menu => {
-        if (!menu.pageURL) return false; // pageURL이 없으면 폴더이므로 추가하지 않음
-        return !existingMenuIds.has(menu.menuId);
+        const menuIdStr = String(menu.menuId);
+        if (existingMenuIds.has(menuIdStr)) {
+            console.log(`[addMenusToTree] 필터링됨 (중복): ${menu.menuName} (${menuIdStr})`);
+            return false;
+        }
+        return true;
     });
+
+    console.log("[addMenusToTree] 추가할 메뉴 개수:", menusToAdd.length);
+    console.log("[addMenusToTree] 추가할 메뉴 IDs:", menusToAdd.map(m => m.menuId));
 
     if (menusToAdd.length === 0) {
         return tree;
@@ -382,14 +393,22 @@ export function addMenusToTree(
     if (!targetFolderId || !targetNode || targetNode.pageURL) {
         const newMenus = menusToAdd.map((menu, index) => ({
             ...menu,
+            // pageURL과 기타 속성 명시적으로 보존
+            pageURL: menu.pageURL,
+            iconClass: menu.iconClass,
+            menuName: menu.menuName,
+            menuId: menu.menuId,
             parentMenuId: null,
             depth: 0,
             sortNo: tree.length + index,
+            // children은 포함하지 않고 빈 폴더/파일로 추가
             children: [],
             hasChildren: false,
             isExpanded: false,
             level: 0,
-            isVisible: true
+            isVisible: true,
+            enabledTF: menu.enabledTF ?? true,
+            displayYn: menu.displayYn ?? "Y"
         }));
         return [...tree, ...newMenus];
     }
@@ -400,14 +419,22 @@ export function addMenusToTree(
             if (node.menuId === targetFolderId) {
                 const newMenus = menusToAdd.map((menu, index) => ({
                     ...menu,
+                    // pageURL과 기타 속성 명시적으로 보존
+                    pageURL: menu.pageURL,
+                    iconClass: menu.iconClass,
+                    menuName: menu.menuName,
+                    menuId: menu.menuId,
                     parentMenuId: targetFolderId,
                     depth: node.depth + 1,
                     sortNo: node.children.length + index,
+                    // children은 포함하지 않고 빈 폴더/파일로 추가
                     children: [],
                     hasChildren: false,
                     isExpanded: false,
                     level: node.depth + 1,
-                    isVisible: true
+                    isVisible: true,
+                    enabledTF: menu.enabledTF ?? true,
+                    displayYn: menu.displayYn ?? "Y"
                 }));
                 return {
                     ...node,

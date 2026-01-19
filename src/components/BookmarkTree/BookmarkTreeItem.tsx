@@ -31,7 +31,9 @@ export function BookmarkTreeItemRenderer({
     onRemove,
     onAddSubFolder
 }: BookmarkTreeItemProps): ReactElement {
-    const isFolder = !item.data.pageURL;
+    // pageURL이 있으면 무조건 파일, 없으면 폴더
+    const hasPageURL = !!item.data.pageURL;
+    const isFolder = !hasPageURL; // pageURL이 없으면 폴더, 있으면 파일
     const hasChildren = item.children && item.children.length > 0;
 
     const handleRemoveClick = (e: React.MouseEvent) => {

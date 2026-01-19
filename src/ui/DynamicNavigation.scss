@@ -2520,6 +2520,12 @@
 
                 .bookmark-edit-remove-btn {
                     color: #ff4d4f;
+                    padding: 2px 6px;
+                    font-size: 14px;
+                    min-width: auto;
+                    width: auto;
+                    height: auto;
+                    line-height: 1;
 
                     &:hover {
                         background: rgba(255, 77, 79, 0.2);

@@ -56,7 +56,7 @@ export function BookmarkEditMenu({
     const [focusedItem, setFocusedItem] = useState<TreeItemIndex | undefined>();
     const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(() => {
         return Object.values(treeItems)
-            .filter(item => item.isFolder && item.children && item.children.length > 0)
+            .filter(item => !item.data.pageURL && item.children && item.children.length > 0)
             .map(item => item.index);
     });
     const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
@@ -72,7 +72,7 @@ export function BookmarkEditMenu({
         previousTreeItemsRef.current = treeItems;
 
         const newExpandedItems = Object.values(treeItems)
-            .filter(item => item.isFolder && item.children && item.children.length > 0)
+            .filter(item => !item.data.pageURL && item.children && item.children.length > 0)
             .map(item => item.index);
         
         setExpandedItems(prev => {
@@ -193,7 +193,8 @@ export function BookmarkEditMenu({
     // 아이템 이름 변경
     const handleRenameItem = useCallback(
         (item: TreeItem<BookmarkTreeItemData>, name: string): void => {
-            if (item.isFolder) {
+            // pageURL이 없으면 폴더이므로 이름 변경 가능
+            if (!item.data.pageURL) {
                 onCreateFolder(name, item.data.parentId);
             }
         },
@@ -295,8 +296,9 @@ export function BookmarkEditMenu({
             children: React.ReactNode;
         }) => {
             const { isExpanded } = context;
-            const isFolder = item.isFolder;
+            // pageURL이 있으면 무조건 파일, 없으면 폴더
             const hasPageURL = !!item.data.pageURL;
+            const isFolder = !hasPageURL; // pageURL이 없으면 폴더, 있으면 파일
 
             return (
                 <div
@@ -317,8 +319,19 @@ export function BookmarkEditMenu({
                             ) : (
                                 <CustomIcon type="file" fileType={hasPageURL ? item.data.pageURL?.split(".").pop()?.toLowerCase() : undefined} />
                             )}
+                            <span className="bookmark-edit-item-name">{item.data.name}</span>
+                            <button
+                                type="button"
+                                className="mx-button mx-button-default mx-name-bookmarkRemove bookmark-edit-remove-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveItem(item.index);
+                                }}
+                                aria-label="삭제"
+                            >
+                                ×
+                            </button>
                         </div>
-                        <span className="bookmark-edit-item-name">{item.data.name}</span>
 
                         {isFolder && (
                             <button
@@ -333,18 +346,6 @@ export function BookmarkEditMenu({
                                 +
                             </button>
                         )}
-
-                        <button
-                            type="button"
-                            className="mx-button mx-button-default mx-name-bookmarkRemove bookmark-edit-remove-btn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveItem(item.index);
-                            }}
-                            aria-label="삭제"
-                        >
-                            ×
-                        </button>
                     </div>
                     {children}
                 </div>

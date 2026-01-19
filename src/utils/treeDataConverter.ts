@@ -19,11 +19,13 @@ export function menuTreeToTreeItems(menuTree: MenuTreeNode[]): BookmarkTreeItemM
 
     // 재귀적으로 노드를 변환
     const convertNode = (node: MenuTreeNode, parentId: string | null): void => {
-        const isFolder = !node.pageURL;
+        // pageURL이 있으면 무조건 파일, 없으면 폴더
+        const hasPageURL = !!node.pageURL;
+        const isFolder = !hasPageURL;
         const childrenIds: TreeItemIndex[] = [];
 
-        // 자식 노드 먼저 처리
-        if (node.children && node.children.length > 0) {
+        // pageURL이 없는 경우에만 자식 노드 처리 (폴더만 children 가질 수 있음)
+        if (isFolder && node.children && node.children.length > 0) {
             node.children.forEach(child => {
                 childrenIds.push(child.menuId);
                 convertNode(child, node.menuId);
@@ -32,16 +34,17 @@ export function menuTreeToTreeItems(menuTree: MenuTreeNode[]): BookmarkTreeItemM
 
         const treeItem: BookmarkTreeItem = {
             index: node.menuId,
-            isFolder,
+            isFolder: isFolder, // pageURL이 있으면 false (파일), 없으면 true (폴더)
             canMove: true,
             canRename: isFolder, // 폴더만 이름 변경 가능
             data: {
                 name: node.menuName,
                 parentId,
-                pageURL: node.pageURL,
+                pageURL: node.pageURL, // pageURL이 있으면 파일
                 iconClass: node.iconClass,
                 sortNo: node.sortNo
             },
+            // pageURL이 있으면 children 없음 (파일), 없으면 children 설정 (폴더)
             children: isFolder ? childrenIds : undefined
         };
 

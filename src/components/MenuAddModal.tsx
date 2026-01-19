@@ -90,12 +90,20 @@ export function MenuAddModal({
 
     // 추가 버튼 클릭
     const handleAdd = useCallback(() => {
-        const menusToAdd = Array.from(selectedMenus.values());
+        // selectedMenuIds와 selectedMenus를 동기화하여 정확한 메뉴만 전달
+        const menusToAdd = Array.from(selectedMenuIds)
+            .map(menuId => selectedMenus.get(menuId))
+            .filter((menu): menu is MenuTreeNode => menu !== undefined);
+        
+        console.log("[MenuAddModal] 선택된 메뉴 개수:", selectedMenuIds.size);
+        console.log("[MenuAddModal] 전달할 메뉴 개수:", menusToAdd.length);
+        console.log("[MenuAddModal] 전달할 메뉴 IDs:", menusToAdd.map(m => m.menuId));
+        
         if (menusToAdd.length > 0) {
             onAddMenus(menusToAdd, targetFolderId);
             onClose();
         }
-    }, [selectedMenus, targetFolderId, onAddMenus, onClose]);
+    }, [selectedMenus, selectedMenuIds, targetFolderId, onAddMenus, onClose]);
 
     // 오버레이 클릭 (배경 클릭 시 닫기)
     const handleOverlayClick = useCallback((e: React.MouseEvent) => {

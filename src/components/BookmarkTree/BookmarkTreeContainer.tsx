@@ -40,7 +40,7 @@ export function BookmarkTreeContainer({
     const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(() => {
         // 초기에 모든 폴더를 확장
         return Object.values(treeItems)
-            .filter(item => item.isFolder && item.children && item.children.length > 0)
+            .filter(item => !item.data.pageURL && item.children && item.children.length > 0)
             .map(item => item.index);
     });
     const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
