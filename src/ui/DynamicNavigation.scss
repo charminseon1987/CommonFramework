@@ -451,6 +451,153 @@
             .nav-content {
                 .bookmark-edit-menu{
                     color : white;
+
+                    .bookmark-edit-tree-container {
+                        // overflow: auto;
+                        min-width: 0;
+
+                        .rct-tree-root{
+                            .rct-tree-items-container{
+                                min-width: max-content;
+
+                                // react-complex-tree children 스타일 - 하위 depth 표시
+                                .rct-tree-item-children {
+                                    display: block !important;
+                                    margin-left: 20px;
+                                    padding-left: 8px;
+                                    margin-top: 4px;
+                                    border-left: 2px solid rgba(255, 255, 255, 0.1);
+                                }
+
+                                // react-complex-tree 기본 스타일 오버라이드 - children이 숨겨지지 않도록
+                                .rct-tree-item-container {
+                                    display: block !important;
+                                }
+
+                                .bookmark-edit-item {
+                                    margin-bottom: 4px;
+                                    padding: 0;
+                                    cursor: grab;
+
+                                    &.is-dragging {
+                                        opacity: 0.5;
+                                        cursor: grabbing;
+                                    }
+
+                                    &.folder {
+                                        font-weight: 600;
+                                    }
+
+                                    &:active {
+                                        cursor: grabbing;
+                                    }
+
+                                    .bookmark-edit-item-content {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 12px;
+                                        min-width: max-content;
+                                        // padding: 8px 16px;
+                                        // background: rgba(255, 255, 255, 0.05);
+                                        border-radius: 4px;
+                                        transition: all 0.2s ease;
+                                        color: #ffffff !important;
+                                        -webkit-text-fill-color: #ffffff !important;
+                                        cursor: grab;
+
+                                        * {
+                                            color: #ffffff !important;
+                                            -webkit-text-fill-color: #ffffff !important;
+                                        }
+
+                                        &.is-dragging-over {
+                                            background: rgba(24, 144, 255, 0.2);
+                                            border: 2px dashed var(--theme-color);
+                                        }
+
+                                        &:hover {
+                                            background: rgba(255, 255, 255, 0.1);
+                                        }
+
+                                        &:active {
+                                            cursor: grabbing;
+                                        }
+                                    }
+
+                                    .bookmark-edit-item-icon {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 12px;
+                                        padding: 8px 14px;
+                                        background: rgba(255, 255, 255, 0.08);
+                                        border-radius: 4px;
+                                        flex: 1;
+                                    }
+
+                                    .bookmark-edit-item-name {
+                                        flex: 1;
+                                        color: #ffffff !important;
+                                        -webkit-text-fill-color: #ffffff !important;
+                                        font-size: 14px;
+                                    }
+
+                                    // react-complex-tree children 스타일은 bookmark-edit-tree-container 레벨에서 처리
+
+                                    .bookmark-edit-add-folder-icon,
+                                    .bookmark-edit-remove-icon {
+                                        display: inline-flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        width: 24px;
+                                        height: 24px;
+                                        padding: 4px;
+                                        background: rgba(128, 128, 128, 0.3);
+                                        border: none;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        transition: all 0.2s ease;
+                                        color: rgba(255, 255, 255, 0.9);
+                                        flex-shrink: 0;
+
+                                        svg {
+                                            width: 14px;
+                                            height: 14px;
+                                            stroke: currentColor;
+                                        }
+
+                                        &:hover {
+                                            color: #ffffff;
+                                            background: rgba(128, 128, 128, 0.5);
+                                        }
+
+                                        &:focus {
+                                            outline: 2px solid var(--theme-color);
+                                            outline-offset: 2px;
+                                        }
+                                    }
+
+                                    .bookmark-edit-remove-icon {
+                                        color: rgba(255, 255, 255, 0.9);
+                                        background: rgba(128, 128, 128, 0.3);
+
+                                        &:hover {
+                                            color: #ffffff;
+                                            background: rgba(128, 128, 128, 0.5);
+                                        }
+                                    }
+
+                                    .bookmark-edit-add-folder-icon {
+                                        background: rgba(128, 128, 128, 0.3);
+
+                                        &:hover {
+                                            color: #ffffff;
+                                            background: rgba(128, 128, 128, 0.5);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -485,6 +632,11 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+
+        // 북마크 편집 시 트리가 넓어져도 가로 스크롤 가능
+        &:has(.bookmark-edit-menu) {
+            overflow-x: auto;
+        }
     }
 
     .nav-bookmark-settings-btn {
@@ -2411,12 +2563,15 @@
 
             .bookmark-edit-tree-container {
                 flex: 1;
-                overflow-y: auto;
+                overflow: auto;
                 padding: 8px 0;
                 color: white;
+                min-width: 0;
 
                 .rct-tree-root{
                     .rct-tree-items-container{
+                        min-width: max-content;
+
                         .bookmark-edit-item {
                             .bookmark-edit-item-icon{
                                 .mx-button{
@@ -2442,20 +2597,30 @@
                 .rct-tree-item {
                     color: #ffffff !important;
                 }
+
+                // react-complex-tree children 스타일 - 하위 depth 표시
+                .rct-tree-item-children {
+                    display: block !important;
+                    margin-left: 20px;
+                    padding-left: 8px;
+                    margin-top: 4px;
+                    border-left: 2px solid rgba(255, 255, 255, 0.1);
+                }
+
+                // react-complex-tree 기본 스타일 오버라이드 - children이 숨겨지지 않도록
+                .rct-tree-item-container {
+                    display: block !important;
+                }
             }
 
             .bookmark-edit-item {
                 margin-bottom: 4px;
+                padding: 0;
                 cursor: grab;
 
                 &.is-dragging {
                     opacity: 0.5;
                     cursor: grabbing;
-                }
-
-                &.is-dragging-over {
-                    background: rgba(24, 144, 255, 0.2);
-                    border: 2px dashed var(--theme-color);
                 }
 
                 &.folder {
@@ -2469,7 +2634,8 @@
                 .bookmark-edit-item-content {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: 12px;
+                    min-width: max-content;
                     padding: 8px 16px;
                     background: rgba(255, 255, 255, 0.05);
                     border-radius: 4px;
@@ -2481,6 +2647,11 @@
                     * {
                         color: #ffffff !important;
                         -webkit-text-fill-color: #ffffff !important;
+                    }
+
+                    &.is-dragging-over {
+                        background: rgba(24, 144, 255, 0.2);
+                        border: 2px dashed var(--theme-color);
                     }
 
                     &:hover {
@@ -2503,6 +2674,16 @@
                     }
                 }
 
+                .bookmark-edit-item-icon {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 8px 14px;
+                    background: rgba(255, 255, 255, 0.08);
+                    border-radius: 4px;
+                    flex: 1;
+                }
+
                 .bookmark-edit-item-name {
                     flex: 1;
                     color: #ffffff !important;
@@ -2516,36 +2697,57 @@
                     -webkit-text-fill-color: #ffffff !important;
                 }
 
-                .bookmark-edit-add-folder-btn,
-                .bookmark-edit-remove-btn {
-                    padding: 4px 8px;
-                    background: transparent;
-                    border: 1px solid rgba(255, 255, 255, 0.2);
+                // react-complex-tree children 스타일은 bookmark-edit-tree-container 레벨에서 처리
+
+                .bookmark-edit-add-folder-icon,
+                .bookmark-edit-remove-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 24px;
+                    height: 24px;
+                    padding: 4px;
+                    background: rgba(128, 128, 128, 0.3);
+                    border: none;
                     border-radius: 4px;
-                    color: #ffffff !important;
-                    -webkit-text-fill-color: #ffffff !important;
-                    font-size: 16px;
                     cursor: pointer;
                     transition: all 0.2s ease;
+                    color: rgba(255, 255, 255, 0.9);
+                    flex-shrink: 0;
+
+                    svg {
+                        width: 14px;
+                        height: 14px;
+                        stroke: currentColor;
+                    }
 
                     &:hover {
-                        background: rgba(255, 255, 255, 0.1);
-                        border-color: var(--theme-color);
+                        color: #ffffff;
+                        background: rgba(128, 128, 128, 0.5);
+                    }
+
+                    &:focus {
+                        outline: 2px solid var(--theme-color);
+                        outline-offset: 2px;
                     }
                 }
 
-                .bookmark-edit-remove-btn {
-                    color: #ff4d4f;
-                    padding: 2px 6px;
-                    font-size: 14px;
-                    min-width: auto;
-                    width: auto;
-                    height: auto;
-                    line-height: 1;
+                .bookmark-edit-remove-icon {
+                    color: rgba(255, 255, 255, 0.9);
+                    background: rgba(128, 128, 128, 0.3);
 
                     &:hover {
-                        background: rgba(255, 77, 79, 0.2);
-                        border-color: #ff4d4f;
+                        color: #ffffff;
+                        background: rgba(128, 128, 128, 0.5);
+                    }
+                }
+
+                .bookmark-edit-add-folder-icon {
+                    background: rgba(128, 128, 128, 0.3);
+
+                    &:hover {
+                        color: #ffffff;
+                        background: rgba(128, 128, 128, 0.5);
                     }
                 }
 

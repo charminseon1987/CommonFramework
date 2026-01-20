@@ -302,15 +302,14 @@ export function BookmarkEditMenu({
             return (
                 <div
                     {...context.itemContainerWithChildrenProps}
-                    className={classNames("bookmark-edit-item", {
-                        folder: isFolder,
-                        "is-dragging-over": context.isDraggingOver
-                    })}
+                    className={classNames("bookmark-edit-item", { folder: isFolder })}
                 >
                     <div
                         {...context.itemContainerWithoutChildrenProps}
                         {...context.interactiveElementProps}
-                        className="bookmark-edit-item-content"
+                        className={classNames("bookmark-edit-item-content", {
+                            "is-dragging-over": context.isDraggingOver
+                        })}
                     >
                         <div className="bookmark-edit-item-icon">
                             {isFolder ? (
@@ -319,32 +318,73 @@ export function BookmarkEditMenu({
                                 <CustomIcon type="file" fileType={hasPageURL ? item.data.pageURL?.split(".").pop()?.toLowerCase() : undefined} />
                             )}
                             <span className="bookmark-edit-item-name">{item.data.name}</span>
-                            <button
-                                type="button"
-                                className="mx-button mx-button-default mx-name-bookmarkRemove bookmark-edit-remove-btn"
+                            <span
+                                className="bookmark-edit-remove-icon"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleRemoveItem(item.index);
                                 }}
                                 aria-label="삭제"
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        {isFolder && (
-                            <button
-                                type="button"
-                                className="mx-button mx-button-default mx-name-bookmarkAddSubFolder bookmark-edit-add-folder-btn"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCreateFolderClick(String(item.index));
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleRemoveItem(item.index);
+                                    }
                                 }}
-                                aria-label="하위 폴더 추가"
                             >
-                                +
-                            </button>
-                        )}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </span>
+                            {isFolder && (
+                                <span
+                                    className="bookmark-edit-add-folder-icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCreateFolderClick(String(item.index));
+                                    }}
+                                    aria-label="하위 폴더 추가"
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleCreateFolderClick(String(item.index));
+                                        }
+                                    }}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </span>
+                            )}
+                        </div>
                     </div>
                     {children}
                 </div>
@@ -368,7 +408,7 @@ export function BookmarkEditMenu({
     return (
         <div className="bookmark-edit-menu">
             <div className="bookmark-edit-header">
-                <h3>북마크 편집</h3>
+                {/* <h3>북마크 편집</h3> */}
                 <div className="bookmark-edit-header-buttons">
                     <button
                         type="button"
