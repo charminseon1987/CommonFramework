@@ -2415,6 +2415,22 @@
                 padding: 8px 0;
                 color: white;
 
+                .rct-tree-root{
+                    .rct-tree-items-container{
+                        .bookmark-edit-item {
+                            .bookmark-edit-item-icon{
+                                .mx-button{
+                                    padding: unset;
+                                }
+                            }
+                        }
+                    }
+
+                    
+                }
+
+
+
                 // react-complex-tree 텍스트 색상
                 .rct-tree-item-title,
                 .bookmark-edit-item-title {
@@ -2674,6 +2690,8 @@
                     color: #333333 !important;
                     font-size: 18px !important;
                     font-weight: 500 !important;
+                    flex-shrink: 0 !important;
+                    white-space: nowrap !important;
                 }
 
                 .close {
@@ -2687,6 +2705,7 @@
                     line-height: 1;
                     opacity: 0.5;
                     transition: opacity 0.2s ease;
+                    flex-shrink: 0 !important;
 
                     &:hover {
                         opacity: 1;

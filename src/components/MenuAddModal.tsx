@@ -174,7 +174,7 @@ export function MenuAddModal({
             <div className="mx-underlay">
                 <div 
                     className="modal-dialog mx-dialog"
-                    style={{ left: `${position.x}px`, top: `${position.y}px` }}
+                    style={{ left: `${position.x}px`, top: `${position.y}px`, borderRadius: '20px' }}
                 >
                     <div className="modal-content mx-window-content">
                         {/* Header */}
@@ -221,6 +221,7 @@ export function MenuAddModal({
                                 type="button"
                                 className="mx-button mx-button-default"
                                 onClick={onClose}
+                                style = {{marginRight: '10px'}}
                             >
                                 취소
                             </button>

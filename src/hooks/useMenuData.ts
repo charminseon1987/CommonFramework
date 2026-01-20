@@ -16,7 +16,7 @@ export function useMenuData(props: DynamicNavigationContainerProps, mode: "all" 
     const previousMenuDataRef = useRef<MenuItemData[] | null>(null);
 
     useEffect(() => {
-        if (menuDataSource.status !== ValueStatus.Available) return;
+        if (!menuDataSource || menuDataSource.status !== ValueStatus.Available) return;
 
         const sourceItems = getMenuSource(mode, menuDataSource.items, bookmark?.items);
         const resourceMap = buildResourceMap(Resource);
@@ -35,8 +35,8 @@ export function useMenuData(props: DynamicNavigationContainerProps, mode: "all" 
         previousMenuDataRef.current = result;
     }, [
         mode,
-        menuDataSource.status,
-        menuDataSource.items,
+        menuDataSource?.status,
+        menuDataSource?.items,
         bookmark?.items,
         Resource?.status,
         Resource?.items,

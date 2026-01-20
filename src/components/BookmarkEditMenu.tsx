@@ -447,11 +447,14 @@ export function BookmarkEditMenu({
                 </ControlledTreeEnvironment>
             </div>
 
-            <div className="bookmark-edit-footer">
+            <div className="bookmark-edit-footer"
+               
+            >
                 <button
                     type="button"
                     className="mx-button mx-button-default mx-name-bookmarkCancel"
                     onClick={onCancel}
+                    style={{marginRight: '10px', marginLeft: '70px'}}
                 >
                     취소
                 </button>

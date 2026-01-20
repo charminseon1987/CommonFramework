@@ -4,6 +4,7 @@ import { ReactElement, createElement, Fragment } from "react";
 import classNames from "classnames";
 import { MenuTreeNode } from "../types/menu.types";
 import { StarToggleIcon } from "./StarToggleIcon";
+import CustomIcon from "./CustomIcon";
 
 interface MenuTreeSelectorProps {
     menuItems: MenuTreeNode[];
@@ -43,13 +44,28 @@ export function MenuTreeSelector({
                         "is-selected": isSelected
                     })}
                 >
+                    {/* Folder/File Icon */}
+                    {hasPageURL ? (
+                        <CustomIcon 
+                            type="file" 
+                            fileType={item.pageURL?.split(".").pop()?.toLowerCase()} 
+                        />
+                    ) : hasChildren ? (
+                        <CustomIcon 
+                            type="folder" 
+                            isOpen={isExpanded} 
+                        />
+                    ) : (
+                        <CustomIcon type="emptyFolder" />
+                    )}
+
                     {/* Star Toggle Icon - 모든 항목에 표시 */}
                     <StarToggleIcon
                         isSelected={isSelected}
                         isBookmarked={isBookmarked}
                         onClick={() => {
-                            // 북마크된 메뉴나 선택된 메뉴는 클릭 불가
-                            if (!isBookmarked && !isSelected) {
+                            // 북마크된 메뉴는 클릭 불가, 선택된 메뉴는 다시 클릭하면 선택 취소 가능
+                            if (!isBookmarked) {
                                 onToggleSelection(item.menuId, item);
                             }
                         }}
@@ -62,8 +78,8 @@ export function MenuTreeSelector({
                             selected: isSelected
                         })}
                         onClick={() => {
-                            // 북마크된 메뉴나 선택된 메뉴는 클릭 불가
-                            if (!isBookmarked && !isSelected) {
+                            // 북마크된 메뉴는 클릭 불가, 선택된 메뉴는 다시 클릭하면 선택 취소 가능
+                            if (!isBookmarked) {
                                 onToggleSelection(item.menuId, item);
                             }
                         }}
