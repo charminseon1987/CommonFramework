@@ -2630,289 +2630,287 @@
             }
         }
 
-        // Menu Add Modal 스타일
-        .menu-add-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-
-        .menu-add-modal {
-            background: var(--depth-0-bg);
-            border-radius: 8px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .menu-add-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-            h3 {
-                margin: 0;
-                color: #ffffff !important;
-                -webkit-text-fill-color: #ffffff !important;
-                font-size: 18px;
-                font-weight: 600;
+        // Menu Add Modal 스타일 (위젯 전용 스타일 - Mendix 기본 클래스에 영향 없음)
+        .bookmark-modal-wrapper {
+            .mx-underlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 0, 0, 0.85) !important;
+                z-index: 10000 !important;
             }
 
-            .menu-add-modal-close-btn {
+            .modal-dialog.mx-dialog {
+                position: fixed !important;
+                width: 500px !important;
+                max-width: 500px !important;
+                max-height: 80vh !important;
+                z-index: 10001 !important;
+            }
+
+            .modal-content.mx-window-content {
+                background: #ffffff !important;
+                border-radius: 4px !important;
+                box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                max-height: 80vh !important;
+            }
+
+            .modal-header.mx-window-header {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 15px 20px !important;
+                border-bottom: 1px solid #e5e5e5 !important;
+                border-radius: 4px 4px 0 0 !important;
+                cursor: move !important;
+                user-select: none !important;
+
+                .modal-title {
+                    margin: 0 !important;
+                    color: #333333 !important;
+                    font-size: 18px !important;
+                    font-weight: 500 !important;
+                }
+
+                .close {
+                    background: transparent;
+                    border: none;
+                    color: #999999;
+                    cursor: pointer;
+                    padding: 0;
+                    font-size: 24px;
+                    font-weight: 300;
+                    line-height: 1;
+                    opacity: 0.5;
+                    transition: opacity 0.2s ease;
+
+                    &:hover {
+                        opacity: 1;
+                    }
+
+                    span {
+                        display: block;
+                    }
+                }
+            }
+
+            .menu-add-modal-target {
+                padding: 12px 20px;
+                background: #e8f4fd;
+                border-bottom: 1px solid #e5e5e5;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+
+                .target-label {
+                    color: #666666;
+                    font-size: 14px;
+                }
+
+                .target-folder-name {
+                    color: #333333;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+            }
+
+            .modal-body.mx-window-body {
+                flex: 1 !important;
+                overflow-y: auto !important;
+                padding: 20px !important;
+                color: #333333 !important;
+            }
+
+            .modal-footer.mx-dialog-footer {
+                display: flex !important;
+                gap: 10px !important;
+                padding: 15px 20px !important;
+                border-top: 1px solid #e5e5e5 !important;
+                border-radius: 0 0 4px 4px !important;
+                justify-content: flex-end !important;
+
+                .mx-button {
+                    min-width: 80px;
+
+                    &.disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+
+            // Menu Tree Selector 스타일
+            .menu-tree-selector {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-tree-selector-item {
+                margin-bottom: 4px;
+            }
+
+            .menu-tree-selector-content {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 12px;
+                border-radius: 4px;
+                transition: background 0.2s ease;
+                color: #333333;
+
+                &:hover {
+                    background: #f5f5f5;
+                }
+
+                &.is-folder {
+                    font-weight: 600;
+                }
+
+                &.is-bookmarked {
+                    opacity: 0.6;
+                }
+
+                &.is-selected {
+                    background: #e8f4fd;
+                    cursor: default;
+
+                    &:hover {
+                        background: #e8f4fd;
+                    }
+                }
+            }
+
+            .menu-tree-selector-expand-btn {
                 background: transparent;
                 border: none;
-                color: #ffffff;
+                color: #666666;
                 cursor: pointer;
                 padding: 4px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 24px;
-                height: 24px;
+                width: 20px;
+                height: 20px;
                 border-radius: 4px;
-                transition: background 0.2s ease;
+                transition: all 0.2s ease;
 
                 &:hover {
-                    background: rgba(255, 255, 255, 0.1);
+                    background: #f0f0f0;
+                    color: #333333;
                 }
 
                 svg {
+                    width: 16px;
+                    height: 16px;
+                    transition: transform 0.2s ease;
+                }
+
+                &.expanded svg {
+                    transform: rotate(90deg);
+                }
+            }
+
+            .menu-tree-selector-expand-placeholder {
+                width: 20px;
+                height: 20px;
+                flex-shrink: 0;
+            }
+
+            // 체크박스 스타일
+            .menu-tree-selector-checkbox {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                flex-shrink: 0;
+
+                input[type="checkbox"] {
+                    position: absolute;
+                    opacity: 0;
+                    cursor: pointer;
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .checkmark {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
                     width: 20px;
                     height: 20px;
+                    border: 2px solid #cccccc;
+                    border-radius: 4px;
+                    background: transparent;
+                    transition: all 0.2s ease;
                 }
-            }
-        }
 
-        .menu-add-modal-target {
-            padding: 12px 20px;
-            background: rgba(24, 144, 255, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-
-            .target-label {
-                color: rgba(255, 255, 255, 0.7);
-                font-size: 14px;
-            }
-
-            .target-folder-name {
-                color: #ffffff;
-                font-weight: 600;
-                font-size: 14px;
-            }
-        }
-
-        .menu-add-modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 20px;
-        }
-
-        .menu-add-modal-footer {
-            display: flex;
-            gap: 12px;
-            padding: 16px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-
-            button {
-                flex: 1;
-                padding: 10px 16px;
-                border: none;
-                border-radius: 4px;
-                font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s ease;
-            }
-
-            .menu-add-modal-cancel-btn {
-                background: rgba(255, 255, 255, 0.1);
-                color: #ffffff;
-
-                &:hover {
-                    background: rgba(255, 255, 255, 0.2);
+                input[type="checkbox"]:checked ~ .checkmark {
+                    background: var(--theme-color);
+                    border-color: var(--theme-color);
                 }
-            }
 
-            .menu-add-modal-add-btn {
-                background: var(--theme-color);
-                color: white;
-
-                &:hover:not(.disabled) {
-                    background: #33a0ff;
+                input[type="checkbox"]:checked ~ .checkmark::after {
+                    content: "";
+                    position: absolute;
+                    left: 6px;
+                    top: 2px;
+                    width: 5px;
+                    height: 10px;
+                    border: solid white;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
                 }
 
                 &.disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
+
+                    input[type="checkbox"] {
+                        cursor: not-allowed;
+                    }
+                }
+
+                &.bookmarked {
+                    opacity: 0.6;
                 }
             }
-        }
 
-        // Menu Tree Selector 스타일
-        .menu-tree-selector {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .menu-tree-selector-item {
-            margin-bottom: 4px;
-        }
-
-        .menu-tree-selector-content {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background 0.2s ease;
-
-            &:hover {
-                background: rgba(255, 255, 255, 0.05);
-            }
-
-            &.is-folder {
-                font-weight: 600;
-            }
-
-            &.is-bookmarked {
-                opacity: 0.6;
-            }
-        }
-
-        .menu-tree-selector-expand-btn {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-
-            &:hover {
-                background: rgba(255, 255, 255, 0.1);
-                color: #ffffff;
-            }
-
-            svg {
-                width: 16px;
-                height: 16px;
-                transition: transform 0.2s ease;
-            }
-
-            &.expanded svg {
-                transform: rotate(90deg);
-            }
-        }
-
-        .menu-tree-selector-expand-placeholder {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        // 체크박스 스타일
-        .menu-tree-selector-checkbox {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            flex-shrink: 0;
-
-            input[type="checkbox"] {
-                position: absolute;
-                opacity: 0;
+            .menu-tree-selector-name {
+                flex: 1;
+                color: #333333 !important;
+                -webkit-text-fill-color: #333333 !important;
+                font-size: 14px;
                 cursor: pointer;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
 
-            .checkmark {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 20px;
-                height: 20px;
-                border: 2px solid rgba(255, 255, 255, 0.5);
-                border-radius: 4px;
-                background: transparent;
-                transition: all 0.2s ease;
-            }
+                &.selected {
+                    cursor: default;
+                    color: #0066cc !important;
+                    -webkit-text-fill-color: #0066cc !important;
+                }
+                user-select: none;
 
-            input[type="checkbox"]:checked ~ .checkmark {
-                background: var(--theme-color);
-                border-color: var(--theme-color);
-            }
-
-            input[type="checkbox"]:checked ~ .checkmark::after {
-                content: "";
-                position: absolute;
-                left: 6px;
-                top: 2px;
-                width: 5px;
-                height: 10px;
-                border: solid white;
-                border-width: 0 2px 2px 0;
-                transform: rotate(45deg);
-            }
-
-            &.disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-
-                input[type="checkbox"] {
-                    cursor: not-allowed;
+                &.bookmarked {
+                    opacity: 0.6;
                 }
             }
 
-            &.bookmarked {
-                opacity: 0.6;
+            .menu-tree-selector-children {
+                list-style: none;
+                padding: 0;
+                margin: 4px 0 0 28px;
+                border-left: 1px solid #e5e5e5;
+                padding-left: 12px;
             }
-        }
-
-        .menu-tree-selector-name {
-            flex: 1;
-            color: #ffffff !important;
-            -webkit-text-fill-color: #ffffff !important;
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-
-            &.bookmarked {
-                opacity: 0.6;
-            }
-        }
-
-        .menu-tree-selector-children {
-            list-style: none;
-            padding: 0;
-            margin: 4px 0 0 28px;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            padding-left: 12px;
         }
     }
     .nav-tabs {

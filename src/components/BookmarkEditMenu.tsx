@@ -252,14 +252,13 @@ export function BookmarkEditMenu({
         [onRemoveMenuItem]
     );
 
-    // 이미 북마크된 메뉴 ID 수집
+    // 이미 북마크된 메뉴 ID 수집 (폴더와 파일 모두 포함)
     const bookmarkedMenuIds = useMemo(() => {
         const ids = new Set<string>();
         const collectIds = (nodes: MenuTreeNode[]): void => {
             nodes.forEach(node => {
-                if (node.pageURL) {
-                    ids.add(node.menuId);
-                }
+                // 폴더와 파일 모두 북마크된 메뉴 ID에 추가
+                ids.add(node.menuId);
                 if (node.children && node.children.length > 0) {
                     collectIds(node.children);
                 }
@@ -375,6 +374,7 @@ export function BookmarkEditMenu({
                         type="button"
                         className="mx-button mx-button-primary mx-name-bookmarkAddMenu"
                         onClick={() => handleOpenMenuAddModal(null)}
+                        style = {{marginLeft: '26px', marginRight: '13px'}}
                     >
                         메뉴 추가
                     </button>
@@ -389,7 +389,7 @@ export function BookmarkEditMenu({
             </div>
 
             {showFolderInput && (
-                <div className="bookmark-edit-folder-input">
+                <div className="bookmark-edit-folder-input" style={{color: 'black'}}>
                     <input
                         type="text"
                         value={newFolderName}

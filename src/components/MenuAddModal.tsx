@@ -29,6 +29,10 @@ export function MenuAddModal({
     const [selectedMenus, setSelectedMenus] = useState<Map<string, MenuTreeNode>>(new Map());
     // 확장된 노드 ID
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    // 모달 위치 및 드래그 상태
+    const [position, setPosition] = useState<{ x: number; y: number }>({ x: 276, y: 82 });
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
     // 모든 노드를 재귀적으로 확장하는 함수
     const expandAllNodes = useCallback((nodes: MenuTreeNode[], expandedSet: Set<string>): void => {
@@ -49,6 +53,8 @@ export function MenuAddModal({
             const allExpandedIds = new Set<string>();
             expandAllNodes(fullMenuTree, allExpandedIds);
             setExpandedIds(allExpandedIds);
+            // 모달 위치 초기화
+            setPosition({ x: 276, y: 82 });
         }
     }, [isOpen, fullMenuTree, expandAllNodes]);
 
@@ -105,12 +111,6 @@ export function MenuAddModal({
         }
     }, [selectedMenus, selectedMenuIds, targetFolderId, onAddMenus, onClose]);
 
-    // 오버레이 클릭 (배경 클릭 시 닫기)
-    const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-        if (e.target === e.currentTarget) {
-            onClose();
-        }
-    }, [onClose]);
 
     // ESC 키로 닫기
     useEffect(() => {
@@ -124,6 +124,45 @@ export function MenuAddModal({
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isOpen, onClose]);
 
+    // 드래그 시작 핸들러
+    const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        // close 버튼 클릭 시 드래그 시작하지 않음
+        if ((e.target as HTMLElement).closest('.close')) {
+            return;
+        }
+        
+        setIsDragging(true);
+        // 마우스 위치와 모달의 현재 위치를 기준으로 오프셋 계산
+        setDragOffset({
+            x: e.clientX - position.x,
+            y: e.clientY - position.y
+        });
+    }, [position]);
+
+    // 드래그 중 및 종료 이벤트 처리
+    useEffect(() => {
+        if (!isDragging) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            setPosition({
+                x: e.clientX - dragOffset.x,
+                y: e.clientY - dragOffset.y
+            });
+        };
+
+        const handleMouseUp = () => {
+            setIsDragging(false);
+        };
+
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+
+        return () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, [isDragging, dragOffset]);
+
     if (!isOpen) {
         return null;
     }
@@ -131,64 +170,72 @@ export function MenuAddModal({
     const selectedCount = selectedMenuIds.size;
 
     return (
-        <div className="menu-add-modal-overlay" onClick={handleOverlayClick}>
-            <div className="menu-add-modal">
-                {/* Header */}
-                <div className="menu-add-modal-header">
-                    <h3>메뉴 추가</h3>
-                    <button
-                        type="button"
-                        className="menu-add-modal-close-btn"
-                        onClick={onClose}
-                        aria-label="닫기"
-                    >
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
-                        </svg>
-                    </button>
-                </div>
+        <div className="bookmark-modal-wrapper">
+            <div className="mx-underlay">
+                <div 
+                    className="modal-dialog mx-dialog"
+                    style={{ left: `${position.x}px`, top: `${position.y}px` }}
+                >
+                    <div className="modal-content mx-window-content">
+                        {/* Header */}
+                        <div 
+                            className="modal-header mx-window-header"
+                            onMouseDown={handleMouseDown}
+                        >
+                            <h3 className="modal-title">메뉴 추가</h3>
+                            <button
+                                type="button"
+                                className="close"
+                                onClick={onClose}
+                                aria-label="닫기"
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
 
-                {/* Target Folder Indicator */}
-                {targetFolderId && targetFolderName && (
-                    <div className="menu-add-modal-target">
-                        <span className="target-label">추가 위치:</span>
-                        <span className="target-folder-name">{targetFolderName}</span>
+                        {/* Target Folder Indicator */}
+                        {targetFolderId && targetFolderName && (
+                            <div className="menu-add-modal-target">
+                                <span className="target-label">추가 위치:</span>
+                                <span className="target-folder-name">{targetFolderName}</span>
+                            </div>
+                        )}
+
+                        {/* Body - Menu Tree */}
+                        <div className="modal-body mx-window-body">
+                            <ul className="menu-tree-selector">
+                                <MenuTreeSelector
+                                    menuItems={fullMenuTree}
+                                    selectedMenuIds={selectedMenuIds}
+                                    bookmarkedMenuIds={bookmarkedMenuIds}
+                                    onToggleSelection={handleToggleSelection}
+                                    expandedIds={expandedIds}
+                                    onToggleExpand={handleToggleExpand}
+                                />
+                            </ul>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="modal-footer mx-dialog-footer">
+                            <button
+                                type="button"
+                                className="mx-button mx-button-default"
+                                onClick={onClose}
+                            >
+                                취소
+                            </button>
+                            <button
+                                type="button"
+                                className={classNames("mx-button mx-button-primary", {
+                                    disabled: selectedCount === 0
+                                })}
+                                onClick={handleAdd}
+                                disabled={selectedCount === 0}
+                            >
+                                추가 {selectedCount > 0 && `(${selectedCount})`}
+                            </button>
+                        </div>
                     </div>
-                )}
-
-                {/* Body - Menu Tree */}
-                <div className="menu-add-modal-body">
-                    <ul className="menu-tree-selector">
-                        <MenuTreeSelector
-                            menuItems={fullMenuTree}
-                            selectedMenuIds={selectedMenuIds}
-                            bookmarkedMenuIds={bookmarkedMenuIds}
-                            onToggleSelection={handleToggleSelection}
-                            expandedIds={expandedIds}
-                            onToggleExpand={handleToggleExpand}
-                        />
-                    </ul>
-                </div>
-
-                {/* Footer */}
-                <div className="menu-add-modal-footer">
-                    <button
-                        type="button"
-                        className="menu-add-modal-cancel-btn"
-                        onClick={onClose}
-                    >
-                        취소
-                    </button>
-                    <button
-                        type="button"
-                        className={classNames("menu-add-modal-submit-btn", {
-                            disabled: selectedCount === 0
-                        })}
-                        onClick={handleAdd}
-                        disabled={selectedCount === 0}
-                    >
-                        추가 {selectedCount > 0 && `(${selectedCount})`}
-                    </button>
                 </div>
             </div>
         </div>

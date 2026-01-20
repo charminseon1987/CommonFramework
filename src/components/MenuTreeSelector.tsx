@@ -39,23 +39,31 @@ export function MenuTreeSelector({
                 <div
                     className={classNames("menu-tree-selector-content", {
                         "is-folder": !hasPageURL && hasChildren,
-                        "is-bookmarked": isBookmarked
+                        "is-bookmarked": isBookmarked,
+                        "is-selected": isSelected
                     })}
                 >
                     {/* Star Toggle Icon - 모든 항목에 표시 */}
                     <StarToggleIcon
                         isSelected={isSelected}
                         isBookmarked={isBookmarked}
-                        onClick={() => onToggleSelection(item.menuId, item)}
+                        onClick={() => {
+                            // 북마크된 메뉴나 선택된 메뉴는 클릭 불가
+                            if (!isBookmarked && !isSelected) {
+                                onToggleSelection(item.menuId, item);
+                            }
+                        }}
                     />
 
                     {/* Menu Name */}
                     <span
                         className={classNames("menu-tree-selector-name", {
-                            bookmarked: isBookmarked
+                            bookmarked: isBookmarked,
+                            selected: isSelected
                         })}
                         onClick={() => {
-                            if (!isBookmarked) {
+                            // 북마크된 메뉴나 선택된 메뉴는 클릭 불가
+                            if (!isBookmarked && !isSelected) {
                                 onToggleSelection(item.menuId, item);
                             }
                         }}

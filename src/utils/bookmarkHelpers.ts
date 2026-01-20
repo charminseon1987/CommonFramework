@@ -389,27 +389,34 @@ export function addMenusToTree(
 
     const targetNode = targetFolderId ? findNodeById(tree, targetFolderId) : null;
 
-    // 타겟 폴더가 없거나 pageURL이 있으면 루트에 추가
-    if (!targetFolderId || !targetNode || targetNode.pageURL) {
-        const newMenus = menusToAdd.map((menu, index) => ({
-            ...menu,
-            // pageURL과 기타 속성 명시적으로 보존
-            pageURL: menu.pageURL,
-            iconClass: menu.iconClass,
-            menuName: menu.menuName,
-            menuId: menu.menuId,
-            parentMenuId: null,
-            depth: 0,
-            sortNo: tree.length + index,
-            // children은 포함하지 않고 빈 폴더/파일로 추가
-            children: [],
-            hasChildren: false,
-            isExpanded: false,
-            level: 0,
-            isVisible: true,
-            enabledTF: menu.enabledTF ?? true,
-            displayYn: menu.displayYn ?? "Y"
-        }));
+    // 타겟 노드가 실제로 폴더인지 확인 (pageURL이 없어야 함)
+    const isTargetFolder = targetNode && !targetNode.pageURL && (targetNode.children || targetNode.hasChildren);
+
+    // 타겟 폴더가 없거나 타겟이 파일이면 루트에 추가
+    if (!targetFolderId || !targetNode || !isTargetFolder) {
+        const newMenus = menusToAdd.map((menu, index) => {
+            const isFolder = !menu.pageURL;
+            return {
+                ...menu,
+                // 폴더인 경우 pageURL을 명시적으로 undefined로 설정
+                pageURL: isFolder ? undefined : menu.pageURL,
+                iconClass: menu.iconClass,
+                menuName: menu.menuName,
+                menuId: menu.menuId,
+                parentMenuId: null,
+                depth: 0,
+                sortNo: tree.length + index,
+                // children은 포함하지 않고 빈 폴더/파일로 추가
+                children: [],
+                // 폴더인 경우 hasChildren을 원본 값으로 유지
+                hasChildren: isFolder ? (menu.hasChildren || false) : false,
+                isExpanded: false,
+                level: 0,
+                isVisible: true,
+                enabledTF: menu.enabledTF ?? true,
+                displayYn: menu.displayYn ?? "Y"
+            };
+        });
         return [...tree, ...newMenus];
     }
 
@@ -417,27 +424,33 @@ export function addMenusToTree(
     const addToNode = (nodes: MenuTreeNode[]): MenuTreeNode[] => {
         return nodes.map(node => {
             if (node.menuId === targetFolderId) {
-                const newMenus = menusToAdd.map((menu, index) => ({
-                    ...menu,
-                    // pageURL과 기타 속성 명시적으로 보존
-                    pageURL: menu.pageURL,
-                    iconClass: menu.iconClass,
-                    menuName: menu.menuName,
-                    menuId: menu.menuId,
-                    parentMenuId: targetFolderId,
-                    depth: node.depth + 1,
-                    sortNo: node.children.length + index,
-                    // children은 포함하지 않고 빈 폴더/파일로 추가
-                    children: [],
-                    hasChildren: false,
-                    isExpanded: false,
-                    level: node.depth + 1,
-                    isVisible: true,
-                    enabledTF: menu.enabledTF ?? true,
-                    displayYn: menu.displayYn ?? "Y"
-                }));
+                const newMenus = menusToAdd.map((menu, index) => {
+                    const isFolder = !menu.pageURL;
+                    return {
+                        ...menu,
+                        // 폴더인 경우 pageURL을 명시적으로 undefined로 설정
+                        pageURL: isFolder ? undefined : menu.pageURL,
+                        iconClass: menu.iconClass,
+                        menuName: menu.menuName,
+                        menuId: menu.menuId,
+                        parentMenuId: targetFolderId,
+                        depth: node.depth + 1,
+                        sortNo: node.children.length + index,
+                        // children은 포함하지 않고 빈 폴더/파일로 추가
+                        children: [],
+                        // 폴더인 경우 hasChildren을 원본 값으로 유지
+                        hasChildren: isFolder ? (menu.hasChildren || false) : false,
+                        isExpanded: false,
+                        level: node.depth + 1,
+                        isVisible: true,
+                        enabledTF: menu.enabledTF ?? true,
+                        displayYn: menu.displayYn ?? "Y"
+                    };
+                });
                 return {
                     ...node,
+                    // 폴더 속성 보존: pageURL이 없어야 함
+                    pageURL: undefined,
                     children: [...node.children, ...newMenus],
                     hasChildren: true
                 };
