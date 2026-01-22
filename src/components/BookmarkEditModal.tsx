@@ -248,7 +248,7 @@ export function BookmarkEditModal({
 
     return (
         <div className="bookmark-modal-wrapper">
-            <div className="mx-underlay">
+            <div className="lay">
                 <div 
                     className="modal-dialog mx-dialog"
                     style={{ left: `${position.x}px`, top: `${position.y}px`, borderRadius: '20px' }}

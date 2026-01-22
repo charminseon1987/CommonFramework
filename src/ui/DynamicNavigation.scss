@@ -564,7 +564,7 @@
                             font-size: 24px;
                             font-weight: 300;
                             line-height: 1;
-                            opacity: 0.5;
+                            // opacity: 0.5;
                             transition: opacity 0.2s ease;
                             flex-shrink: 0 !important;
         
@@ -615,7 +615,7 @@
                                                 // react-complex-tree 드래그 관련 스타일
                                                 .rct-tree-item {
                                                     &.rct-tree-item-dragging {
-                                                        opacity: 0.5 !important;
+                                                        // opacity: 0.5 !important;
                                                         cursor: grabbing !important;
                                                     }
                                                 }
@@ -627,7 +627,7 @@
                     
                                                     &.is-dragging,
                                                     &.rct-tree-item-dragging {
-                                                        opacity: 0.5 !important;
+                                                        // opacity: 0.5 !important;
                                                         cursor: grabbing !important;
                                                     }
                     
@@ -827,7 +827,7 @@
                             // react-complex-tree 드래그 관련 스타일
                             .rct-tree-item {
                                 &.rct-tree-item-dragging {
-                                    opacity: 0.5 !important;
+                                    // opacity: 0.5 !important;
                                     cursor: grabbing !important;
                                 }
                             }
@@ -839,7 +839,7 @@
 
                                 &.is-dragging,
                                 &.rct-tree-item-dragging {
-                                    opacity: 0.5 !important;
+                                    // opacity: 0.5 !important;
                                     cursor: grabbing !important;
                                 }
 
@@ -1129,7 +1129,7 @@
                 }
 
                 &.disabled {
-                    opacity: 0.5;
+                    // opacity: 0.5;
                     cursor: not-allowed;
 
                     input[type="checkbox"] {
@@ -1265,7 +1265,7 @@
                 cursor: grab;
 
                 &.is-dragging {
-                    opacity: 0.5;
+                    // opacity: 0.5;
                     cursor: grabbing;
                 }
 
@@ -1446,7 +1446,7 @@
                     }
 
                     &.disabled {
-                        opacity: 0.5;
+                        // opacity: 0.5;
                         cursor: not-allowed;
                     }
                 }
@@ -3435,7 +3435,7 @@
                 cursor: grab;
 
                 &.is-dragging {
-                    opacity: 0.5;
+                    // opacity: 0.5;
                     cursor: grabbing;
                 }
 
@@ -3616,7 +3616,7 @@
                     }
 
                     &.disabled {
-                        opacity: 0.5;
+                        // opacity: 0.5;
                         cursor: not-allowed;
                     }
                 }
@@ -3687,7 +3687,7 @@
                     font-size: 24px;
                     font-weight: 300;
                     line-height: 1;
-                    opacity: 0.5;
+                    // opacity: 0.5;
                     transition: opacity 0.2s ease;
                     flex-shrink: 0 !important;
 
@@ -3773,7 +3773,7 @@
                             // react-complex-tree 드래그 관련 스타일
                             .rct-tree-item {
                                 &.rct-tree-item-dragging {
-                                    opacity: 0.5 !important;
+                                    // opacity: 0.5 !important;
                                     cursor: grabbing !important;
                                 }
                             }
@@ -3785,7 +3785,7 @@
 
                                 &.is-dragging,
                                 &.rct-tree-item-dragging {
-                                    opacity: 0.5 !important;
+                                    // opacity: 0.5 !important;
                                     cursor: grabbing !important;
                                 }
 
@@ -4075,7 +4075,7 @@
                 }
 
                 &.disabled {
-                    opacity: 0.5;
+                    // opacity: 0.5;
                     cursor: not-allowed;
 
                     input[type="checkbox"] {
