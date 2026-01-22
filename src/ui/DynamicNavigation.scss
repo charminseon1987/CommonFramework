@@ -193,7 +193,108 @@
     }
 }
 
+.bookmark-edit-menu-add-mode{
+    margin-top: 50px;
+    height: 450px;
+    padding: 10px;
+    background-color: white;
+    overflow-y: auto;
+    transition: all 0.2s ease;
 
+    // 메뉴 추가 트리 컨테이너
+    .menu-add-tree-container {
+        min-width: max-content;
+
+        // 메뉴 트리 셀렉터 루트
+        .menu-tree-selector {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        // 메뉴 트리 셀렉터 아이템
+        .menu-tree-selector-item {
+            margin-bottom: 4px;
+            padding: 0;
+
+            // 하위 depth 표시 - children 스타일
+            .menu-tree-selector-children {
+                display: block !important;
+                margin-left: 20px;
+                padding-left: 8px;
+                margin-top: 4px;
+                border-left: 2px solid rgba(0, 0, 0, 0.1);
+                list-style: none;
+                padding-top: 0;
+            }
+
+            // 메뉴 트리 셀렉터 콘텐츠
+            .menu-tree-selector-content {
+                display: flex !important;
+                align-items: center;
+                gap: 12px;
+                min-width: max-content;
+                padding: 2px;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                cursor: pointer;
+
+                &:hover {
+                    background: rgba(0, 0, 0, 0.05) !important;
+                }
+
+                // 선택된 상태
+                &.is-selected {
+                    background: rgba(24, 144, 255, 0.1) !important;
+                }
+
+                // 북마크된 상태
+                &.is-bookmarked {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                // 폴더 상태
+                &.is-folder {
+                    font-weight: 600;
+                }
+
+                // CustomIcon (첫 번째 자식) 스타일
+                > *:first-child {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 8px 14px;
+                    background: rgba(0, 0, 0, 0.03);
+                    border-radius: 4px;
+                    flex-shrink: 0;
+                }
+
+                // StarToggleIcon (두 번째 자식) 스타일
+                > *:nth-child(2) {
+                    flex-shrink: 0;
+                }
+
+                // 메뉴 이름
+                .menu-tree-selector-name {
+                    flex: 1;
+                    font-size: 14px;
+                    user-select: none;
+
+                    &.selected {
+                        color: var(--theme-color, #1890ff);
+                        font-weight: 500;
+                    }
+
+                    &.bookmarked {
+                        color: rgba(0, 0, 0, 0.5);
+                        text-decoration: line-through;
+                    }
+                }
+            }
+        }
+    }
+}
 
 .bangarlab-navigation {
     --theme-color: #1890ff;
