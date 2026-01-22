@@ -4,6 +4,7 @@ import { ReactElement, createElement, useState, useEffect } from "react";
 import classNames from "classnames";
 import { MenuTreeNode } from "../types/menu.types";
 import { buildMendixImageUrl, buildMendixImageUrlAsync } from "../utils/imageUtils";
+import CustomIcon from "./CustomIcon";
 
 interface MenuItemProps {
     item: MenuTreeNode;
@@ -98,7 +99,9 @@ export function MenuItem({
     const hasIcon = item.iconClass && item.iconClass.trim() !== "";
     // 이미지가 실제로 유효한 URL을 가지고 있는지 확인
     const hasImage = layout === "vertical" && item.imageInfo && item.imageInfo.guid && imageUrl && imageUrl.trim() !== "";
-    const hasAnyIcon = hasIcon || hasImage;
+    // 기본 아이콘 표시 여부 (iconClass와 imageInfo가 모두 없을 때)
+    const shouldShowDefaultIcon = !hasIcon && !hasImage;
+    const hasAnyIcon = hasIcon || hasImage || shouldShowDefaultIcon;
 
     // nav-item-content 클릭 핸들러 (아이콘 영역 클릭 시에도 메뉴 클릭 동작)
     const handleContentClick = (e: React.MouseEvent): void => {
@@ -158,18 +161,37 @@ export function MenuItem({
                 tabIndex={0}
                 aria-label={item.menuName}
             >
-                {/* 아이콘 */}
+                {/* 아이콘 (우선순위 1: iconClass) */}
                 {item.iconClass && item.iconClass.trim() !== "" && (
                     <span className="nav-icon" aria-hidden="true">
                         <i className={item.iconClass}></i>
                     </span>
                 )}
 
-                {/* 이미지 (vertical layout일 때 nav-label 왼쪽에 표시) */}
+                {/* 이미지 (우선순위 2: imageInfo, vertical layout일 때 nav-label 왼쪽에 표시) */}
                 {layout === "vertical" && item.imageInfo && item.imageInfo.guid && imageUrl && (
                     <div className="mx-image-viewer mx-image-viewer-responsive mx-name-image1" aria-hidden="true">
                         <img className="img-thumbnail" alt="" src={imageUrl} />
                     </div>
+                )}
+
+                {/* 기본 아이콘 (우선순위 3: iconClass와 imageInfo가 모두 없을 때) */}
+                {shouldShowDefaultIcon && (
+                    <span className="nav-icon" aria-hidden="true">
+                        {item.pageURL ? (
+                            <CustomIcon 
+                                type="file" 
+                                fileType={item.pageURL.split(".").pop()?.toLowerCase()} 
+                            />
+                        ) : hasChildren ? (
+                            <CustomIcon 
+                                type="folder" 
+                                isOpen={item.isExpanded} 
+                            />
+                        ) : (
+                            <CustomIcon type="emptyFolder" />
+                        )}
+                    </span>
                 )}
 
                 {/* 메뉴명 - aria-expanded 속성 없음 (확장/축소와 무관) */}

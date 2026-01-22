@@ -12,6 +12,11 @@ import {
     removeMenuItem,
     addMenusToTree
 } from "../utils/bookmarkHelpers";
+import {
+    toggleDepth0MenuExpand,
+    toggleSameDepthMenuExpand,
+    findMenuNode
+} from "../utils/menuHelpers";
 import { ActionValue } from "mendix";
 
 interface UseBookmarkEditOptions {
@@ -191,6 +196,26 @@ export function useBookmarkEdit({ initialTree, onSave }: UseBookmarkEditOptions)
         setIsEditMode(false);
     }, [initialTree]);
 
+    // 메뉴 확장/축소 토글
+    const toggleExpand = useCallback((menuId: string) => {
+        setEditedTree((prevTree: MenuTreeNode[]) => {
+            // 클릭한 메뉴의 depth 확인
+            const targetNode = findMenuNode(prevTree, menuId);
+
+            // depth-0 메뉴인지 확인 (최상위 레벨에서 직접 확인)
+            const isDepth0 =
+                targetNode?.depth === 0 || prevTree.some(item => String(item.menuId) === String(menuId));
+
+            // depth-0 메뉴: 다른 depth-0 메뉴 자동 닫기
+            // depth 1 이상: 같은 depth의 메뉴만 닫기
+            const newTree = isDepth0
+                ? toggleDepth0MenuExpand(prevTree, menuId)
+                : toggleSameDepthMenuExpand(prevTree, menuId);
+
+            return newTree;
+        });
+    }, []);
+
     return {
         isEditMode,
         editedTree,
@@ -202,6 +227,7 @@ export function useBookmarkEdit({ initialTree, onSave }: UseBookmarkEditOptions)
         handleAddMenus,
         handleSave,
         handleCancel,
-        updateTree
+        updateTree,
+        toggleExpand
     };
 }

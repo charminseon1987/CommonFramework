@@ -72,7 +72,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         setIsAllExpanded
     );
 
-    const { navigate } = useMenuNavigation(props);
+    const { navigate } = useMenuNavigation(props, setState);
     const homeNavigationHandler = useHomeNavigation(setState);
 
     // 홈 버튼 클릭 핸들러 (collapsed 상태 유지)
@@ -478,9 +478,9 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         ) : (
                             <NavigationMenu
                                 menuItems={activeTab === "bookmark" ? bookmarkEdit.editedTree : state.menuTree}
-                                activeMenuId={state.activeMenuId}
+                                activeMenuId={activeTab === "bookmark" ? null : state.activeMenuId}
                                 onMenuClick={handleMenuClickWrapper}
-                                onToggleExpand={toggleExpand}
+                                onToggleExpand={activeTab === "bookmark" ? bookmarkEdit.toggleExpand : toggleExpand}
                                 depth={0}
                                 maxDepth={props.maxDepth}
                                 showDepthIndicator={props.showDepthIndicator}
