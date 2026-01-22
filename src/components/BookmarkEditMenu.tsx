@@ -15,39 +15,34 @@ import { MenuTreeNode } from "../types/menu.types";
 import { menuTreeToTreeItems, treeItemsToMenuTree, moveTreeItems, isDescendant } from "../utils/treeDataConverter";
 import { BOOKMARK_ROOT_ID } from "../types/bookmarkTree.types";
 import { BookmarkTreeItemData } from "../types/bookmarkTree.types";
-import { MenuAddModal } from "./MenuAddModal";
 import CustomIcon from "./CustomIcon";
 
 interface BookmarkEditMenuProps {
     menuTree: MenuTreeNode[];
-    fullMenuTree?: MenuTreeNode[];
     onMoveMenuItem: (menuId: string, newParentId: string | null, newIndex: number) => void;
     onRemoveMenuItem: (menuId: string) => void;
     onCreateFolder: (folderName: string, parentId: string | null) => void;
-    onAddMenus: (menus: MenuTreeNode[], targetFolderId: string | null) => void;
     onSave: () => void;
     onCancel: () => void;
     hasChanges: boolean;
     onUpdateTree?: (newTree: MenuTreeNode[]) => void;
+    onOpenMenuAdd?: (targetFolderId: string | null) => void;
 }
 
 export function BookmarkEditMenu({
     menuTree,
-    fullMenuTree = [],
     onMoveMenuItem,
     onRemoveMenuItem,
     onCreateFolder,
-    onAddMenus,
     onSave,
     onCancel,
     hasChanges,
-    onUpdateTree
+    onUpdateTree,
+    onOpenMenuAdd
 }: BookmarkEditMenuProps): ReactElement {
     const [newFolderName, setNewFolderName] = useState("");
     const [showFolderInput, setShowFolderInput] = useState(false);
     const [folderParentId, setFolderParentId] = useState<string | null>(null);
-    const [isMenuAddModalOpen, setIsMenuAddModalOpen] = useState(false);
-    const [menuAddTargetFolderId, setMenuAddTargetFolderId] = useState<string | null>(null);
 
     // MenuTreeNode를 TreeItemMap으로 변환
     const treeItems = useMemo(() => menuTreeToTreeItems(menuTree), [menuTree]);
@@ -223,26 +218,12 @@ export function BookmarkEditMenu({
         setFolderParentId(null);
     }, []);
 
-    // 메뉴 추가 모달 열기
-    const handleOpenMenuAddModal = useCallback((targetFolderId: string | null = null) => {
-        setMenuAddTargetFolderId(targetFolderId);
-        setIsMenuAddModalOpen(true);
-    }, []);
-
-    // 메뉴 추가 모달 닫기
-    const handleCloseMenuAddModal = useCallback(() => {
-        setIsMenuAddModalOpen(false);
-        setMenuAddTargetFolderId(null);
-    }, []);
-
-    // 메뉴 추가 처리
-    const handleAddMenus = useCallback(
-        (menus: MenuTreeNode[], targetFolderId: string | null) => {
-            onAddMenus(menus, targetFolderId);
-            handleCloseMenuAddModal();
-        },
-        [onAddMenus, handleCloseMenuAddModal]
-    );
+    // 메뉴 추가 모드로 전환
+    const handleOpenMenuAdd = useCallback((targetFolderId: string | null = null) => {
+        if (onOpenMenuAdd) {
+            onOpenMenuAdd(targetFolderId);
+        }
+    }, [onOpenMenuAdd]);
 
     // 아이템 삭제
     const handleRemoveItem = useCallback(
@@ -252,40 +233,6 @@ export function BookmarkEditMenu({
         [onRemoveMenuItem]
     );
 
-    // 이미 북마크된 메뉴 ID 수집 (폴더와 파일 모두 포함)
-    const bookmarkedMenuIds = useMemo(() => {
-        const ids = new Set<string>();
-        const collectIds = (nodes: MenuTreeNode[]): void => {
-            nodes.forEach(node => {
-                // 폴더와 파일 모두 북마크된 메뉴 ID에 추가
-                ids.add(node.menuId);
-                if (node.children && node.children.length > 0) {
-                    collectIds(node.children);
-                }
-            });
-        };
-        collectIds(menuTree);
-        return ids;
-    }, [menuTree]);
-
-    // 타겟 폴더 이름 찾기
-    const targetFolderName = useMemo(() => {
-        if (!menuAddTargetFolderId) return undefined;
-        const findNode = (nodes: MenuTreeNode[]): MenuTreeNode | null => {
-            for (const node of nodes) {
-                if (node.menuId === menuAddTargetFolderId) {
-                    return node;
-                }
-                if (node.children && node.children.length > 0) {
-                    const found = findNode(node.children);
-                    if (found) return found;
-                }
-            }
-            return null;
-        };
-        const node = findNode(menuTree);
-        return node?.menuName;
-    }, [menuAddTargetFolderId, menuTree]);
 
     // 아이템 렌더러
     const renderItem = useCallback(
@@ -413,7 +360,7 @@ export function BookmarkEditMenu({
                     <button
                         type="button"
                         className="mx-button mx-button-primary mx-name-bookmarkAddMenu"
-                        onClick={() => handleOpenMenuAddModal(null)}
+                        onClick={() => handleOpenMenuAdd(null)}
                         style = {{marginLeft: '26px', marginRight: '13px'}}
                     >
                         메뉴 추가
@@ -453,7 +400,14 @@ export function BookmarkEditMenu({
                 </div>
             )}
 
-            <div className="bookmark-edit-tree-container">
+            <div className="bookmark-edit-tree-container"
+            style={{
+                marginTop: `50px`,
+        
+                height: `450px`,
+                padding: `10px`,
+                backgroundColor:'white'
+            }}>
                 <ControlledTreeEnvironment
                     items={treeItems}
                     getItemTitle={item => item.data.name}
@@ -488,6 +442,11 @@ export function BookmarkEditMenu({
             </div>
 
             <div className="bookmark-edit-footer"
+                style={{
+                    marginTop: `10px`,
+                    justifyContent: `flex-end`,
+                    display: `flex`,
+                }}
                
             >
                 <button
@@ -509,18 +468,6 @@ export function BookmarkEditMenu({
                     저장
                 </button>
             </div>
-
-            {isMenuAddModalOpen && (
-                <MenuAddModal
-                    isOpen={isMenuAddModalOpen}
-                    onClose={handleCloseMenuAddModal}
-                    fullMenuTree={fullMenuTree}
-                    bookmarkedMenuIds={bookmarkedMenuIds}
-                    onAddMenus={handleAddMenus}
-                    targetFolderId={menuAddTargetFolderId}
-                    targetFolderName={targetFolderName}
-                />
-            )}
         </div>
     );
 }

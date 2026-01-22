@@ -26,7 +26,7 @@ import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
 import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
 import BookmarkSettingsButton from "./components/BookmarkSettingsButton";
-import { BookmarkEditMenu } from "./components/BookmarkEditMenu";
+import { BookmarkEditModal } from "./components/BookmarkEditModal";
 import { useBookmarkEdit } from "./hooks/useBookmarkEdit";
 // import logoImage from "./assets/logo.png";
 
@@ -462,42 +462,52 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                     <NavigationTab value={activeTab} onChange={setActiveTab} />
                     {/* 메뉴 */}
                     <nav className="nav-content">
-                        {activeTab === "bookmark" && bookmarkEdit.isEditMode ? (
-                            <BookmarkEditMenu
-                                menuTree={bookmarkEdit.editedTree}
-                                fullMenuTree={allMenuTree}
-                                onMoveMenuItem={bookmarkEdit.handleMoveMenuItem}
-                                onRemoveMenuItem={bookmarkEdit.handleRemoveMenuItem}
-                                onCreateFolder={bookmarkEdit.handleCreateFolder}
-                                onAddMenus={bookmarkEdit.handleAddMenus}
-                                onSave={bookmarkEdit.handleSave}
-                                onCancel={bookmarkEdit.handleCancel}
-                                hasChanges={bookmarkEdit.hasChanges}
-                                onUpdateTree={bookmarkEdit.updateTree}
-                            />
-                        ) : (
-                            <NavigationMenu
-                                menuItems={activeTab === "bookmark" ? bookmarkEdit.editedTree : state.menuTree}
-                                activeMenuId={activeTab === "bookmark" ? null : state.activeMenuId}
-                                onMenuClick={handleMenuClickWrapper}
-                                onToggleExpand={activeTab === "bookmark" ? bookmarkEdit.toggleExpand : toggleExpand}
-                                depth={0}
-                                maxDepth={props.maxDepth}
-                                showDepthIndicator={props.showDepthIndicator}
-                                isCollapsed={isCollapsed}
-                                onUncollapse={handleUncollapse}
-                            />
-                        )}
+                        <NavigationMenu
+                            menuItems={activeTab === "bookmark" ? bookmarkEdit.editedTree : state.menuTree}
+                            activeMenuId={activeTab === "bookmark" ? null : state.activeMenuId}
+                            onMenuClick={handleMenuClickWrapper}
+                            onToggleExpand={activeTab === "bookmark" ? bookmarkEdit.toggleExpand : toggleExpand}
+                            depth={0}
+                            maxDepth={props.maxDepth}
+                            showDepthIndicator={props.showDepthIndicator}
+                            isCollapsed={isCollapsed}
+                            onUncollapse={handleUncollapse}
+                        />
                         {activeTab === "bookmark" && (
                             <BookmarkSettingsButton
                                 isEditMode={bookmarkEdit.isEditMode}
                                 onToggleEditMode={bookmarkEdit.toggleEditMode}
                             />
                         )}
-                        <LogoutButton className="nav-logout-btn" onLogout={props.onLogout} />
+                        <LogoutButton
+                            className={classNames("nav-logout-btn", {
+                                "general-menu-tab": activeTab !== "bookmark"
+                            })}
+                            onLogout={props.onLogout}
+                        />
                     </nav>
                 </aside>
             </div>
+            
+            {/* 북마크 편집 모달 */}
+            {activeTab === "bookmark" && bookmarkEdit.isEditMode && (
+                <BookmarkEditModal
+                    isOpen={bookmarkEdit.isEditMode}
+                    onClose={() => {
+                        bookmarkEdit.handleCancel();
+                    }}
+                    menuTree={bookmarkEdit.editedTree}
+                    fullMenuTree={allMenuTree}
+                    onMoveMenuItem={bookmarkEdit.handleMoveMenuItem}
+                    onRemoveMenuItem={bookmarkEdit.handleRemoveMenuItem}
+                    onCreateFolder={bookmarkEdit.handleCreateFolder}
+                    onAddMenus={bookmarkEdit.handleAddMenus}
+                    onSave={bookmarkEdit.handleSave}
+                    onCancel={bookmarkEdit.handleCancel}
+                    hasChanges={bookmarkEdit.hasChanges}
+                    onUpdateTree={bookmarkEdit.updateTree}
+                />
+            )}
         </div>
     );
 }
