@@ -464,3 +464,38 @@ export function addMenusToTree(
 
     return addToNode(tree);
 }
+
+/**
+ * localStorage에 저장된 북마크 JSON 키
+ */
+const BOOKMARK_JSON_STORAGE_KEY = "bangarlab-bookmark-json";
+
+/**
+ * localStorage에서 북마크 JSON 문자열 로드
+ */
+export function loadBookmarkJsonFromStorage(): string | null {
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            const stored = localStorage.getItem(BOOKMARK_JSON_STORAGE_KEY);
+            if (stored) {
+                return stored;
+            }
+        }
+    } catch (error) {
+        console.warn("[BookmarkHelpers] Failed to load bookmark JSON from localStorage:", error);
+    }
+    return null;
+}
+
+/**
+ * localStorage에서 북마크 JSON 문자열 삭제
+ */
+export function clearBookmarkJsonFromStorage(): void {
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            localStorage.removeItem(BOOKMARK_JSON_STORAGE_KEY);
+        }
+    } catch (error) {
+        console.warn("[BookmarkHelpers] Failed to clear bookmark JSON from localStorage:", error);
+    }
+}

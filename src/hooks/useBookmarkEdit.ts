@@ -150,14 +150,25 @@ export function useBookmarkEdit({ initialTree, onSave }: UseBookmarkEditOptions)
         // 디버깅: JSON 문자열 출력
         console.log("[BookmarkEdit] JSON to save:", jsonString);
 
+        // localStorage에 저장
+        try {
+            if (typeof window !== "undefined" && window.localStorage) {
+                localStorage.setItem("bangarlab-bookmark-json", jsonString);
+                console.log("[BookmarkEdit] JSON saved to localStorage");
+            }
+        } catch (error) {
+            console.warn("[BookmarkEdit] Failed to save to localStorage:", error);
+        }
+
         // Mendix Action 호출
         // 참고: Mendix ActionValue.execute()는 파라미터를 직접 받지 않습니다.
-        // JSON 문자열을 전달하려면 위젯 XML에 String 속성을 정의하고,
-        // 그 속성에 jsonString을 설정한 후 Action을 호출해야 합니다.
-        // 예: props.bookmarkJsonAttr.setValue(jsonString); onSave.execute();
+        // JSON 문자열은 localStorage에 저장되었으므로, Microflow/Nanoflow에서
+        // JavaScript Action을 통해 읽어올 수 있습니다.
         if (onSave && onSave.canExecute) {
             onSave.execute();
             setHasChanges(false);
+            // 저장 성공 시 편집 모드 자동 종료
+            setIsEditMode(false);
             return true;
         }
 

@@ -20,26 +20,27 @@
 
 1. **File** → **New** → **Microflow** 선택
 2. Microflow 이름: `ACT_BookmarkReorganize` (또는 원하는 이름)
-3. **Parameters** 탭에서 파라미터 추가:
-   - **Name**: `BookmarkJson`
-   - **Type**: `String`
-   - **Required**: `Yes`
+3. **Parameters** 탭: 파라미터 불필요 (localStorage에서 직접 읽어옴)
 
 ### 2.2 Microflow 로직 구현
 
-#### Step 1: JSON 파싱
+#### Step 1: localStorage에서 JSON 읽기
 
-1. **Toolbox**에서 **JSON to Object** 액티비티를 추가합니다.
+1. **Toolbox**에서 **JavaScript Action** 액티비티를 추가합니다.
 2. 설정:
-   - **JSON String**: `$BookmarkJson` (파라미터)
-   - **Mapping**: JSON 구조를 Mendix 엔티티로 매핑
+   - **JavaScript Action**: `GetBookmarkJsonFromLocalStorage` (6.1 섹션 참고)
+   - **Return Value**: `$BookmarkJson` (String 변수)
+3. **If** 액티비티 추가:
+   - Condition: `$BookmarkJson = empty`
+   - True: 메시지 표시 후 종료
+   - False: 다음 단계 진행
 
-**또는** (더 간단한 방법)
+#### Step 2: JSON 파싱
 
 1. **Toolbox**에서 **Call Microflow** 액티비티를 추가합니다.
 2. JSON 파싱을 위한 별도 Microflow 호출:
    - Microflow: `SUB_ParseBookmarkJson`
-   - Parameter: `$BookmarkJson`
+   - Parameter: `$BookmarkJson` (Step 1에서 읽어온 값)
 
 #### Step 2: 기존 북마크 데이터 삭제
 
@@ -261,43 +262,136 @@ Nanoflow는 클라이언트 사이드에서 실행되므로, 간단한 경우에
 위젯 코드에서 JSON을 전달하는 방법:
 
 ```typescript
-// useBookmarkEdit.ts 또는 BookmarkEditMenu.tsx에서
+// useBookmarkEdit.ts에서
 const handleSave = () => {
     const structure = buildBookmarkStructure(editedTree);
     const jsonString = bookmarkStructureToJson(structure);
     
+    // localStorage에 저장
+    try {
+        if (typeof window !== "undefined" && window.localStorage) {
+            localStorage.setItem("bangarlab-bookmark-json", jsonString);
+            console.log("[BookmarkEdit] JSON saved to localStorage");
+        }
+    } catch (error) {
+        console.warn("[BookmarkEdit] Failed to save to localStorage:", error);
+    }
+    
     // Mendix Action 호출
     if (onSave && onSave.canExecute) {
-        // JSON 문자열을 파라미터로 전달
-        // 주의: Mendix Action이 String 파라미터를 받을 수 있어야 함
         onSave.execute();
     }
 };
 ```
 
-**중요**: Mendix Action은 기본적으로 JSON 문자열을 직접 파라미터로 받을 수 없습니다. 다음 방법 중 하나를 사용해야 합니다:
+**중요**: Mendix Action은 기본적으로 JSON 문자열을 직접 파라미터로 받을 수 없습니다. 따라서 위젯에서 JSON을 localStorage에 저장하고, Microflow/Nanoflow에서 JavaScript Action을 통해 읽어옵니다.
 
-### 방법 1: String 파라미터로 전달 (권장)
+### 방법: localStorage + JavaScript Action 사용 (권장)
 
-1. Microflow 파라미터를 `String` 타입으로 설정
-2. 위젯에서 JSON 문자열을 그대로 전달
-3. Microflow에서 JSON 파싱
+1. 위젯에서 JSON을 localStorage에 저장 (자동 처리됨)
+2. Microflow/Nanoflow에서 JavaScript Action으로 localStorage에서 읽기
+3. 읽어온 JSON 문자열을 파싱하여 처리
 
-### 방법 2: Object 파라미터로 전달
+## 6.1 JavaScript Action 생성
 
-1. Mendix 엔티티를 생성하여 JSON 데이터 저장
-2. 위젯에서 Object를 생성하여 전달
-3. Microflow에서 Object 속성 읽기
+**상세 가이드**: JavaScript Action 설정 방법에 대한 자세한 내용은 [JAVASCRIPT_ACTION_SETUP_GUIDE.md](JAVASCRIPT_ACTION_SETUP_GUIDE.md)를 참고하세요.
 
-## 7. 테스트 방법
+### Step 1: JavaScript Action 생성
 
-### 7.1 테스트 시나리오
+1. Mendix Studio Pro에서 **App Explorer** → **Add** → **JavaScript Action** 선택
+2. Action 이름: `GetBookmarkJsonFromLocalStorage`
+3. **Return Type** 설정:
+   - Type: `String`
+   - Required: `No` (값이 없을 수 있음)
+
+### Step 2: JavaScript 코드 작성
+
+JavaScript Action의 코드 에디터에 다음 코드를 작성:
+
+```javascript
+export async function GetBookmarkJsonFromLocalStorage() {
+    // 브라우저 환경 확인
+    if (typeof window !== "undefined" && window.localStorage) {
+        try {
+            const jsonString = window.localStorage.getItem("bangarlab-bookmark-json");
+            return jsonString || "";
+        } catch (error) {
+            console.error("[GetBookmarkJsonFromLocalStorage] Error:", error);
+            return "";
+        }
+    }
+    return "";
+}
+```
+
+### Step 3: Microflow에서 JavaScript Action 사용
+
+`ACT_BookmarkReorganize` Microflow를 다음과 같이 수정:
+
+```
+[Start]
+  → [JavaScript Action: GetBookmarkJsonFromLocalStorage]
+    Return: $BookmarkJson (String)
+  → [If: $BookmarkJson = empty]
+    → [Show Message: "저장할 북마크 데이터가 없습니다."]
+    → [End]
+  → [Retrieve: ExistingBookmarks]
+    Entity: SyMenu_Bookmarked
+    XPath: [SyMenu_Bookmarked_SyUser = $CurrentUser]
+  → [Delete Object: ExistingBookmarks]
+  → [Call Microflow: SUB_ParseBookmarkJson]
+    Parameter: $BookmarkJson
+    Return: $ParsedItems (List)
+  → [Loop: $ParsedItems]
+    → [Create Object: SyMenu_Bookmarked]
+    → ... (기존 로직 계속)
+  → [Commit]
+  → [End]
+```
+
+**주의사항**:
+- Microflow 파라미터는 더 이상 필요하지 않습니다 (JavaScript Action에서 직접 읽어옴)
+- JavaScript Action은 브라우저 환경에서만 동작합니다 (클라이언트 사이드)
+- localStorage는 사용자별로 격리되어 저장됩니다
+- **`Refresh in Client` 액티비티를 추가하여 bookmark 데이터 소스를 새로고침해야 위젯에 변경사항이 반영됩니다**
+- 저장 성공 시 위젯에서 편집 모드가 자동으로 닫힙니다
+
+## 7. 저장 후 동작
+
+### 7.1 위젯 자동 동작
+
+저장 버튼 클릭 시 위젯에서 자동으로 수행되는 동작:
+
+1. **편집 모드 자동 종료**: 저장 성공 시 편집 모드가 자동으로 닫힙니다.
+2. **데이터 새로고침**: Microflow에서 `Refresh in Client` 액티비티를 사용하여 bookmark 데이터 소스를 새로고침해야 합니다.
+
+### 7.2 Refresh in Client 설정
+
+Microflow에서 `Commit` 액티비티 이후에 `Refresh in Client` 액티비티를 추가합니다:
+
+1. **Toolbox**에서 **Refresh in Client** 액티비티를 추가합니다.
+2. 설정:
+   - **Object**: bookmark 데이터 소스 객체 (또는 `$CreatedBookmarks` 리스트)
+   - **Refresh behavior**: `Refresh object` 또는 `Refresh list`
+3. 이렇게 하면 위젯의 bookmark 데이터 소스가 자동으로 새로고침되어 저장된 북마크가 bookmark tab에 표시됩니다.
+
+**참고**: 
+- `Refresh in Client`는 클라이언트 사이드에서만 동작합니다.
+- 데이터 소스가 List인 경우 `Refresh list`를 사용합니다.
+- 특정 객체만 새로고침하려면 `Refresh object`를 사용합니다.
+
+## 8. 테스트 방법
+
+### 8.1 테스트 시나리오
 
 1. **북마크 추가**: 메뉴를 북마크에 추가
 2. **폴더 생성**: 새 폴더 생성
 3. **드래그앤드롭**: 메뉴를 폴더로 이동
 4. **저장**: 변경사항 저장
-5. **확인**: 데이터베이스에서 북마크 구조 확인
+5. **확인**: 
+   - 편집 모드가 자동으로 닫히는지 확인
+   - bookmark tab에서 저장된 북마크가 표시되는지 확인
+   - 데이터베이스에서 북마크 구조 확인
 
 ### 7.2 디버깅
 
@@ -311,9 +405,9 @@ const handleSave = () => {
    - JSON 문자열 출력 확인
    - Action 호출 확인
 
-## 8. 주의사항
+## 9. 주의사항
 
-### 8.1 성능 고려사항
+### 9.1 성능 고려사항
 
 - 대량의 북마크가 있는 경우, 배치 처리 고려
 - 트랜잭션 범위 최소화
@@ -327,7 +421,7 @@ const handleSave = () => {
 - **pageURL이 있는 항목은 폴더가 될 수 없음** (위젯에서 자동 검증)
 - **pageURL이 있는 항목은 하위 children을 가질 수 없음** (위젯에서 자동 검증)
 
-### 8.4 트랜잭션 처리
+### 9.3 트랜잭션 처리
 
 **중요**: 트랜잭션은 **Mendix Microflow에서 자동으로 처리**됩니다.
 
@@ -380,7 +474,7 @@ const handleSave = () => {
 
 ## 9. 완성된 예시 Microflow
 
-### 9.1 엔티티 구조 확인
+### 10.1 엔티티 구조 확인
 
 **SyMenu_Bookmarked 엔티티 속성:**
 - `MenuId` (Integer): 메뉴 고유 ID
@@ -482,6 +576,9 @@ const handleSave = () => {
   → [Commit]
     Object to commit: $CreatedBookmarks
     Commit behavior: Yes
+  → [Refresh in Client]
+    Object: $CreatedBookmarks (또는 bookmark 데이터 소스)
+    Refresh behavior: Refresh object
   → [Show Message: "북마크가 저장되었습니다."]
   → [End]
 
@@ -489,6 +586,8 @@ const handleSave = () => {
   → [Show Message: "북마크 저장 중 오류가 발생했습니다: " + $Error]
   → [Log: Error]
 ```
+
+**중요**: `Refresh in Client` 액티비티를 추가하여 bookmark 데이터 소스를 새로고침해야 합니다. 이렇게 하면 위젯에서 저장된 북마크 데이터를 자동으로 다시 로드합니다.
 
 **주요 변경사항:**
 
@@ -508,7 +607,7 @@ const handleSave = () => {
    - Error Handler 추가 권장
    - 트랜잭션 롤백 자동 처리
 
-## 10. 추가 리소스
+## 11. 추가 리소스
 
 - [Mendix Microflow 가이드](https://docs.mendix.com/refguide/microflows)
 - [Mendix JSON 처리](https://docs.mendix.com/refguide/json-structures)
