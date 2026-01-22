@@ -13,8 +13,7 @@ import {
 import classNames from "classnames";
 import { MenuTreeNode } from "../types/menu.types";
 import { menuTreeToTreeItems, treeItemsToMenuTree, moveTreeItems, isDescendant } from "../utils/treeDataConverter";
-import { BOOKMARK_ROOT_ID } from "../types/bookmarkTree.types";
-import { BookmarkTreeItemData } from "../types/bookmarkTree.types";
+import { BOOKMARK_ROOT_ID, BookmarkTreeItemData } from "../types/bookmarkTree.types";
 import CustomIcon from "./CustomIcon";
 
 interface BookmarkEditMenuProps {
@@ -361,7 +360,7 @@ export function BookmarkEditMenu({
                         type="button"
                         className="mx-button mx-button-primary mx-name-bookmarkAddMenu"
                         onClick={() => handleOpenMenuAdd(null)}
-                        style = {{marginLeft: '26px', marginRight: '13px'}}
+                        
                     >
                         메뉴 추가
                     </button>
@@ -373,9 +372,7 @@ export function BookmarkEditMenu({
                         새 폴더
                     </button>
                 </div>
-            </div>
-
-            {showFolderInput && (
+                {showFolderInput && (
                 <div className="bookmark-edit-folder-input" style={{color: 'black'}}>
                     <input
                         type="text"
@@ -398,16 +395,13 @@ export function BookmarkEditMenu({
                         취소
                     </button>
                 </div>
-            )}
+                )}
+            </div>
+
+          
 
             <div className="bookmark-edit-tree-container"
-            style={{
-                marginTop: `50px`,
-        
-                height: `450px`,
-                padding: `10px`,
-                backgroundColor:'white'
-            }}>
+           >
                 <ControlledTreeEnvironment
                     items={treeItems}
                     getItemTitle={item => item.data.name}
