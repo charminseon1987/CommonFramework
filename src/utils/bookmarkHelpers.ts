@@ -86,7 +86,7 @@ export function buildBookmarkStructure(tree: MenuTreeNode[]): BookmarkStructure 
                 sortNo: sortOffset + index,
                 leftNo: leftNo,
                 rightNo: rightNo,
-                isFolder: hasChildren, // pageURL이 없고 children이 있을 때만 true
+                isFolder: !hasPageURL, // pageURL이 있으면 false (파일), 없으면 true (폴더)
                 originalMenuId: hasPageURL ? node.menuId : undefined // 페이지가 있는 경우 원본 메뉴 ID
             };
 

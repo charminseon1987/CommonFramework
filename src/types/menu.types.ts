@@ -28,6 +28,9 @@ export interface MenuItemData {
 
     // Mendix Object
     guid?: string;
+
+    // 북마크 모드에서 원본 메뉴 ID (pageURL 복원용)
+    originalMenuId?: string;
 }
 
 /**
