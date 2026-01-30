@@ -21,6 +21,280 @@
     flex-grow: 0 !important;
     padding-top: 72px !important; // nav-header 높이만큼 여백 추가
 }
+.bookmark-edit-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+
+
+.bookmark-edit-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+}
+.bookmark-edit-folder-input{
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.bookmark-edit-tree-container{
+    margin-top: 50px;
+    height: 450px;
+    padding: 10px;
+    background-color: white;
+    overflow-y: auto;
+    transition: all 0.2s ease;
+
+    // 드래그 앤 드롭 효과 - 컨테이너 레벨
+    &.drag-over {
+        background: rgba(24, 144, 255, 0.1) !important;
+    }
+
+    // react-complex-tree 루트
+    .rct-tree-root {
+        .rct-tree-items-container {
+            min-width: max-content;
+
+            // react-complex-tree children 스타일 - 하위 depth 표시
+            .rct-tree-item-children {
+                display: block !important;
+                margin-left: 20px;
+                padding-left: 8px;
+                margin-top: 4px;
+                border-left: 2px solid rgba(0, 0, 0, 0.1);
+
+                &.drag-over {
+                    border-left-color: var(--theme-color, #1890ff) !important;
+                    background: rgba(24, 144, 255, 0.05) !important;
+                }
+            }
+
+            // react-complex-tree 기본 스타일 오버라이드
+            .rct-tree-item-container {
+                display: block !important;
+            }
+
+            // react-complex-tree 드래그 관련 스타일
+            .rct-tree-item {
+                &.rct-tree-item-dragging {
+                    cursor: grabbing !important;
+                }
+            }
+
+            // 북마크 편집 아이템 스타일
+            .bookmark-edit-item {
+                margin-bottom: 4px;
+                padding: 0;
+                cursor: grab !important;
+
+                &.is-dragging,
+                &.rct-tree-item-dragging {
+                    cursor: grabbing !important;
+                }
+
+                &.folder {
+                    font-weight: 600;
+                }
+
+                &:active {
+                    cursor: grabbing !important;
+                }
+
+                .bookmark-edit-item-content {
+                    display: flex !important;
+                    align-items: center;
+                    gap: 12px;
+                    min-width: max-content;
+                    padding: 2px;
+                    // background: rgba(0, 0, 0, 0.02);
+                    border-radius: 4px;
+                    transition: all 0.2s ease;
+                    cursor: grab !important;
+
+                    &.is-dragging-over {
+                        background: rgba(24, 144, 255, 0.2) !important;
+                        border: 2px dashed var(--theme-color, #1890ff) !important;
+                    }
+
+                    &:hover {
+                        background: rgba(0, 0, 0, 0.05) !important;
+                    }
+
+                    &:active {
+                        cursor: grabbing !important;
+                    }
+                }
+
+                .bookmark-edit-drag-handle {
+                    display: flex;
+                    align-items: center;
+                    cursor: grab !important;
+                    color: rgba(0, 0, 0, 0.4);
+
+                    &:active {
+                        cursor: grabbing !important;
+                    }
+                }
+
+                .bookmark-edit-item-icon {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 8px 14px;
+                    background: rgba(0, 0, 0, 0.03);
+                    border-radius: 4px;
+                    flex: 1;
+                }
+
+                .bookmark-edit-item-name {
+                    flex: 1;
+                    font-size: 14px;
+                }
+
+                .bookmark-edit-add-folder-icon,
+                .bookmark-edit-remove-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 24px;
+                    height: 24px;
+                    padding: 4px;
+                    background: rgba(128, 128, 128, 0.2);
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    color: rgba(0, 0, 0, 0.7);
+                    flex-shrink: 0;
+
+                    svg {
+                        width: 14px;
+                        height: 14px;
+                        stroke: currentColor;
+                    }
+
+                    &:hover {
+                        color: rgba(0, 0, 0, 0.9);
+                        background: rgba(128, 128, 128, 0.3);
+                    }
+
+                    &:focus {
+                        outline: none;
+                        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.3);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.bookmark-edit-menu-add-mode{
+    margin-top: 50px;
+    height: 450px;
+    padding: 10px;
+    background-color: white;
+    overflow-y: auto;
+    transition: all 0.2s ease;
+
+    // 메뉴 추가 트리 컨테이너
+    .menu-add-tree-container {
+        min-width: max-content;
+
+        // 메뉴 트리 셀렉터 루트
+        .menu-tree-selector {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        // 메뉴 트리 셀렉터 아이템
+        .menu-tree-selector-item {
+            margin-bottom: 4px;
+            padding: 0;
+
+            // 하위 depth 표시 - children 스타일
+            .menu-tree-selector-children {
+                display: block !important;
+                margin-left: 20px;
+                padding-left: 8px;
+                margin-top: 4px;
+                border-left: 2px solid rgba(0, 0, 0, 0.1);
+                list-style: none;
+                padding-top: 0;
+            }
+
+            // 메뉴 트리 셀렉터 콘텐츠
+            .menu-tree-selector-content {
+                display: flex !important;
+                align-items: center;
+                gap: 12px;
+                min-width: max-content;
+                padding: 2px;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                cursor: pointer;
+
+                &:hover {
+                    background: rgba(0, 0, 0, 0.05) !important;
+                }
+
+                // 선택된 상태
+                &.is-selected {
+                    background: rgba(24, 144, 255, 0.1) !important;
+                }
+
+                // 북마크된 상태
+                &.is-bookmarked {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                // 폴더 상태
+                &.is-folder {
+                    font-weight: 600;
+                }
+
+                // CustomIcon (첫 번째 자식) 스타일
+                > *:first-child {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 8px 14px;
+                    background: rgba(0, 0, 0, 0.03);
+                    border-radius: 4px;
+                    flex-shrink: 0;
+                }
+
+                // StarToggleIcon (두 번째 자식) 스타일
+                > *:nth-child(2) {
+                    flex-shrink: 0;
+                }
+
+                // 메뉴 이름
+                .menu-tree-selector-name {
+                    flex: 1;
+                    font-size: 14px;
+                    user-select: none;
+
+                    &.selected {
+                        color: var(--theme-color, #1890ff);
+                        font-weight: 500;
+                    }
+
+                    &.bookmarked {
+                        color: rgba(0, 0, 0, 0.5);
+                        text-decoration: line-through;
+                    }
+                }
+            }
+        }
+    }
+}
 
 .bangarlab-navigation {
     --theme-color: #1890ff;
@@ -41,7 +315,8 @@
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-9md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
+    --tab-hover: #afa8ba;
+    --tab: #7a7485;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
 
     * {
@@ -64,6 +339,7 @@
         list-style: none;
         padding: 0;
         margin: 0;
+        order: 0;
     }
 
     .nav-submenu {
@@ -88,27 +364,31 @@
             font-weight: 600;
             font-size: 15px;
             background-color: var(--depth-0-bg);
-            color: var(--text-active);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
         }
 
         &.depth-1 > .nav-item-content {
             padding: 14px 20px 14px 52px;
             font-size: 14px;
             background-color: var(--depth-1-bg);
-            color: var(--text-active);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
         }
 
         &.depth-2 > .nav-item-content {
             padding: 12px 20px 12px 93px;
             font-size: 13px;
             background-color: var(--depth-2-bg);
-            color: var(--text-active);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
         }
 
         &.depth-3 > .nav-item-content {
             padding: 12px 20px 12px 116px;
             font-size: 13px;
-            color: var(--text-active);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
             background-color: var(--depth-3-bg);
         }
 
@@ -177,11 +457,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 22px;
-            min-width: 22px;
-            height: 22px;
+            width: 25px;
+            min-width: 25px;
+            height: 25px;
             font-size: 18px;
-            color: var(--text-active);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
             transition: all 0.2s ease;
 
             i {
@@ -195,9 +476,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            min-width: 24px;
-            height: 24px;
+            width: 25px;
+            min-width: 25px;
+            height: 25px;
             flex-shrink: 0;
             margin: 0;
 
@@ -223,7 +504,8 @@
             display: block;
             transition: opacity var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1),
                 width var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--text-active);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
             font-weight: 500;
         }
 
@@ -336,212 +618,319 @@
 
     // 사이드바 토글 버튼 (햄버거 버튼)
     .hamburger-btn {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    padding: 12px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
+        position: relative;
+        width: 44px;
+        height: 44px;
+        padding: 12px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    .hamburger-icon {
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 5px;
-        width: 20px;
-        height: 20px;
-        color: var(--text-active);
-        transition: inherit;
 
-        .hamburger-line {
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .hamburger-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
             width: 20px;
-            height: 2.5px;
-            background-color: currentColor;
-            border-radius: 2px;
+            height: 20px;
+            color: var(--text-active);
             transition: inherit;
-            transform-origin: center;
+
+            .hamburger-line {
+                width: 20px;
+                height: 2.5px;
+                background-color: currentColor;
+                border-radius: 2px;
+                transition: inherit;
+                transform-origin: center;
+            }
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--theme-color);
+            outline-offset: 2px;
+        }
+
+        &.is-open {
+            .hamburger-line:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+
+            .hamburger-line:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger-line:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
         }
     }
 
-    &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+    &.layout-vertical {
+        height: calc(100vh - 48px);
+        flex-shrink: 0 !important;
+        flex-grow: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        transition: width 0.25s ease;
+        background-color: var(--depth-0-bg);
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
 
-    &:active {
-        transform: scale(0.95);
-    }
-
-    &:focus-visible {
-        outline: 2px solid var(--theme-color);
-        outline-offset: 2px;
-    }
-
-    &.is-open {
-        .hamburger-line:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-        }
-
-        .hamburger-line:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger-line:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-        }
-    }
-}
-
-    
-&.layout-vertical {
-    height: 100vh;
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    transition: width 0.25s ease;
-    background-color: var(--depth-0-bg);
-
-    &.collapsed {
-        width: 60px !important;
-        max-width: 60px !important;
-        min-width: 60px !important;
-
-        .nav-sidebar {
+        &.collapsed {
             width: 60px !important;
             max-width: 60px !important;
             min-width: 60px !important;
-        }
 
-        // 기본적으로 nav-label 숨김
-        .nav-label {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-        }
+            .nav-sidebar {
+                width: 60px !important;
+                max-width: 60px !important;
+                min-width: 60px !important;
+            }
 
-        // 아이콘과 이미지가 모두 없을 때 nav-label 표시
-        .nav-item-content.no-icon .nav-label {
-            opacity: 1;
-            width: auto;
-            overflow: visible;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            // 기본적으로 nav-label 숨김
+            .nav-label {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+
+            // 아이콘과 이미지가 모두 없을 때 nav-label 표시
+            .nav-item-content.no-icon .nav-label {
+                opacity: 1;
+                width: auto;
+                overflow: visible;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+     
+      
+     
+
+
+    }
+
+    // 사이드바 스타일
+    .nav-sidebar {
+        width: 100% !important; // 부모 컨테이너의 100%를 차지
+        max-width: 100% !important;
+        min-width: 100% !important;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background-color: var(--depth-0-bg);
+        border-right: 1px solid var(--border-color);
+        overflow: hidden; // 사이드바 자체는 스크롤하지 않음
+        box-sizing: border-box; // padding과 border를 높이에 포함
+        max-height: calc(100vh - 48px); // 최대 높이 제한
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    // 메뉴 콘텐츠 영역 (flex-grow로 남은 공간 차지)
+    .nav-content {
+        flex: 1 1 auto; // flex-grow, flex-shrink, flex-basis
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: 0; // flex item이 overflow를 올바르게 처리하도록
+        max-height: 100%; // 최대 높이 제한
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        // 북마크 편집 시 트리가 넓어져도 가로 스크롤 가능
+        &:has(.bookmark-edit-menu) {
+            overflow-x: auto;
         }
     }
-}
 
-// 사이드바 스타일
-.nav-sidebar {
-    width: 100%; // 부모 컨테이너(20%)의 100%를 차지
-    max-width: 100%;
-    min-width: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    background-color: var(--depth-0-bg);
-    border-right: 1px solid var(--border-color);
-    overflow: hidden; // 사이드바 자체는 스크롤하지 않음
-    box-sizing: border-box; // padding과 border를 높이에 포함
-    max-height: calc(100vh - 72px); // 최대 높이 제한
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0;
-}
-
-// 메뉴 콘텐츠 영역 (flex-grow로 남은 공간 차지)
-.nav-content {
-    flex: 1 1 auto; // flex-grow, flex-shrink, flex-basis
-    overflow-y: auto;
-    overflow-x: hidden;
-    min-height: 0; // flex item이 overflow를 올바르게 처리하도록
-    max-height: 100%; // 최대 높이 제한
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.nav-logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    color: var(--text-active);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    text-align: left;
-    flex-shrink: 0;
-
-    .nav-logout-icon {
+    .nav-bookmark-settings-btn {
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 20px;
-        min-width: 20px;
-        height: 20px;
-        flex-shrink: 0;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
         color: var(--text-active);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+        flex-shrink: 0;
+        border: none;
+        order: 1;
+        margin-top: auto;
 
-        svg {
-            width: 16px;
-            height: 16px;
+        .nav-bookmark-settings-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            min-width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: var(--text-active);
+
+            svg {
+                width: 16px;
+                height: 16px;
+                transition: transform 0.3s ease;
+            }
+        }
+
+        .nav-bookmark-settings-text {
+            flex: 1;
+            white-space: nowrap;
+            transition: opacity var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1),
+                width var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        &:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            transform: translateX(2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        &:active {
+            transform: translateX(1px);
+            box-shadow: none;
+        }
+
+        &:focus {
+            outline: 2px solid var(--theme-color);
+            outline-offset: 2px;
+            border-radius: 8px;
+        }
+
+        &.edit-mode {
+            background: linear-gradient(135deg, rgba(24, 144, 255, 0.2) 0%, rgba(24, 144, 255, 0.1) 100%);
+            color: var(--theme-color);
+
+            .nav-bookmark-settings-icon {
+                color: var(--theme-color);
+
+                svg.rotating {
+                    animation: rotate 2s linear infinite;
+                }
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
     }
 
-    .nav-logout-text {
-        flex: 1;
-        white-space: nowrap;
-        transition: opacity var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1),
-            width var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    .nav-logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        color: var(--text-active);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+        flex-shrink: 0;
+        order: 2;
+        margin-top: 0;
 
-    &:hover {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
-        border-color: rgba(24, 144, 255, 0.5);
-        transform: translateX(2px);
-        box-shadow: var(--shadow-sm);
-    }
+        // 일반 메뉴 탭에서 하단에 고정
+        &.general-menu-tab {
+            margin-top: auto;
+        }
 
-    &:active {
-        transform: translateX(1px);
-        box-shadow: none;
-    }
+        // 북마크 설정 버튼이 없을 때만 하단에 고정 (fallback)
+        .nav-content:not(:has(.nav-bookmark-settings-btn)) & {
+            margin-top: auto;
+        }
 
-    &:focus {
-        outline: 2px solid var(--theme-color);
-        outline-offset: 2px;
-        border-radius: 8px;
-    }
+        .nav-logout-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            min-width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: var(--text-active);
 
-    &.collapsed {
-        justify-content: center;
-        padding: 12px;
+            svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
 
         .nav-logout-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
+            flex: 1;
+            white-space: nowrap;
+            transition: opacity var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1),
+                width var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        &:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(24, 144, 255, 0.5);
+            transform: translateX(2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        &:active {
+            transform: translateX(1px);
+            box-shadow: none;
+        }
+
+        &:focus {
+            outline: 2px solid var(--theme-color);
+            outline-offset: 2px;
+            border-radius: 8px;
+        }
+
+        &.collapsed {
+            justify-content: center;
+            padding: 12px;
+
+            .nav-logout-text {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
         }
     }
-}
     &.layout-vertical .nav-sidebar {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 100% !important;
+        
     }
 
     // 헤더 스타일 (홈 버튼과 컨트롤 버튼)
@@ -757,7 +1146,7 @@
             padding: 0;
             padding: 20px;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--depth-0-bg);
             backdrop-filter: blur(10px);
             // height: var(--topbar-height); // 👈 고정 높이 설정
             min-height: var(--topbar-height); // 👈 최소 높이도 고정
@@ -789,12 +1178,8 @@
                     margin: 0;
                     font-size: 18px;
                     font-weight: 700;
-                    color: var(--text-primary);
+                    color: var(--text-active);
                     letter-spacing: -0.02em;
-                    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
 
                     .nav-title-button {
                         border: none;
@@ -807,16 +1192,16 @@
                         font-size: 18px;
                         font-weight: 700;
                         letter-spacing: -0.02em;
-                        // nav-title의 투명 텍스트 효과 완전히 오버라이드
-                        -webkit-text-fill-color: #1890ff !important;
-                        color: #1890ff !important;
+                        color: var(--text-active) !important;
+                        -webkit-text-fill-color: var(--text-active) !important;
                         background: none !important;
                         -webkit-background-clip: initial !important;
                         background-clip: initial !important;
 
                         &:hover {
-                            color: #096dd9 !important;
-                            -webkit-text-fill-color: #096dd9 !important;
+                            color: var(--text-active) !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            opacity: 0.8;
                             transform: translateX(2px);
                         }
 
@@ -882,20 +1267,40 @@
                             background-color: var(--hover-bg);
                         }
 
+                        // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                        .mx-image-viewer {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 25px;
+                            min-width: 25px;
+                            height: 25px;
+                            flex-shrink: 0;
+                            margin: 0;
+
+                            &.mx-image-viewer-responsive {
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .img-thumbnail {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                                display: block;
+                            }
+                        }
+
                         .horizontal-menu-item-label {
                             margin: 0;
                             font-size: 18px;
                             font-weight: 700;
-                            color: var(--text-primary);
+                            color: var(--text-active);
                             letter-spacing: -0.02em;
-                            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            background-clip: text;
                         }
                         .horizontal-menu-item-arrow {
                             border: none;
-                            background: none;
+                            background: rgba(255, 255, 255, 0.1);
                             padding: 0;
                             cursor: pointer;
                             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -904,18 +1309,21 @@
                             font-size: 18px;
                             font-weight: 700;
                             letter-spacing: -0.02em;
-                            // nav-title의 투명 텍스트 효과 완전히 오버라이드
-                            -webkit-text-fill-color: #1890ff !important;
-                            color: #1890ff !important;
-                            background: none !important;
+                            color: var(--text-active) !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            background: rgba(255, 255, 255, 0.1) !important;
                             -webkit-background-clip: initial !important;
                             background-clip: initial !important;
                             display: flex;
                             align-items: center;
                             justify-content: center;
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 6px;
 
                             svg {
                                 transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                                fill: currentColor;
                             }
 
                             &.expanded svg {
@@ -923,13 +1331,14 @@
                             }
 
                             &:hover {
-                                color: #096dd9 !important;
-                                -webkit-text-fill-color: #096dd9 !important;
-                                transform: translateX(2px);
+                                color: var(--text-active) !important;
+                                -webkit-text-fill-color: var(--text-active) !important;
+                                background: rgba(255, 255, 255, 0.2) !important;
+                                transform: scale(1.1);
                             }
 
                             &:active {
-                                transform: translateX(1px);
+                                transform: scale(0.95);
                             }
 
                             &:focus {
@@ -948,8 +1357,8 @@
                         min-width: 200px;
                         width: auto; // 👈 내용에 맞는 너비
                         max-width: 300px; // 👈 최대 너비 제한
-                        background: white;
-                        border: 1px solid var(--border-color);
+                        background: var(--depth-1-bg);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
                         border-radius: 8px;
                         box-shadow: var(--shadow-lg);
                         margin-top: 8px; // 👈 상단 여백 추가
@@ -972,7 +1381,7 @@
                             position: relative;
                             width: 100%; // 👈 전체 너비 사용하여 세로 배치
                             min-width: 100%; // 👈 최소 너비도 전체 너비
-                            border-bottom: 1px solid rgba(232, 232, 232, 0.5); // 👈 구분선 추가
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.1); // 👈 구분선 추가
                             display: flex; // 👈 flex 추가
                             flex-direction: column; // 👈 세로 방향으로 하위 메뉴가 펼쳐지도록
                             align-items: stretch; // 👈 전체 너비 사용
@@ -990,14 +1399,34 @@
                                     transform: none; // 👈 호버 시 이동하지 않음
                                 }
 
+                                // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                .mx-image-viewer {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 25px;
+                                    min-width: 25px;
+                                    height: 25px;
+                                    flex-shrink: 0;
+                                    margin: 0;
+
+                                    &.mx-image-viewer-responsive {
+                                        position: relative;
+                                        overflow: hidden;
+                                    }
+
+                                    .img-thumbnail {
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: contain;
+                                        display: block;
+                                    }
+                                }
+
                                 .horizontal-menu-item-label {
                                     font-size: 14px;
                                     font-weight: 500;
-                                    background: none;
-                                    -webkit-background-clip: initial;
-                                    -webkit-text-fill-color: initial;
-                                    background-clip: initial;
-                                    color: var(--text-primary);
+                                    color: var(--text-active);
                                 }
                             }
 
@@ -1005,7 +1434,7 @@
                                 background-color: var(--hover-bg);
 
                                 .horizontal-menu-item-label {
-                                    color: var(--theme-color);
+                                    color: var(--text-active);
                                     font-weight: 600;
                                 }
                             }
@@ -1038,8 +1467,7 @@
                                 border: none; // 👈 border 제거
                                 border-radius: 0; // 👈 border-radius 제거
                                 box-shadow: none; // 👈 shadow 제거
-                                // background: transparent; // 👈 배경 투명
-                                background-color: white;
+                                background-color: var(--depth-2-bg);
                                 padding: 0; // 👈 padding 제거
 
                                 // depth-2의 서브메뉴 아이템들 (adminpage, masterpage 등)
@@ -1049,7 +1477,7 @@
 
                                     .horizontal-menu-item-content {
                                         padding-left: 32px; // 👈 더 깊은 들여쓰기
-                                        background: transparent; // 👈 배경 투명
+                                        background-color: var(--depth-2-bg);
                                         border: none; // 👈 border 제거
                                         border-radius: 0; // 👈 border-radius 제거
                                         box-shadow: none; // 👈 shadow 제거
@@ -1059,11 +1487,113 @@
                                         z-index: auto; // 👈 부모 z-index 상속
 
                                         &:hover {
-                                            background: transparent; // 👈 호버 시에도 배경 없음
+                                            background-color: var(--hover-bg);
+                                        }
+
+                                        // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                        .mx-image-viewer {
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            width: 25px;
+                                            min-width: 25px;
+                                            height: 25px;
+                                            flex-shrink: 0;
+                                            margin: 0;
+
+                                            &.mx-image-viewer-responsive {
+                                                position: relative;
+                                                overflow: hidden;
+                                            }
+
+                                            .img-thumbnail {
+                                                width: 100%;
+                                                height: 100%;
+                                                object-fit: contain;
+                                                display: block;
+                                            }
                                         }
 
                                         .horizontal-menu-item-label {
                                             font-size: 13px; // 👈 폰트 크기 약간 작게
+                                        }
+                                    }
+
+                                    // depth-3, depth-4 서브메뉴
+                                    .horizontal-menu-item-submenu {
+                                        background-color: var(--depth-3-bg);
+
+                                        .horizontal-menu-item {
+                                            .horizontal-menu-item-content {
+                                                background-color: var(--depth-3-bg);
+
+                                                &:hover {
+                                                    background-color: var(--hover-bg);
+                                                }
+
+                                                // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                                .mx-image-viewer {
+                                                    display: flex;
+                                                    align-items: center;
+                                                    justify-content: center;
+                                                    width: 25px;
+                                                    min-width: 25px;
+                                                    height: 25px;
+                                                    flex-shrink: 0;
+                                                    margin: 0;
+
+                                                    &.mx-image-viewer-responsive {
+                                                        position: relative;
+                                                        overflow: hidden;
+                                                    }
+
+                                                    .img-thumbnail {
+                                                        width: 100%;
+                                                        height: 100%;
+                                                        object-fit: contain;
+                                                        display: block;
+                                                    }
+                                                }
+                                            }
+
+                                            // depth-4 서브메뉴
+                                            .horizontal-menu-item-submenu {
+                                                background-color: var(--depth-3-bg);
+
+                                                .horizontal-menu-item {
+                                                    .horizontal-menu-item-content {
+                                                        background-color: var(--depth-3-bg);
+
+                                                        &:hover {
+                                                            background-color: var(--hover-bg);
+                                                        }
+
+                                                        // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                                        .mx-image-viewer {
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: center;
+                                                            width: 25px;
+                                                            min-width: 25px;
+                                                            height: 25px;
+                                                            flex-shrink: 0;
+                                                            margin: 0;
+
+                                                            &.mx-image-viewer-responsive {
+                                                                position: relative;
+                                                                overflow: hidden;
+                                                            }
+
+                                                            .img-thumbnail {
+                                                                width: 100%;
+                                                                height: 100%;
+                                                                object-fit: contain;
+                                                                display: block;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -1091,10 +1621,10 @@
                     align-items: center;
                     gap: 8px;
                     padding: 8px 16px;
-                    border: 1px solid var(--border-color);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
                     border-radius: 8px;
-                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-                    color: var(--text-primary);
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+                    color: var(--text-active);
                     font-size: 14px;
                     font-weight: 500;
                     cursor: pointer;
@@ -1108,7 +1638,7 @@
                         width: 16px;
                         height: 16px;
                         flex-shrink: 0;
-                        color: var(--text-primary);
+                        color: var(--text-active);
 
                         svg {
                             width: 16px;
@@ -1121,16 +1651,16 @@
                     }
 
                     &:hover {
-                        border-color: var(--theme-color);
-                        color: var(--theme-color);
-                        background: linear-gradient(135deg, var(--hover-bg) 0%, rgba(24, 144, 255, 0.12) 100%);
-                        transform: translateY(-1px);
-                        box-shadow: var(--shadow-md);
+                        border-color: rgba(255, 255, 255, 0.2);
+                        color: var(--text-active);
+                        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+                        transform: translateX(2px);
+                        box-shadow: var(--shadow-sm);
                     }
 
                     &:active {
-                        transform: translateY(0);
-                        box-shadow: var(--shadow-sm);
+                        transform: translateX(1px);
+                        box-shadow: none;
                     }
 
                     &:focus {
@@ -1140,6 +1670,26 @@
                     }
                 }
 
+                // 햄버거 버튼 (Horizontal 레이아웃)
+                .nav-control-btn.hamburger-btn {
+                    border: none;
+                    background: transparent;
+                    color: var(--text-active);
+                    box-shadow: none;
+
+                    &:hover {
+                        background-color: rgba(255, 255, 255, 0.1);
+                        border-color: transparent;
+                        color: var(--text-active);
+                        transform: none;
+                        box-shadow: none;
+                    }
+
+                    &:active {
+                        transform: scale(0.95);
+                        box-shadow: none;
+                    }
+                }
             }
 
             // 드롭다운 메뉴
@@ -1148,8 +1698,8 @@
                 top: calc(100% + 8px);
                 right: 0;
                 min-width: 160px;
-                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-                border: 1.5px solid var(--border-color);
+                background: var(--depth-1-bg);
+                border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
                 box-shadow: var(--shadow-lg);
                 z-index: 1001;
@@ -1165,10 +1715,10 @@
                     text-align: left;
                     font-size: 14px;
                     font-weight: 500;
-                    color: var(--text-primary);
+                    color: var(--text-active);
                     cursor: pointer;
                     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    border-bottom: 1px solid rgba(232, 232, 232, 0.5);
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
                     &:last-child {
                         border-bottom: none;
@@ -1176,12 +1726,11 @@
 
                     &:hover {
                         background-color: var(--hover-bg);
-                        color: var(--theme-color);
+                        color: var(--text-active);
                     }
 
                     &:active {
-                        background-color: rgba(24, 144, 255, 0.15);
-                        background-color: rgba(36, 39, 108, 0.15);
+                        background-color: rgba(255, 255, 255, 0.15);
                     }
 
                     &:focus {
@@ -1303,166 +1852,704 @@
         }
     }
 
-
-
-
     // Horizontal (Topbar Fullwidth) 스타일 추가
     &.layout-topbar_fullwidth {
-      .nav-topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px;
-        border-bottom: 1px solid var(--border-color);
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        height: var(--topbar-height); // 👈 고정 높이 설정
-        min-height: var(--topbar-height); // 👈 최소 높이도 고정
-        max-height: var(--topbar-height); // 👈 최대 높이도 고정
-        overflow: visible; // 👈 드롭다운이 잘리지 않도록
-        position: fixed; // 👈 fixed로 변경하여 페이지 상단에 고정
-        top: 0; // 👈 상단에 고정
-        left: 0; // 👈 왼쪽에 고정
-        right: 0; // 👈 오른쪽에 고정
-        width: 100%; // 👈 전체 너비
-        z-index: 1000; // 👈 다른 요소 위에 표시
-        
-  
-        .nav-topbar-inner {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          height: 100%;
-          width: 100%;
-          max-width: 1400px;
-        }
-  
-        .nav-topbar-left {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          gap: 16px;
-          flex-shrink: 0;
-  
-          .nav-title{
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-  
-  
-            .nav-title-button{
-              border: none;
-              background: none;
-              padding: 0;
-              cursor: pointer;
-              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-              text-align: left;
-              margin: 0;
-              font-size: 18px;
-              font-weight: 700;
-              letter-spacing: -0.02em;
-              // nav-title의 투명 텍스트 효과 완전히 오버라이드
-              -webkit-text-fill-color: #1890ff !important;
-              color: #1890ff !important;
-              background: none !important;
-              -webkit-background-clip: initial !important;
-              background-clip: initial !important;
-
-              img {
-                height: auto;
-                max-height: 40px;
-                width: auto;
-                display: block;
-              }
-
-              &:has(img) {
-                &:hover {
-                  color: #1890ff !important;
-                  -webkit-text-fill-color: #1890ff !important;
-                  transform: none;
-                }
-              }
-
-              &:not(:has(img)):hover {
-                color: #096dd9 !important;
-                -webkit-text-fill-color: #096dd9 !important;
-                transform: translateX(2px);
-              }
-              
-              &:active {
-                transform: translateX(1px);
-              }
-              
-              &:focus {
-                outline: 2px solid var(--theme-color);
-                outline-offset: 4px;
-                border-radius: 4px;
-              }
-              
-            }
-          }
-        }
-        
-  
-        .nav-topbar-center {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 16px;
-          flex:1;
-          overflow: visible; // 👈 드롭다운이 잘리지 않도록
-          position: static; // 👈 static으로 변경하여 nav-topbar 기준으로 위치
-          z-index: 10000; // 👈 드롭다운이 다른 요소 위에 표시되도록
-          // 가로 메뉴 스타일 추가
-          .horizontal-menu-depth-0 {
-            position: relative;
-            display: flex; // 👈 가로 정렬
-            flex-direction: row; // 👈 가로 방향
-            align-items: center; // 👈 중앙 정렬로 변경하여 높이 고정 유지
-            gap: 8px; // 메뉴 간 간격
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            justify-content: center;
-            padding: 8px 30px;
-            height: 100%; // 👈 부모 높이에 맞춤
+        .nav-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--depth-0-bg);
+            backdrop-filter: blur(10px);
+            height: var(--topbar-height); // 👈 고정 높이 설정
+            min-height: var(--topbar-height); // 👈 최소 높이도 고정
+            max-height: var(--topbar-height); // 👈 최대 높이도 고정
             overflow: visible; // 👈 드롭다운이 잘리지 않도록
-            
-            // 메뉴 아이템 (HOME1, HOME2 등)
-            .horizontal-menu-item {
-              position: relative; // 👈 서브메뉴의 기준점
-              display: flex;
-              flex-direction: column;
-              align-items: flex-start;
-              width: auto; // 👈 자동 너비
-              min-width: fit-content; // 👈 내용에 맞는 최소 너비
-              height: 100%; // 👈 부모 높이에 맞춤 (홈 버튼과 같은 높이 유지)
-              align-self: stretch; // 👈 부모의 높이를 따라감
+            position: fixed; // 👈 fixed로 변경하여 페이지 상단에 고정
+            top: 0; // 👈 상단에 고정
+            left: 0; // 👈 왼쪽에 고정
+            right: 0; // 👈 오른쪽에 고정
+            width: 100%; // 👈 전체 너비
+            z-index: 1000; // 👈 다른 요소 위에 표시
+
+            .nav-topbar-inner {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 100%;
+                width: 100%;
+                max-width: 1400px;
             }
-            
-            .horizontal-menu-item-content{
-              padding: 8px 30px;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              white-space: nowrap;
-              border-radius: 8px;
-              transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-              cursor: pointer;
-              height: 100%; // 👈 부모 높이에 맞춤
-              box-sizing: border-box; // 👈 패딩 포함 높이 계산
-              
-              &:hover {
-                background-color: var(--hover-bg);
-              }
-              
-              .horizontal-menu-item-label{
+
+            .nav-topbar-left {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 16px;
+                flex-shrink: 0;
+
+                .nav-title {
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: var(--text-active);
+                    letter-spacing: -0.02em;
+
+                    .nav-title-button {
+                        border: none;
+                        background: none;
+                        padding: 0;
+                        cursor: pointer;
+                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                        text-align: left;
+                        margin: 0;
+                        font-size: 18px;
+                        font-weight: 700;
+                        letter-spacing: -0.02em;
+                        color: var(--text-active) !important;
+                        -webkit-text-fill-color: var(--text-active) !important;
+                        background: none !important;
+                        -webkit-background-clip: initial !important;
+                        background-clip: initial !important;
+
+                        img {
+                            height: auto;
+                            max-height: 40px;
+                            width: auto;
+                            display: block;
+                        }
+
+                        &:has(img) {
+                            &:hover {
+                                color: var(--text-active) !important;
+                                -webkit-text-fill-color: var(--text-active) !important;
+                                opacity: 0.8;
+                                transform: none;
+                            }
+                        }
+
+                        &:not(:has(img)):hover {
+                            color: var(--text-active) !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            opacity: 0.8;
+                            transform: translateX(2px);
+                        }
+
+                        &:active {
+                            transform: translateX(1px);
+                        }
+
+                        &:focus {
+                            outline: 2px solid var(--theme-color);
+                            outline-offset: 4px;
+                            border-radius: 4px;
+                        }
+                    }
+                }
+            }
+
+            .nav-topbar-center {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                flex: 1;
+                overflow: visible; // 👈 드롭다운이 잘리지 않도록
+                position: static; // 👈 static으로 변경하여 nav-topbar 기준으로 위치
+                z-index: 10000; // 👈 드롭다운이 다른 요소 위에 표시되도록
+                // 가로 메뉴 스타일 추가
+                .horizontal-menu-depth-0 {
+                    position: relative;
+                    display: flex; // 👈 가로 정렬
+                    flex-direction: row; // 👈 가로 방향
+                    align-items: center; // 👈 중앙 정렬로 변경하여 높이 고정 유지
+                    gap: 8px; // 메뉴 간 간격
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    justify-content: center;
+                    padding: 8px 30px;
+                    height: 100%; // 👈 부모 높이에 맞춤
+                    overflow: visible; // 👈 드롭다운이 잘리지 않도록
+
+                    // 메뉴 아이템 (HOME1, HOME2 등)
+                    .horizontal-menu-item {
+                        position: relative; // 👈 서브메뉴의 기준점
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        width: auto; // 👈 자동 너비
+                        min-width: fit-content; // 👈 내용에 맞는 최소 너비
+                        height: 100%; // 👈 부모 높이에 맞춤 (홈 버튼과 같은 높이 유지)
+                        align-self: stretch; // 👈 부모의 높이를 따라감
+                    }
+
+                    .horizontal-menu-item-content {
+                        padding: 8px 30px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        white-space: nowrap;
+                        border-radius: 8px;
+                        transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                        cursor: pointer;
+                        height: 100%; // 👈 부모 높이에 맞춤
+                        box-sizing: border-box; // 👈 패딩 포함 높이 계산
+
+                        &:hover {
+                            background-color: var(--hover-bg);
+                        }
+
+                        // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                        .mx-image-viewer {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 25px;
+                            min-width: 25px;
+                            height: 25px;
+                            flex-shrink: 0;
+                            margin: 0;
+
+                            &.mx-image-viewer-responsive {
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            .img-thumbnail {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                                display: block;
+                            }
+                        }
+
+                        .horizontal-menu-item-label {
+                            margin: 0;
+                            font-size: 18px;
+                            font-weight: 700;
+                            color: var(--text-active);
+                            letter-spacing: -0.02em;
+                        }
+                        .horizontal-menu-item-arrow {
+                            border: none;
+                            background: rgba(255, 255, 255, 0.1);
+                            padding: 0;
+                            cursor: pointer;
+                            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                            text-align: left;
+                            margin: 0;
+                            font-size: 18px;
+                            font-weight: 700;
+                            letter-spacing: -0.02em;
+                            color: var(--text-active) !important;
+                            -webkit-text-fill-color: var(--text-active) !important;
+                            background: rgba(255, 255, 255, 0.1) !important;
+                            -webkit-background-clip: initial !important;
+                            background-clip: initial !important;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 6px;
+
+                            svg {
+                                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                                fill: currentColor;
+                            }
+
+                            &.expanded svg {
+                                transform: rotate(180deg);
+                            }
+
+                            &:hover {
+                                color: var(--text-active) !important;
+                                -webkit-text-fill-color: var(--text-active) !important;
+                                background: rgba(255, 255, 255, 0.2) !important;
+                                transform: scale(1.1);
+                            }
+
+                            &:active {
+                                transform: scale(0.95);
+                            }
+
+                            &:focus {
+                                outline: 2px solid var(--theme-color);
+                                outline-offset: 4px;
+                                border-radius: 4px;
+                            }
+                        }
+                    }
+                    a {
+                        font-size: 18px;
+                        font-weight: 700;
+                        letter-spacing: -0.02em;
+                        color: var(--text-active);
+                        background-color: var(--depth-1-bg);
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100%;
+                        padding: 8px 30px;
+                    }
+
+                    // 서브메뉴 (header1, header2 등) - 전체 너비를 차지하는 박스로 표시
+                    .horizontal-menu-item-submenu {
+                        position: fixed; // 👈 fixed로 변경하여 전체 화면 기준으로 위치
+                        top: var(--topbar-height); // 👈 nav-topbar 높이만큼 아래에 위치
+                        left: 0; // 👈 왼쪽 끝부터
+                        right: 0; // 👈 오른쪽 끝까지
+                        width: 100vw; // 👈 전체 뷰포트 너비 사용
+                        min-height: 200px; // 👈 최소 높이 설정
+                        background: rgba(2, 5, 87, 0.95);
+                        backdrop-filter: blur(10px);
+                        border-top: 1px solid rgba(255, 255, 255, 0.1);
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                        box-shadow: var(--shadow-lg);
+                        z-index: 999; // 👈 다른 요소 위에 표시 (topbar보다 낮게)
+                        list-style: none;
+                        padding: 24px 40px; // 👈 패딩 추가
+                        animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                        display: flex; // 👈 flex 추가
+                        flex-direction: row; // 👈 가로 방향으로 변경하여 HEADER1, HEADER2가 가로로 배치되도록
+                        align-items: flex-start; // 👈 상단 정렬
+                        gap: 40px; // 👈 아이템 간 간격 추가
+                        justify-content: flex-start; // 👈 왼쪽 정렬
+                        box-sizing: border-box; // 👈 패딩 포함 크기 계산
+
+                        .horizontal-menu-item {
+                            position: relative;
+                            width: auto; // 👈 자동 너비
+                            min-width: 200px; // 👈 최소 너비 설정
+                            flex: 0 0 auto; // 👈 flex-shrink와 flex-grow 비활성화
+                            border-bottom: none; // 👈 구분선 제거
+                            display: flex; // 👈 flex 추가
+                            flex-direction: column; // 👈 세로 방향으로 하위 메뉴가 펼쳐지도록
+                            align-items: flex-start; // 👈 왼쪽 정렬
+
+                            .horizontal-menu-item-content {
+                                padding: 12px 16px;
+                                width: 100%; // 👈 전체 너비 사용
+                                min-width: 100%; // 👈 최소 너비도 전체 너비
+                                border-radius: 8px;
+                                margin: 0;
+                                white-space: nowrap; // 👈 텍스트 줄바꿈 방지
+
+                                &:hover {
+                                    background-color: var(--hover-bg);
+                                    transform: none; // 👈 호버 시 이동하지 않음
+                                }
+
+                                // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                .mx-image-viewer {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 25px;
+                                    min-width: 25px;
+                                    height: 25px;
+                                    flex-shrink: 0;
+                                    margin: 0;
+
+                                    &.mx-image-viewer-responsive {
+                                        position: relative;
+                                        overflow: hidden;
+                                    }
+
+                                    .img-thumbnail {
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: contain;
+                                        display: block;
+                                    }
+                                }
+
+                                .horizontal-menu-item-label {
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                    color: var(--text-active);
+                                }
+                            }
+
+                            &.active .horizontal-menu-item-content {
+                                background-color: var(--hover-bg);
+
+                                .horizontal-menu-item-label {
+                                    color: var(--text-active);
+                                    font-weight: 700;
+                                }
+                            }
+
+                            // HEADER1의 하위 메뉴가 펼쳐질 때 HEADER2가 아래로 밀리도록
+                            &.expanded {
+                                width: auto; // 👈 하위 메뉴가 펼쳐질 때 자동 너비
+                                min-width: 200px; // 👈 최소 너비 유지
+                            }
+
+                            // depth-1의 서브메뉴는 세로로 트리 구조처럼 펼쳐짐 (HEADER1의 하위 메뉴)
+                            .horizontal-menu-item-submenu {
+                                position: relative; // 👈 상대 위치로 변경하여 세로로 펼쳐지도록
+                                top: 0; // 👈 top 제거
+                                left: 0; // 👈 왼쪽 정렬
+                                width: 100%; // 👈 전체 너비 사용
+                                margin-left: 0; // 👈 좌측 마진 제거
+                                margin-top: 8px; // 👈 상단 마진 추가
+                                margin-bottom: 0; // 👈 하단 마진 제거
+                                z-index: 1002; // 👈 더 높은 z-index
+                                padding-left: 0; // 👈 들여쓰기 제거
+                                flex-shrink: 0; // 👈 축소되지 않도록
+                                // depth-2 서브메뉴는 border와 shadow 제거
+                                border: none; // 👈 border 제거
+                                border-radius: 0; // 👈 border-radius 제거
+                                box-shadow: none; // 👈 shadow 제거
+                                background-color: var(--depth-2-bg);
+                                padding: 0; // 👈 padding 제거
+
+                                // depth-2의 서브메뉴 아이템들 (adminpage, masterpage 등)
+                                .horizontal-menu-item {
+                                    .horizontal-menu-item-content {
+                                        padding-left: 24px; // 👈 bullet point를 위한 들여쓰기
+                                        background-color: var(--depth-2-bg);
+                                        border: none; // 👈 border 제거
+                                        border-radius: 0; // 👈 border-radius 제거
+                                        box-shadow: none; // 👈 shadow 제거
+                                        position: relative; // 👈 bullet point 위치 기준
+
+                                        // bullet point 추가
+                                        &::before {
+                                            content: "•";
+                                            position: absolute;
+                                            left: 8px;
+                                            color: var(--text-active);
+                                            font-size: 16px;
+                                            line-height: 1;
+                                        }
+
+                                        &:hover {
+                                            background-color: var(--hover-bg);
+
+                                            &::before {
+                                                color: var(--text-active);
+                                            }
+                                        }
+
+                                        // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                        .mx-image-viewer {
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            width: 25px;
+                                            min-width: 25px;
+                                            height: 25px;
+                                            flex-shrink: 0;
+                                            margin: 0;
+
+                                            &.mx-image-viewer-responsive {
+                                                position: relative;
+                                                overflow: hidden;
+                                            }
+
+                                            .img-thumbnail {
+                                                width: 100%;
+                                                height: 100%;
+                                                object-fit: contain;
+                                                display: block;
+                                            }
+                                        }
+
+                                        .horizontal-menu-item-label {
+                                            font-size: 14px; // 👈 폰트 크기
+                                            font-weight: 400;
+                                            color: var(--text-active);
+                                        }
+                                    }
+
+                                    &.active .horizontal-menu-item-content {
+                                        background-color: var(--hover-bg);
+
+                                        &::before {
+                                            color: var(--text-active);
+                                        }
+
+                                        .horizontal-menu-item-label {
+                                            color: var(--text-active);
+                                            font-weight: 600;
+                                        }
+                                    }
+
+                                    // depth-3, depth-4 서브메뉴
+                                    .horizontal-menu-item-submenu {
+                                        background-color: var(--depth-3-bg);
+
+                                        .horizontal-menu-item {
+                                            .horizontal-menu-item-content {
+                                                background-color: var(--depth-3-bg);
+
+                                                &:hover {
+                                                    background-color: var(--hover-bg);
+                                                }
+
+                                                // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                                .mx-image-viewer {
+                                                    display: flex;
+                                                    align-items: center;
+                                                    justify-content: center;
+                                                    width: 25px;
+                                                    min-width: 25px;
+                                                    height: 25px;
+                                                    flex-shrink: 0;
+                                                    margin: 0;
+
+                                                    &.mx-image-viewer-responsive {
+                                                        position: relative;
+                                                        overflow: hidden;
+                                                    }
+
+                                                    .img-thumbnail {
+                                                        width: 100%;
+                                                        height: 100%;
+                                                        object-fit: contain;
+                                                        display: block;
+                                                    }
+                                                }
+                                            }
+
+                                            // depth-4 서브메뉴
+                                            .horizontal-menu-item-submenu {
+                                                background-color: var(--depth-3-bg);
+
+                                                .horizontal-menu-item {
+                                                    .horizontal-menu-item-content {
+                                                        background-color: var(--depth-3-bg);
+
+                                                        &:hover {
+                                                            background-color: var(--hover-bg);
+                                                        }
+
+                                                        // Mendix 이미지 뷰어 스타일 (vertical과 동일)
+                                                        .mx-image-viewer {
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: center;
+                                                            width: 25px;
+                                                            min-width: 25px;
+                                                            height: 25px;
+                                                            flex-shrink: 0;
+                                                            margin: 0;
+
+                                                            &.mx-image-viewer-responsive {
+                                                                position: relative;
+                                                                overflow: hidden;
+                                                            }
+
+                                                            .img-thumbnail {
+                                                                width: 100%;
+                                                                height: 100%;
+                                                                object-fit: contain;
+                                                                display: block;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .horizontal-menu-item-depth-indicator {
+                        padding: 0 16px;
+                    }
+                }
+            }
+
+            .nav-topbar-right {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 16px;
+                flex-shrink: 0;
+                position: absolute;
+                right: 20px;
+
+                .nav-controls {
+                    position: relative;
+                }
+
+                // 로그아웃 버튼 (Topbar Fullwidth 레이아웃)
+                .nav-logout-btn-horizontal {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+                    color: var(--text-active);
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: var(--shadow-sm);
+
+                    .nav-logout-icon {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 16px;
+                        height: 16px;
+                        flex-shrink: 0;
+                        color: var(--text-active);
+
+                        svg {
+                            width: 16px;
+                            height: 16px;
+                        }
+                    }
+
+                    .nav-logout-text {
+                        white-space: nowrap;
+                    }
+
+                    &:hover {
+                        border-color: rgba(255, 255, 255, 0.2);
+                        color: var(--text-active);
+                        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+                        transform: translateX(2px);
+                        box-shadow: var(--shadow-sm);
+                    }
+
+                    &:active {
+                        transform: translateX(1px);
+                        box-shadow: none;
+                    }
+
+                    &:focus {
+                        outline: 2px solid var(--theme-color);
+                        outline-offset: 2px;
+                        border-radius: 8px;
+                    }
+                }
+            }
+
+            // 햄버거 버튼 (기존 nav-control-btn 스타일 확장)
+            .nav-control-btn.hamburger-btn {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                align-items: center;
+                padding: 8px;
+                border: none;
+                background: transparent;
+                color: var(--text-active);
+                box-shadow: none;
+
+                .hamburger-line {
+                    width: 18px;
+                    height: 2.5px;
+                    background-color: currentColor;
+                    border-radius: 2px;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transform-origin: center;
+                }
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-color: transparent;
+                    color: var(--text-active);
+                    transform: none;
+                    box-shadow: none;
+                }
+
+                &:active {
+                    transform: scale(0.95);
+                    box-shadow: none;
+                }
+
+                &.is-open {
+                    .hamburger-line {
+                        &:nth-child(1) {
+                            transform: translateY(6px) rotate(45deg);
+                        }
+
+                        &:nth-child(2) {
+                            opacity: 0;
+                            transform: scaleX(0);
+                        }
+
+                        &:nth-child(3) {
+                            transform: translateY(-6px) rotate(-45deg);
+                        }
+                    }
+                }
+            }
+
+            // 드롭다운 메뉴
+            .nav-dropdown-menu {
+                position: absolute;
+                top: calc(100% + 8px);
+                right: 0;
+                min-width: 160px;
+                background: var(--depth-1-bg);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                box-shadow: var(--shadow-lg);
+                z-index: 1001;
+                overflow: hidden;
+                animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+                .nav-dropdown-item {
+                    display: block;
+                    width: 100%;
+                    padding: 12px 16px;
+                    border: none;
+                    background: transparent;
+                    text-align: left;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: var(--text-active);
+                    cursor: pointer;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    &:hover {
+                        background-color: var(--hover-bg);
+                        color: var(--text-active);
+                    }
+
+                    &:active {
+                        background-color: rgba(255, 255, 255, 0.15);
+                    }
+
+                    &:focus {
+                        outline: 2px solid var(--theme-color);
+                        outline-offset: -2px;
+                    }
+                }
+            }
+
+            @keyframes dropdownFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .nav-title {
                 margin: 0;
                 font-size: 18px;
                 font-weight: 700;
@@ -1472,8 +2559,9 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
-              }
-              .horizontal-menu-item-arrow{
+            }
+
+            .nav-title-button {
                 border: none;
                 background: none;
                 padding: 0;
@@ -1490,471 +2578,117 @@
                 background: none !important;
                 -webkit-background-clip: initial !important;
                 background-clip: initial !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                
-                svg {
-                  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+                img {
+                    height: auto;
+                    max-height: 40px;
+                    width: auto;
+                    display: block;
                 }
-                
-                &.expanded svg {
-                  transform: rotate(180deg);
+
+                &:has(img) {
+                    &:hover {
+                        color: #1890ff !important;
+                        -webkit-text-fill-color: #1890ff !important;
+                        transform: none;
+                    }
                 }
-                
-                &:hover {
-                  color: #096dd9 !important;
-                  -webkit-text-fill-color: #096dd9 !important;
-                  transform: translateX(2px);
+
+                &:not(:has(img)):hover {
+                    color: #096dd9 !important;
+                    -webkit-text-fill-color: #096dd9 !important;
+                    transform: translateX(2px);
                 }
-                
+
                 &:active {
-                  transform: translateX(1px);
+                    transform: translateX(1px);
                 }
-                
+
                 &:focus {
-                  outline: 2px solid var(--theme-color);
-                  outline-offset: 4px;
-                  border-radius: 4px;
+                    outline: 2px solid var(--theme-color);
+                    outline-offset: 4px;
+                    border-radius: 4px;
                 }
-              }
             }
-            a {
-              font-size: 18px;
-              font-weight: 700;
-              // color: var(--text-primary);
-              letter-spacing: -0.02em;
-           
-              color: black;
-              background-color: #d4e6f7;
-              margin: 0;
-              padding: 0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 100%;
-              padding: 8px 30px;
-            }
-            
-            // 서브메뉴 (header1, header2 등) - 전체 너비를 차지하는 박스로 표시
-            .horizontal-menu-item-submenu {
-              position: fixed; // 👈 fixed로 변경하여 전체 화면 기준으로 위치
-              top: var(--topbar-height); // 👈 nav-topbar 높이만큼 아래에 위치
-              left: 0; // 👈 왼쪽 끝부터
-              right: 0; // 👈 오른쪽 끝까지
-              width: 100vw; // 👈 전체 뷰포트 너비 사용
-              min-height: 200px; // 👈 최소 높이 설정
-              background: white;
-              border-top: 1px solid var(--border-color);
-              border-bottom: 1px solid var(--border-color);
-              box-shadow: var(--shadow-lg);
-              z-index: 999; // 👈 다른 요소 위에 표시 (topbar보다 낮게)
-              list-style: none;
-              padding: 24px 40px; // 👈 패딩 추가
-              animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-              display: flex; // 👈 flex 추가
-              flex-direction: row; // 👈 가로 방향으로 변경하여 HEADER1, HEADER2가 가로로 배치되도록
-              align-items: flex-start; // 👈 상단 정렬
-              gap: 40px; // 👈 아이템 간 간격 추가
-              justify-content: flex-start; // 👈 왼쪽 정렬
-              box-sizing: border-box; // 👈 패딩 포함 크기 계산
-              
-              .horizontal-menu-item {
-                position: relative;
-                width: auto; // 👈 자동 너비
-                min-width: 200px; // 👈 최소 너비 설정
-                flex: 0 0 auto; // 👈 flex-shrink와 flex-grow 비활성화
-                border-bottom: none; // 👈 구분선 제거
-                display: flex; // 👈 flex 추가
-                flex-direction: column; // 👈 세로 방향으로 하위 메뉴가 펼쳐지도록
-                align-items: flex-start; // 👈 왼쪽 정렬
-                
-                .horizontal-menu-item-content {
-                  padding: 12px 16px;
-                  width: 100%; // 👈 전체 너비 사용
-                  min-width: 100%; // 👈 최소 너비도 전체 너비
-                  border-radius: 8px;
-                  margin: 0;
-                  white-space: nowrap; // 👈 텍스트 줄바꿈 방지
-                  
-                  &:hover {
-                    background-color: var(--hover-bg);
-                    transform: none; // 👈 호버 시 이동하지 않음
-                  }
-                  
-                  .horizontal-menu-item-label {
-                    font-size: 16px;
-                    font-weight: 600;
-                    background: none;
-                    -webkit-background-clip: initial;
-                    -webkit-text-fill-color: initial;
-                    background-clip: initial;
-                    color: var(--text-primary);
-                  }
-                }
-                
-                &.active .horizontal-menu-item-content {
-                  background-color: var(--hover-bg);
-                  
-                  .horizontal-menu-item-label {
-                    color: var(--theme-color);
-                    font-weight: 700;
-                  }
-                }
-                
-                // HEADER1의 하위 메뉴가 펼쳐질 때 HEADER2가 아래로 밀리도록
-                &.expanded {
-                  width: auto; // 👈 하위 메뉴가 펼쳐질 때 자동 너비
-                  min-width: 200px; // 👈 최소 너비 유지
-                }
-                
-                // depth-1의 서브메뉴는 세로로 트리 구조처럼 펼쳐짐 (HEADER1의 하위 메뉴)
-                .horizontal-menu-item-submenu {
-                  position: relative; // 👈 상대 위치로 변경하여 세로로 펼쳐지도록
-                  top: 0; // 👈 top 제거
-                  left: 0; // 👈 왼쪽 정렬
-                  width: 100%; // 👈 전체 너비 사용
-                  margin-left: 0; // 👈 좌측 마진 제거
-                  margin-top: 8px; // 👈 상단 마진 추가
-                  margin-bottom: 0; // 👈 하단 마진 제거
-                  z-index: 1002; // 👈 더 높은 z-index
-                  padding-left: 0; // 👈 들여쓰기 제거
-                  flex-shrink: 0; // 👈 축소되지 않도록
-                  // depth-2 서브메뉴는 border와 shadow 제거
-                  border: none; // 👈 border 제거
-                  border-radius: 0; // 👈 border-radius 제거
-                  box-shadow: none; // 👈 shadow 제거
-                  background: transparent; // 👈 배경 투명
-                  padding: 0; // 👈 padding 제거
-                  
-                  // depth-2의 서브메뉴 아이템들 (adminpage, masterpage 등)
-                  .horizontal-menu-item {
-                    .horizontal-menu-item-content {
-                      padding-left: 24px; // 👈 bullet point를 위한 들여쓰기
-                      background: transparent; // 👈 배경 투명
-                      border: none; // 👈 border 제거
-                      border-radius: 0; // 👈 border-radius 제거
-                      box-shadow: none; // 👈 shadow 제거
-                      position: relative; // 👈 bullet point 위치 기준
-                      
-                      // bullet point 추가
-                      &::before {
-                        content: '•';
-                        position: absolute;
-                        left: 8px;
-                        color: var(--text-secondary);
-                        font-size: 16px;
-                        line-height: 1;
-                      }
-                      
-                      &:hover {
-                        background: transparent; // 👈 호버 시에도 배경 없음
-                        
-                        &::before {
-                          color: var(--theme-color);
-                        }
-                      }
-                      
-                      .horizontal-menu-item-label {
-                        font-size: 14px; // 👈 폰트 크기
-                        font-weight: 400;
-                        color: var(--text-secondary);
-                      }
-                    }
-                    
-                    &.active .horizontal-menu-item-content {
-                      background: transparent;
-                      
-                      &::before {
-                        color: var(--theme-color);
-                      }
-                      
-                      .horizontal-menu-item-label {
-                        color: var(--theme-color);
-                        font-weight: 600;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            
-            .horizontal-menu-item-depth-indicator{
-              padding: 0 16px;
-            }
-          }
-  
         }
-  
-        .nav-topbar-right {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 16px;
-          flex-shrink: 0;
-          position: absolute;
-          right: 20px;
-  
-          .nav-controls {
-            position: relative;
-          }
 
-          // 로그아웃 버튼 (Topbar Fullwidth 레이아웃)
-          .nav-logout-btn-horizontal {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
+       
 
-            .nav-logout-icon {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 16px;
-              height: 16px;
-              flex-shrink: 0;
-              color: var(--text-primary);
-
-              svg {
-                width: 16px;
-                height: 16px;
-              }
-            }
-
-            .nav-logout-text {
-              white-space: nowrap;
-            }
-
-            &:hover {
-              border-color: var(--theme-color);
-              color: var(--theme-color);
-              background: linear-gradient(135deg, var(--hover-bg) 0%, rgba(24, 144, 255, 0.12) 100%);
-              transform: translateY(-1px);
-              box-shadow: var(--shadow-md);
-            }
-
-            &:active {
-              transform: translateY(0);
-              box-shadow: var(--shadow-sm);
-            }
-
-            &:focus {
-              outline: 2px solid var(--theme-color);
-              outline-offset: 2px;
-              border-radius: 8px;
-            }
-          }
-        }
-  
-        // 햄버거 버튼 (기존 nav-control-btn 스타일 확장)
-        .nav-control-btn.hamburger-btn {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-around;
-          align-items: center;
-          padding: 8px;
-  
-          .hamburger-line {
-            width: 18px;
-            height: 2.5px;
-            background-color: currentColor;
-            border-radius: 2px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: center;
-          }
-  
-          &.is-open {
-            .hamburger-line {
-              &:nth-child(1) {
-                transform: translateY(6px) rotate(45deg);
-              }
-  
-              &:nth-child(2) {
-                opacity: 0;
-                transform: scaleX(0);
-              }
-  
-              &:nth-child(3) {
-                transform: translateY(-6px) rotate(-45deg);
-              }
-            }
-          }
-        }
-  
-        // 드롭다운 메뉴
-        .nav-dropdown-menu {
-          position: absolute;
-          top: calc(100% + 8px);
-          right: 0;
-          min-width: 160px;
-          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-          border: 1.5px solid var(--border-color);
-          border-radius: 8px;
-          box-shadow: var(--shadow-lg);
-          z-index: 1001;
-          overflow: hidden;
-          animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
-          .nav-dropdown-item {
-            display: block;
+        // Mega Menu 스타일 (Topbar Fullwidth 레이아웃)
+        .mega-menu {
             width: 100%;
-            padding: 12px 16px;
-            border: none;
-            background: transparent;
-            text-align: left;
-            font-size: 14px;
+            position: fixed; // topbar 아래에 고정
+            top: var(--topbar-height);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #eee;
             font-weight: 500;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border-bottom: 1px solid rgba(232, 232, 232, 0.5);
-  
-            &:last-child {
-              border-bottom: none;
+            z-index: 999; // topbar보다 낮게
+
+            .mega-submenu-area {
+                position: relative;
+                display: block;
+                width: 100%;
+                min-height: 100px;
+                padding: 16px 0;
             }
-  
-            &:hover {
-              background-color: var(--hover-bg);
-              color: var(--theme-color);
+
+            .mega-submenu-column {
+                .mega-submenu {
+                    list-style: none;
+                    margin: 0;
+                    padding: 0 16px;
+
+                    .mega-submenu-item {
+                        background: none;
+                        border: none;
+                        padding: 8px;
+                        cursor: pointer;
+                        color: var(--text-secondary);
+
+                        &:hover {
+                            color: var(--theme-color);
+                        }
+                    }
+                }
             }
-  
-            &:active {
-              background-color: rgba(24, 144, 255, 0.15);
-            }
-  
-            &:focus {
-              outline: 2px solid var(--theme-color);
-              outline-offset: -2px;
-            }
-          }
         }
-  
-        @keyframes dropdownFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-  
-        .nav-title {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-          background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-  
-        .nav-title-button {
-          border: none;
-          background: none;
-          padding: 0;
-          cursor: pointer;
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-          text-align: left;
-          margin: 0;
-          font-size: 18px;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-          // nav-title의 투명 텍스트 효과 완전히 오버라이드
-          -webkit-text-fill-color: #1890ff !important;
-          color: #1890ff !important;
-          background: none !important;
-          -webkit-background-clip: initial !important;
-          background-clip: initial !important;
-
-          img {
-            height: auto;
-            max-height: 40px;
-            width: auto;
-            display: block;
-          }
-
-          &:has(img) {
-            &:hover {
-              color: #1890ff !important;
-              -webkit-text-fill-color: #1890ff !important;
-              transform: none;
-            }
-          }
-
-          &:not(:has(img)):hover {
-            color: #096dd9 !important;
-            -webkit-text-fill-color: #096dd9 !important;
-            transform: translateX(2px);
-          }
-          
-          &:active {
-            transform: translateX(1px);
-          }
-          
-          &:focus {
-            outline: 2px solid var(--theme-color);
-            outline-offset: 4px;
-            border-radius: 4px;
-          }
-        }
-      }
-
-      // Mega Menu 스타일 (Topbar Fullwidth 레이아웃)
-      .mega-menu {
-        width: 100%;
-        position: fixed; // topbar 아래에 고정
-        top: var(--topbar-height);
-        left: 0;
-        right: 0;
-        background: #fff;
-        border-top: 1px solid #eee;
-        font-weight: 500;
-        z-index: 999; // topbar보다 낮게
-
-        .mega-submenu-area {
-          position: relative;
-          display: block;
-          width: 100%;
-          min-height: 100px;
-          padding: 16px 0;
-        }
-
-        .mega-submenu-column {
-          .mega-submenu {
-            list-style: none;
-            margin: 0;
-            padding: 0 16px;
-
-            .mega-submenu-item {
-              background: none;
-              border: none;
-              padding: 8px;
-              cursor: pointer;
-              color: var(--text-secondary);
-
-              &:hover {
-                color: var(--theme-color);
-              }
-            }
-          }
-        }
-      }
     }
-  }
+    .nav-tabs {
+        display: flex;
+        height: 30px;
+    }
 
+    .nav-tab {
+        flex: 1;
+        background: var(--tab);
+        border: none;
+        cursor: pointer;
 
+        color: var(--text-active);
+        font-size: 14px;
+        padding: 0 14px; /* ⭐ height와 맞춤 */
+        height: 100%;
 
+        border-radius: 12px 12px 0 0;
+        transition: background 0.2s ease, color 0.2s ease;
 
+        &:hover {
+            background: var(--tab-hover);
+        }
+
+        &.active {
+            font-weight: 600;
+            z-index: 2;
+        }
+    }
+    .nav-sidebar.collapsed {
+        .nav-tabs {
+            min-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+    }
+}

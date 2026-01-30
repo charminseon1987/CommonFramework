@@ -28,6 +28,9 @@ export interface MenuItemData {
 
     // Mendix Object
     guid?: string;
+
+    // 북마크 모드에서 원본 메뉴 ID (pageURL 복원용)
+    originalMenuId?: string;
 }
 
 /**
@@ -98,4 +101,40 @@ export interface ImageInfo {
     publicThumbnailPath?: string; // PublicThumbnailPath가 있으면 우선 사용
 }
 
+/**
+ * 북마크 편집 모드 상태
+ */
+export type BookmarkEditMode = "view" | "edit";
 
+/**
+ * 북마크 구조 JSON 저장용 타입
+ */
+export interface BookmarkStructure {
+    items: BookmarkStructureItem[];
+}
+
+/**
+ * 북마크 구조 항목
+ */
+export interface BookmarkStructureItem {
+    menuId: string;
+    menuName: string;
+    parentId: string | null;
+    depth: number;
+    sortNo: number;
+    leftNo: number; // Nested Set Model 좌측 번호 (위젯에서 계산)
+    rightNo: number; // Nested Set Model 우측 번호 (위젯에서 계산)
+    isFolder?: boolean;
+    originalMenuId?: string; // 원본 메뉴 ID (폴더가 아닌 경우)
+}
+
+/**
+ * 북마크 폴더 생성용 타입
+ */
+export interface BookmarkFolder {
+    folderId: string;
+    folderName: string;
+    parentId: string | null;
+    depth: number;
+    sortNo: number;
+}

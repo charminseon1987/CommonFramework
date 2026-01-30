@@ -1,5 +1,5 @@
 // src/BangarlabDynamicNavigation.tsx
-import { ReactElement, createElement, useState, useEffect } from "react";
+import { ReactElement, createElement, useState, useEffect, useRef, useMemo } from "react";
 import classNames from "classnames";
 import { DynamicNavigationContainerProps } from "./types/widget.types";
 import { NavigationMenu } from "./components/NavigationMenu";
@@ -13,10 +13,21 @@ import { useMenuPositions } from "./hooks/useMenuPositions";
 import { useMenuExpand } from "./hooks/useMenuExpand";
 import { useMenuNavigation } from "./hooks/useMenuNavigation";
 import { useHomeNavigation } from "./hooks/useHomeNavigation";
-import { loadCollapsedState, saveCollapsedState } from "./utils/menuHelpers";
+import {
+    loadCollapsedState,
+    saveCollapsedState,
+    loadExpandedMenuIds,
+    restoreMenuExpansion,
+    expandAllMenus,
+    buildMenuTree
+} from "./utils/menuHelpers";
+import { MenuTreeNode } from "./types/menu.types";
 import HamburgerButton from "./components/HamburgerButton";
 import LogoutButton from "./components/LogoutButton";
 import NavigationTab, { NavigationTabKey } from "./components/NavigationTab";
+import BookmarkSettingsButton from "./components/BookmarkSettingsButton";
+import { BookmarkEditModal } from "./components/BookmarkEditModal";
+import { useBookmarkEdit } from "./hooks/useBookmarkEdit";
 // import logoImage from "./assets/logo.png";
 
 export function DynamicNavigation(props: DynamicNavigationContainerProps): ReactElement {
@@ -27,15 +38,41 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     const [isAllExpanded, setIsAllExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState<NavigationTabKey>("all");
+    const originalAriaExpandedRef = useRef<string | null>(null);
+    const originalCollapsedStateRef = useRef<boolean | null>(null);
+
     const menuData = useMenuData(props, activeTab);
     const { state, setState } = useNavigationState(menuData);
+
+    // 전체 메뉴 트리 데이터 (메뉴 추가용)
+    const allMenuData = useMenuData(props, "all");
+    const [allMenuTree, setAllMenuTree] = useState<MenuTreeNode[]>([]);
+    useEffect(() => {
+        if (allMenuData) {
+            const tree = buildMenuTree(allMenuData);
+            setAllMenuTree(tree);
+        }
+    }, [allMenuData]);
+
+    // 북마크 편집 hook
+    const bookmarkTree = useMemo(() => {
+        return activeTab === "bookmark" ? state.menuTree : [];
+    }, [activeTab, state.menuTree]);
+    const bookmarkEdit = useBookmarkEdit({
+        initialTree: bookmarkTree,
+        onSave: props.onBookmarkReorganize
+    });
+
     /* ------------------------------------------------------------------
      * hooks
      * ------------------------------------------------------------------ */
     // const { toggleExpand, toggleExpandHorizontal, expandAll, collapseAll } = useMenuExpand(setState, setIsAllExpanded);
-    const { toggleExpand, toggleExpandHorizontal } = useMenuExpand(setState, setIsAllExpanded);
+    const { toggleExpand, toggleExpandHorizontal, toggleExpandHorizontalAll } = useMenuExpand(
+        setState,
+        setIsAllExpanded
+    );
 
-    const { navigate } = useMenuNavigation(props);
+    const { navigate } = useMenuNavigation(props, setState);
     const homeNavigationHandler = useHomeNavigation(setState);
 
     // 홈 버튼 클릭 핸들러 (collapsed 상태 유지)
@@ -58,8 +95,256 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
             // localStorage에서 저장된 collapsed 상태 복원 (값이 없으면 false)
             const savedCollapsedState = loadCollapsedState();
             setIsCollapsed(savedCollapsedState);
+
+            let clickHandler: ((e: MouseEvent) => void) | null = null;
+            let buttonElement: HTMLButtonElement | null = null;
+
+            // 호버 전 초기 collapsed 상태 저장 - 실제 DOM 상태 확인
+            // DOM이 준비된 후 실제 상태를 확인하여 저장
+            const timeoutId = setTimeout(() => {
+                if (originalCollapsedStateRef.current === null) {
+                    const button = findSidebarToggleButton();
+                    const scrollContainer = findScrollContainer();
+
+                    let actualCollapsedState = true; // 기본값: collapsed 상태
+
+                    // 버튼의 aria-expanded 속성 확인
+                    if (button) {
+                        const ariaExpanded = button.getAttribute("aria-expanded");
+                        // aria-expanded="false"이면 collapsed 상태(true)
+                        // aria-expanded="true"이면 expanded 상태(false)
+                        if (ariaExpanded === "true") {
+                            actualCollapsedState = false;
+                        } else {
+                            actualCollapsedState = true;
+                        }
+                    }
+
+                    // 스크롤 컨테이너의 mx-scrollcontainer-open 클래스 확인
+                    if (scrollContainer) {
+                        const hasOpenClass = scrollContainer.classList.contains("mx-scrollcontainer-open");
+                        // mx-scrollcontainer-open 클래스가 없으면 collapsed 상태(true)
+                        // mx-scrollcontainer-open 클래스가 있으면 expanded 상태(false)
+                        if (hasOpenClass) {
+                            actualCollapsedState = false;
+                        } else {
+                            actualCollapsedState = true;
+                        }
+                    }
+
+                    // 버튼과 스크롤 컨테이너를 모두 찾지 못한 경우 localStorage 값 사용
+                    if (!button && !scrollContainer) {
+                        actualCollapsedState =
+                            savedCollapsedState !== null && savedCollapsedState !== undefined
+                                ? savedCollapsedState
+                                : true;
+                    }
+
+                    originalCollapsedStateRef.current = actualCollapsedState;
+                }
+
+                // 토글바 버튼 클릭 이벤트 리스너 추가 (토글 기능)
+                buttonElement = findSidebarToggleButton();
+                if (buttonElement) {
+                    clickHandler = (e: MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // 현재 상태를 확인하고 토글
+                        // isCollapsed가 true이면 false로, false이면 true로 변경
+                        setIsCollapsed(prevCollapsed => {
+                            const newCollapsed = !prevCollapsed;
+
+                            // localStorage에 새 상태 저장
+                            saveCollapsedState(newCollapsed);
+
+                            // originalCollapsedStateRef도 업데이트 (호버 해제 시 올바른 상태로 복원)
+                            originalCollapsedStateRef.current = newCollapsed;
+
+                            // 스크롤 컨테이너 클래스 토글
+                            const scrollContainer = findScrollContainer();
+                            if (scrollContainer) {
+                                if (newCollapsed) {
+                                    scrollContainer.classList.remove("mx-scrollcontainer-open");
+                                } else {
+                                    scrollContainer.classList.add("mx-scrollcontainer-open");
+                                }
+                            }
+
+                            // aria-expanded 속성 토글
+                            if (buttonElement) {
+                                buttonElement.setAttribute("aria-expanded", newCollapsed ? "false" : "true");
+                            }
+
+                            return newCollapsed;
+                        });
+                    };
+
+                    buttonElement.addEventListener("click", clickHandler, true); // capture phase에서 처리
+                }
+            }, 100); // DOM이 준비될 때까지 약간의 지연
+
+            // cleanup 함수
+            return () => {
+                clearTimeout(timeoutId);
+                if (buttonElement && clickHandler) {
+                    buttonElement.removeEventListener("click", clickHandler, true);
+                }
+            };
         }
     }, [props.layout]);
+
+    /* ------------------------------------------------------------------
+     * 사이드바 호버 시 sidebarToggle3 버튼의 aria-expanded 제어
+     * ------------------------------------------------------------------ */
+    const findSidebarToggleButton = (): HTMLButtonElement | null => {
+        // 여러 방법으로 버튼 찾기 시도
+        const selectors = [
+            'button[data-button-id="l.Atlas_Core.Atlas_Default.sidebarToggle3"]',
+            "button.mx-name-sidebarToggle3",
+            'button[class*="sidebarToggle3"]',
+            'button[aria-controls*="toggleable"]',
+            'button.toggle-btn[aria-haspopup="menu"]'
+        ];
+
+        for (const selector of selectors) {
+            const button = document.querySelector<HTMLButtonElement>(selector);
+            if (button) {
+                return button;
+            }
+        }
+
+        // 모든 버튼을 순회하며 sidebarToggle3가 포함된 버튼 찾기
+        const allButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("button"));
+        for (const button of allButtons) {
+            const className = button.className || "";
+            const dataButtonId = button.getAttribute("data-button-id") || "";
+            if (className.includes("sidebarToggle3") || dataButtonId.includes("sidebarToggle3")) {
+                return button;
+            }
+        }
+
+        return null;
+    };
+
+    const findScrollContainer = (): HTMLElement | null => {
+        // mx-scrollcontainer 요소 찾기
+        const containers = document.querySelectorAll<HTMLElement>(".mx-scrollcontainer");
+        for (const container of Array.from(containers)) {
+            // aria-controls에 toggleable이 포함된 컨테이너 찾기
+            const button = findSidebarToggleButton();
+            if (button) {
+                const ariaControls = button.getAttribute("aria-controls");
+                if (ariaControls && container.id === ariaControls) {
+                    return container;
+                }
+            }
+            // 또는 sidebarToggle3 버튼과 관련된 컨테이너 찾기
+            if (
+                container.classList.contains("mx-scrollcontainer-horizontal") &&
+                container.classList.contains("mx-scrollcontainer-fixed")
+            ) {
+                return container;
+            }
+        }
+        return null;
+    };
+
+    const handleSidebarMouseEnter = () => {
+        // 원래 collapsed 상태가 저장되지 않았을 경우 안전장치 (이미 useEffect에서 저장되어야 함)
+        if (originalCollapsedStateRef.current === null) {
+            // 안전장치: 현재 상태를 저장 (null이면 true로 저장)
+            originalCollapsedStateRef.current = isCollapsed !== null && isCollapsed !== undefined ? isCollapsed : true;
+        }
+
+        // 사이드바 펼치기 (collapsed 상태인 경우에만)
+        if (isCollapsed) {
+            setIsCollapsed(false);
+        } else {
+        }
+
+        // localStorage에서 확장 상태 복원
+        const savedExpandedIds = loadExpandedMenuIds();
+        if (savedExpandedIds.length > 0) {
+            setState(prev => ({
+                ...prev,
+                menuTree: restoreMenuExpansion(prev.menuTree, savedExpandedIds)
+            }));
+        }
+
+        // 약간의 지연을 두고 버튼과 스크롤 컨테이너 찾기 (동적 생성 대응)
+        setTimeout(() => {
+            const button = findSidebarToggleButton();
+            const scrollContainer = findScrollContainer();
+
+            if (button) {
+                // 원래 값 저장 (한 번만 저장)
+                if (originalAriaExpandedRef.current === null) {
+                    originalAriaExpandedRef.current = button.getAttribute("aria-expanded");
+                }
+                // aria-expanded를 true로 설정
+                button.setAttribute("aria-expanded", "true");
+            } else {
+            }
+
+            // mx-scrollcontainer-open 클래스 추가
+            if (scrollContainer) {
+                if (!scrollContainer.classList.contains("mx-scrollcontainer-open")) {
+                    scrollContainer.classList.add("mx-scrollcontainer-open");
+                } else {
+                }
+            } else {
+            }
+        }, 10);
+    };
+
+    const handleSidebarMouseLeave = () => {
+        const button = findSidebarToggleButton();
+        const scrollContainer = findScrollContainer();
+
+        // 원래 collapsed 상태로 복원
+        if (originalCollapsedStateRef.current !== null) {
+            const shouldBeCollapsed = originalCollapsedStateRef.current;
+
+            setIsCollapsed(shouldBeCollapsed);
+
+            // mx-scrollcontainer-open 클래스 제거/유지 (원래 상태에 따라)
+            if (scrollContainer) {
+                if (shouldBeCollapsed === true) {
+                    // 원래 collapsed 상태였으면 클래스 제거
+                    scrollContainer.classList.remove("mx-scrollcontainer-open");
+                } else {
+                    // 원래 펼쳐진 상태였으면 클래스 유지
+                    if (!scrollContainer.classList.contains("mx-scrollcontainer-open")) {
+                        scrollContainer.classList.add("mx-scrollcontainer-open");
+                    }
+                }
+            }
+        } else {
+        }
+
+        if (button) {
+            // 원래 값으로 복원
+            if (originalAriaExpandedRef.current === null) {
+                // 원래 속성이 없었던 경우 제거
+                button.removeAttribute("aria-expanded");
+            } else {
+                // 원래 값으로 복원
+                button.setAttribute("aria-expanded", originalAriaExpandedRef.current);
+            }
+        }
+
+        // 모든 하위 메뉴 닫기 (최상단 depth만 남기기)
+        // localStorage에는 저장하지 않음 (원래 확장 상태는 유지되어야 함)
+        setState(prev => ({
+            ...prev,
+            menuTree: expandAllMenus(prev.menuTree, false)
+        }));
+
+        // ref 초기화 (다음 호버를 위해)
+        originalCollapsedStateRef.current = null;
+        originalAriaExpandedRef.current = null;
+    };
 
     const handleUncollapse = () => {
         setIsCollapsed(false);
@@ -95,36 +380,47 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
         props.customClass
     );
 
-    /* ==================================================================
-     * HORIZONTAL (TOPBAR)
-     * ================================================================== */
-    if (props.layout === "horizontal") {
+    const horizontalMenuActionMap = {
+        horizontal: {
+            onToggleExpand: toggleExpandHorizontal,
+            onToggleExpandNormal: toggleExpand
+        },
+
+        topbar_fullwidth: {
+            onToggleExpandAllChildren: toggleExpandHorizontalAll
+        }
+    } as const;
+
+    if (props.layout === "horizontal" || props.layout === "topbar_fullwidth") {
+        const menuActions =
+            props.layout === "topbar_fullwidth"
+                ? horizontalMenuActionMap.topbar_fullwidth
+                : horizontalMenuActionMap.horizontal;
+
         return (
             <div className={containerClasses}>
                 <header className="nav-topbar" role="navigation">
                     <div className="nav-topbar-inner">
                         {/* 왼쪽 : 홈 */}
                         <div className="nav-topbar-left">
-                            <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                                {/* <img src={logoImage} alt="logo" /> */}
-                            </button>
+                            <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button" />
                         </div>
 
                         {/* 중앙 : depth 0 메뉴 */}
                         <nav className="nav-topbar-center">
                             <HorizontalNavigationMenu
+                                {...menuActions}
                                 menuItems={state.menuTree}
                                 activeMenuId={state.activeMenuId}
                                 onHorizontalMenuClick={handleHorizontalMenuClick}
-                                onToggleExpand={toggleExpandHorizontal}
-                                onToggleExpandNormal={toggleExpand}
                                 depth={0}
                                 maxDepth={props.maxDepth}
                                 showDepthIndicator={props.showDepthIndicator}
+                                layout={props.layout === "topbar_fullwidth" ? "horizontal-full" : "horizontal"}
                             />
                         </nav>
 
-                        {/* 오른쪽 : 로그아웃 및 전체 펼치기 */}
+                        {/* 오른쪽 */}
                         <div className="nav-topbar-right">
                             {props.onLogout && (
                                 <LogoutButton className="nav-logout-btn-horizontal" onLogout={props.onLogout} />
@@ -133,67 +429,7 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
                         </div>
                     </div>
 
-                    {/* ===============================
-                     * Mega / Full Menu
-                     * =============================== */}
-                    {isAllExpanded && (
-                        <FullMenu
-                            menuTree={state.menuTree}
-                            isOpen={isAllExpanded}
-                            activeMenuId={state.activeMenuId}
-                            menuPositions={menuPositions}
-                            isAllExpanded={isAllExpanded}
-                            onMenuClick={(menuId, pageURL) => {
-                                handleHorizontalMenuClick(menuId, pageURL, false);
-                            }}
-                        />
-                    )}
-                </header>
-            </div>
-        );
-    }
-    /* ==================================================================
-     * TOPBAR FULLWIDTH
-     * ================================================================== */
-
-    if (props.layout === "topbar_fullwidth") {
-        return (
-            <div className={containerClasses}>
-                <header className="nav-topbar" role="navigation">
-                    <div className="nav-topbar-inner">
-                        {/* 왼쪽 : 홈 */}
-                        <div className="nav-topbar-left">
-                            <button className="nav-title nav-title-button" onClick={handleHomeClick} type="button">
-                                {/* <img src={logoImage} alt="logo" /> */}
-                            </button>
-                        </div>
-
-                        {/* 중앙 : depth 0 메뉴 */}
-                        <nav className="nav-topbar-center">
-                            <HorizontalNavigationMenu
-                                menuItems={state.menuTree}
-                                activeMenuId={state.activeMenuId}
-                                onHorizontalMenuClick={handleHorizontalMenuClick}
-                                onToggleExpand={toggleExpandHorizontal}
-                                onToggleExpandNormal={toggleExpand}
-                                depth={0}
-                                maxDepth={props.maxDepth}
-                                showDepthIndicator={props.showDepthIndicator}
-                            />
-                        </nav>
-
-                        {/* 오른쪽 : 로그아웃 및 전체 펼치기 */}
-                        <div className="nav-topbar-right">
-                            {props.onLogout && (
-                                <LogoutButton className="nav-logout-btn-horizontal" onLogout={props.onLogout} />
-                            )}
-                            <HamburgerButton isOpen={isAllExpanded} onClick={() => setIsAllExpanded(prev => !prev)} />
-                        </div>
-                    </div>
-
-                    {/* ===============================
-                     * Mega / Full Menu
-                     * =============================== */}
+                    {/* Mega / Full Menu */}
                     {isAllExpanded && (
                         <FullMenu
                             menuTree={state.menuTree}
@@ -217,24 +453,61 @@ export function DynamicNavigation(props: DynamicNavigationContainerProps): React
     return (
         <div>
             <div className={containerClasses}>
-                <aside className="nav-sidebar" role="navigation">
+                <aside
+                    className={classNames("nav-sidebar", { collapsed: isCollapsed })}
+                    role="navigation"
+                    onMouseEnter={handleSidebarMouseEnter}
+                    onMouseLeave={handleSidebarMouseLeave}
+                >
                     <NavigationTab value={activeTab} onChange={setActiveTab} />
+                    {/* 메뉴 */}
                     <nav className="nav-content">
                         <NavigationMenu
-                            menuItems={state.menuTree}
-                            activeMenuId={state.activeMenuId}
+                            menuItems={activeTab === "bookmark" ? bookmarkEdit.editedTree : state.menuTree}
+                            activeMenuId={activeTab === "bookmark" ? null : state.activeMenuId}
                             onMenuClick={handleMenuClickWrapper}
-                            onToggleExpand={toggleExpand}
+                            onToggleExpand={activeTab === "bookmark" ? bookmarkEdit.toggleExpand : toggleExpand}
                             depth={0}
                             maxDepth={props.maxDepth}
                             showDepthIndicator={props.showDepthIndicator}
                             isCollapsed={isCollapsed}
                             onUncollapse={handleUncollapse}
                         />
-                        <LogoutButton className="nav-logout-btn" onLogout={props.onLogout} />
+                        {activeTab === "bookmark" && (
+                            <BookmarkSettingsButton
+                                isEditMode={bookmarkEdit.isEditMode}
+                                onToggleEditMode={bookmarkEdit.toggleEditMode}
+                            />
+                        )}
+                        <LogoutButton
+                            className={classNames("nav-logout-btn", {
+                                "general-menu-tab": activeTab !== "bookmark"
+                            })}
+                            onLogout={props.onLogout}
+                        />
                     </nav>
                 </aside>
             </div>
+            
+            {/* 북마크 편집 모달 */}
+            {activeTab === "bookmark" && bookmarkEdit.isEditMode && (
+                <BookmarkEditModal
+                    isOpen={bookmarkEdit.isEditMode}
+                    onClose={() => {
+                        bookmarkEdit.handleCancel();
+                    }}
+                    menuTree={bookmarkEdit.editedTree}
+                    fullMenuTree={allMenuTree}
+                    onMoveMenuItem={bookmarkEdit.handleMoveMenuItem}
+                    onRemoveMenuItem={bookmarkEdit.handleRemoveMenuItem}
+                    onCreateFolder={bookmarkEdit.handleCreateFolder}
+                    onAddMenus={bookmarkEdit.handleAddMenus}
+                    onSave={bookmarkEdit.handleSave}
+                    onCancel={bookmarkEdit.handleCancel}
+                    hasChanges={bookmarkEdit.hasChanges}
+                    onUpdateTree={bookmarkEdit.updateTree}
+                />
+            )}
         </div>
     );
 }

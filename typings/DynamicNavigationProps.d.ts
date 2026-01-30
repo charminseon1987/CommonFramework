@@ -27,6 +27,7 @@ export interface DynamicNavigationContainerProps {
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;
+    onBookmarkReorganize?: ActionValue;
     themeColor: string;
     showDepthIndicator: boolean;
     animationDuration: number;
@@ -61,6 +62,7 @@ export interface DynamicNavigationPreviewProps {
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;
+    onBookmarkReorganize: {} | null;
     themeColor: string;
     showDepthIndicator: boolean;
     animationDuration: number | null;

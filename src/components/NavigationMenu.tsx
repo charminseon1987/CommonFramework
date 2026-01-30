@@ -32,7 +32,7 @@ export function NavigationMenu({
     if (!menuItems || menuItems.length === 0) {
         return (
             <div className="nav-empty-state" role="status">
-                <p>사용 가능한 메뉴가 없습니다.</p>
+                <p style={{ color: "white" }}>사용 가능한 메뉴가 없습니다.</p>
             </div>
         );
     }

@@ -8,12 +8,13 @@ interface HorizontalNavigationMenuProps {
     menuItems: MenuTreeNode[];
     activeMenuId: string | null;
     onHorizontalMenuClick: (menuId: string, pageURL: string | undefined, hasChildren: boolean, depth: number) => void;
-    onToggleExpand: (menuId: string) => void;
+    onToggleExpand?: (menuId: string) => void;
     onToggleExpandNormal?: (menuId: string) => void;
+    onToggleExpandAllChildren?: (menuId: string) => void;
     depth: number;
     maxDepth: number;
     showDepthIndicator: boolean;
-    layout?: "vertical" | "horizontal";
+    layout?: "vertical" | "horizontal" | "horizontal-full";
 }
 
 export function HorizontalNavigationMenu({
@@ -22,10 +23,11 @@ export function HorizontalNavigationMenu({
     onHorizontalMenuClick,
     onToggleExpand,
     onToggleExpandNormal,
+    onToggleExpandAllChildren,
     depth = 0,
     maxDepth = 2,
     showDepthIndicator = false,
-    layout = "horizontal"
+    layout
 }: HorizontalNavigationMenuProps): ReactElement {
     if (!menuItems || menuItems.length === 0) {
         return (
@@ -45,6 +47,7 @@ export function HorizontalNavigationMenu({
                     onHorizontalMenuClick={onHorizontalMenuClick}
                     onToggleExpand={onToggleExpand}
                     onToggleExpandNormal={onToggleExpandNormal}
+                    onToggleExpandAllChildren={onToggleExpandAllChildren}
                     depth={depth}
                     maxDepth={maxDepth}
                     showDepthIndicator={showDepthIndicator}

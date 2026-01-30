@@ -9,18 +9,14 @@ export const buildMenuTree = (flatMenu: MenuItemData[]): MenuTreeNode[] => {
     if (!flatMenu || flatMenu.length === 0) {
         return [];
     }
-
     // 활성화되고 표시 가능한 메뉴만 필터링 (홈 메뉴 제외)
     const activeMenus = flatMenu.filter(
         item => item.enabledTF !== false && (!item.displayYn || item.displayYn === "Y") && item.menuName !== "홈" // 홈 메뉴 항목 제외
     );
-
     // SortNo로 정렬
     const sortedMenus = [...activeMenus].sort((a, b) => a.sortNo - b.sortNo);
-
     // Map으로 변환
     const menuMap = new Map<string, MenuTreeNode>();
-
     sortedMenus.forEach(item => {
         // 모든 메뉴는 기본적으로 접힌 상태로 설정
         const shouldExpand = false;
@@ -36,7 +32,6 @@ export const buildMenuTree = (flatMenu: MenuItemData[]): MenuTreeNode[] => {
 
     // 트리 구조 생성
     const rootItems: MenuTreeNode[] = [];
-
     sortedMenus.forEach(item => {
         const node = menuMap.get(item.menuId);
         if (!node) return;
@@ -67,9 +62,7 @@ export const buildMenuTree = (flatMenu: MenuItemData[]): MenuTreeNode[] => {
             }
         });
     };
-
     sortChildren(rootItems);
-
     return rootItems;
 };
 
@@ -93,15 +86,23 @@ export const toggleMenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTree
 
 /**
  * Depth 0 메뉴의 확장 상태 토글 (다른 depth 0 메뉴는 자동으로 닫기)
- * Horizontal 레이아웃에서 사용
+ * Horizontal 레이아웃 및 Vertical 레이아웃의 depth-0 메뉴에서 사용
+ *
+ * 동작:
+ * - 클릭한 메뉴는 토글 (열려있으면 닫고, 닫혀있으면 열기)
+ * - 다른 모든 depth-0 메뉴는 확실하게 닫기 (isExpanded: false)
+ * - 모든 하위 메뉴도 모두 닫기 (expandAllMenus로 재귀적으로 처리)
  */
 export const toggleDepth0MenuExpand = (tree: MenuTreeNode[], menuId: string): MenuTreeNode[] => {
+    const searchId = String(menuId); // 문자열로 변환하여 타입 불일치 문제 해결
+    // tree.map을 사용하여 최상위 레벨의 모든 메뉴를 처리
     return tree.map(item => {
-        if (item.menuId === menuId) {
-            // 클릭한 메뉴는 토글
+        if (String(item.menuId) === searchId) {
+            // 클릭한 메뉴는 토글 (열려있으면 닫고, 닫혀있으면 열기)
             return { ...item, isExpanded: !item.isExpanded };
         } else {
-            // 다른 depth 0 메뉴는 닫기
+            // 다른 모든 depth-0 메뉴는 확실하게 닫기
+            // isExpanded가 이미 false여도 하위 메뉴는 닫아야 함
             return {
                 ...item,
                 isExpanded: false,
@@ -127,11 +128,12 @@ export const toggleSameDepthMenuExpand = (tree: MenuTreeNode[], menuId: string):
     }
 
     const targetDepth = targetNode.depth;
+    const searchId = String(menuId); // 문자열로 변환하여 타입 불일치 문제 해결
 
     // 재귀적으로 트리를 순회하며 같은 depth의 형제 메뉴들을 닫는 함수
     const toggleSameDepth = (nodes: MenuTreeNode[]): MenuTreeNode[] => {
         return nodes.map(item => {
-            if (item.menuId === menuId) {
+            if (String(item.menuId) === searchId) {
                 // 클릭한 메뉴는 토글
                 return {
                     ...item,
@@ -157,10 +159,20 @@ export const toggleSameDepthMenuExpand = (tree: MenuTreeNode[], menuId: string):
             }
         });
     };
-
     return toggleSameDepth(tree);
 };
+export const expandChildrenOfExpandedDepth0 = (tree: MenuTreeNode[]): MenuTreeNode[] => {
+    return tree.map(item => {
+        if (item.isExpanded && item.children.length > 0) {
+            return {
+                ...item,
+                children: expandAllMenus(item.children, true)
+            };
+        }
 
+        return item;
+    });
+};
 /**
  * 모든 메뉴 확장/축소
  */
@@ -209,8 +221,9 @@ export const expandMenuPath = (tree: MenuTreeNode[], path: string[]): MenuTreeNo
  * 메뉴 ID로 노드 찾기
  */
 export const findMenuNode = (tree: MenuTreeNode[], menuId: string): MenuTreeNode | null => {
+    const searchId = String(menuId); // 문자열로 변환하여 타입 불일치 문제 해결
     for (const item of tree) {
-        if (item.menuId === menuId) {
+        if (String(item.menuId) === searchId) {
             return item;
         }
         if (item.children.length > 0) {

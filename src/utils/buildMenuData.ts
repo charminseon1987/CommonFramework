@@ -39,7 +39,13 @@ export default function buildMenuData(
             iconClass: resourceAttrs?.IconClass?.value,
 
             imageInfo,
-            guid: menu.id
+            guid: menu.id,
+            // 북마크 모드에서 DB의 OriginalMenuId 속성 읽기
+            originalMenuId: attrs.OriginalMenuId?.value 
+                ? String(attrs.OriginalMenuId.value) 
+                : (attrs.OriginMenuId?.value 
+                    ? String(attrs.OriginMenuId.value) 
+                    : undefined)
         };
     });
 }
