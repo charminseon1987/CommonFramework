@@ -29,7 +29,7 @@ export default function buildMenuData(
             menuName: String(attrs.MenuName?.value ?? ""),
             parentMenuId: attrs.ParentId?.value ?? null,
             depth: Number(attrs.Depth?.value ?? 0),
-            sortNo: Number(attrs.SortNo?.value ?? 0),
+            sortNo: Number(attrs.ChildSeqNbr?.value ?? 0),
             displayYn: attrs.DisplayYn?.value ?? "Y",
             enabledTF: attrs.EnableTF?.value !== false,
 
