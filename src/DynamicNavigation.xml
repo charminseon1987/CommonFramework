@@ -66,8 +66,8 @@
                 <description>Action when user logged out</description>
             </property>
 
-            <property key="onAuthFailed" type="action" required="false">
-                <caption>On Authorization Failed</caption>
+            <property key="onMenuNoURL" type="action" required="false">
+                <caption>On onMenuNoURL</caption>
                 <description>Action when user lacks permission</description>
             </property>
 
