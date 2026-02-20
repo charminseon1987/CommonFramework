@@ -4,7 +4,7 @@
  * @author Mendix Widgets Framework Team
  */
 import { CSSProperties } from "react";
-import { ActionValue, ListValue } from "mendix";
+import { ActionValue, EditableValue, ListValue, Option } from "mendix";
 
 export type LayoutEnum = "vertical" | "horizontal" | "topbar_fullwidth";
 
@@ -24,6 +24,8 @@ export interface DynamicNavigationContainerProps {
     collapsible: boolean;
     onLogout?: ActionValue;
     onMenuNoURL?: ActionValue;
+    pageUrlToOpen?: EditableValue<string>;
+    onOpenPage?: ActionValue<{ pageURL: Option<string> }>;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;
@@ -59,6 +61,8 @@ export interface DynamicNavigationPreviewProps {
     collapsible: boolean;
     onLogout: {} | null;
     onMenuNoURL: {} | null;
+    pageUrlToOpen: string;
+    onOpenPage: {} | null;
     expandedByDefault: boolean;
     autoExpandActivePath: boolean;
     enableDynamicAuth: boolean;

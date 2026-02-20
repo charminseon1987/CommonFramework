@@ -71,6 +71,21 @@
                 <description>Action when user lacks permission</description>
             </property>
 
+            <property key="pageUrlToOpen" type="attribute" required="false">
+                <caption>Page URL to Open (Attribute fallback)</caption>
+                <description>Bind to DataView String attribute. Use when action variable mapping fails: widget sets value then calls onOpenPage. Microflow argument: $pageContext/PageUrlToOpen. See pageurl_파라미터_매핑_해결 plan.</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+            <property key="onOpenPage" type="action" required="false">
+                <caption>On Open Page (Mendix 11 fallback)</caption>
+                <description>Call microflow when mx.ui.openForm is not available. Receives pageURL (String). Show Page cannot use runtime variables - use Decision chain: $pageURL = 'Module/Page' for each branch, then Show Page. See ON_OPEN_PAGE_DECISION_GUIDE.md.</description>
+                <actionVariables>
+                    <actionVariable key="pageURL" type="String" caption="Page path (e.g. PortalModule/userRegister)" />
+                </actionVariables>
+            </property>
+
             <property key="expandedByDefault" type="boolean" defaultValue="false">
                 <caption>Expanded by Default</caption>
                 <description>Expand all menus on load</description>
