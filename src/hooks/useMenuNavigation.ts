@@ -2,7 +2,7 @@ import { saveActiveMenuId, saveExpandedMenuIds } from "../utils/menuHelpers";
 import { Dispatch, SetStateAction } from "react";
 import { NavigationState } from "../types/menu.types";
 
-/** pageURL → "Module/Page" 형식 정규화 (onOpenPage 마이크로플로우 파라미터용) */
+/** pageURL → "Module/Page" 형식 정규화 */
 function toPagePath(pageURL: string): string {
     if (!pageURL || typeof pageURL !== "string") return pageURL;
     let path = pageURL.trim();
@@ -14,6 +14,12 @@ function toPagePath(pageURL: string): string {
     path = path.replace(/\./g, "/").replace(/\/+$/, "");
 
     return path;
+}
+
+/** openForm2용 pageId: "Module/Page.page.xml" (Resource.PageUrl에 .page.xml만 붙임) */
+function toOpenFormPageId(pagePath: string): string {
+    if (!pagePath) return pagePath;
+    return pagePath.endsWith(".page.xml") ? pagePath : `${pagePath}.page.xml`;
 }
 
 export function useMenuNavigation(
@@ -55,10 +61,29 @@ export function useMenuNavigation(
 
         const mx = (window as any).mx;
 
-        // 1) mx.navigation.navigate 시도 (일부 Mendix 버전)
+        // 1) mx.ui.openForm2 시도 (URL 변경 없이 content 영역만 교체)
+        if (mx?.ui?.openForm2) {
+            try {
+                const pageId = toOpenFormPageId(pagePath);
+                if (props.debugMode) console.log("[useMenuNavigation] openForm2", { pagePath, pageId });
+                mx.ui.openForm2(
+                    pageId,
+                    {},
+                    undefined,
+                    undefined,
+                    { location: "content" },
+                    undefined
+                );
+                props.onMenuClick?.canExecute && props.onMenuClick.execute();
+                return;
+            } catch (err) {
+                console.warn("[useMenuNavigation] mx.ui.openForm2 에러", err);
+            }
+        }
+
+        // 2) mx.navigation.navigate 시도 (일부 Mendix 버전)
         if (mx?.navigation?.navigate) {
             try {
-                console.log("[useMenuNavigation] mx.navigation.navigate 시도", { pagePath });
                 mx.navigation.navigate({ page: pagePath, params: {} });
                 props.onMenuClick?.canExecute && props.onMenuClick.execute();
                 return;
@@ -67,7 +92,7 @@ export function useMenuNavigation(
             }
         }
 
-        // 2) onOpenPage Action (마이크로플로우 Decision + Show Page)
+        // 3) onOpenPage Action (마이크로플로우 Decision + Show Page, fallback)
         if (props.onOpenPage?.canExecute) {
             // Attribute 방식: pageUrlToOpen이 바인딩된 경우 setValue 후 execute (action variable 매핑 실패 시 대안)
             const pageUrlToOpen = props.pageUrlToOpen as { setValue?: (v: string) => void } | undefined;
@@ -81,7 +106,7 @@ export function useMenuNavigation(
             return;
         }
 
-        console.error("[useMenuNavigation] 페이지 열기 실패. onOpenPage 마이크로플로우를 연결하세요.", {
+        console.error("[useMenuNavigation] 페이지 열기 실패. mx.ui.openForm2 미지원 시 onOpenPage 마이크로플로우를 연결하세요.", {
             pagePath,
             onOpenPageExists: !!props.onOpenPage
         });
